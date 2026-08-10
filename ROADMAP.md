@@ -25,6 +25,35 @@ The product has three surfaces:
 
 产品只有三层：面向 Agent/CI 的确定性 CLI、面向人的只读优先工作台，以及脱离本项目仍能使用的 Markdown/JSON Canvas 开放文件。
 
+## North star / 北极星
+
+**Turn an existing Markdown Vault into an inspectable Agent knowledge workspace in under two minutes, without migration or a cloud account.**
+
+**两分钟内把已有 Markdown Vault 变成可检查的 Agent 知识工作台，不迁移数据，不注册云账号。**
+
+The daily loop is deliberately small:
+
+1. Open a Vault and compile its current structure.
+2. Understand relationships and structural health.
+3. Let any coding Agent prepare a file-based proposal.
+4. Review exact text, relationship impact, provenance, and target hashes.
+5. Apply or reject through an explicit human-controlled command.
+6. Keep explaining the result in Obsidian Canvas, Excalidraw, or Mermaid.
+
+日常闭环只有六步：打开并编译、理解关系、Agent 生成提案、人工检查证据、明确应用或拒绝、继续用开放图形格式解释结果。
+
+## Product principles / 产品原则
+
+| Principle | Product consequence |
+| --- | --- |
+| **Files are the product** | Markdown, source notes, proposals, and review records remain readable without LLM Wiki Canvas. |
+| **Agents propose; people decide** | No UI or Skill silently writes formal knowledge. |
+| **Structure before retrieval** | Make relationships, provenance, and drift observable before adding search infrastructure. |
+| **One core, many Agents** | Codex, Claude Code, Qoder, TRAE, and WorkBuddy use the same CLI and repository contract. |
+| **Generated views are replaceable** | Graphs, indexes, Canvas, Excalidraw, and Mermaid outputs can always be rebuilt. |
+
+对应的产品判断是：文件本身可用、Agent 只提案、人负责决定、先解决结构可信度、所有 Agent 共用一个内核、所有生成视图都可以重建。
+
 ## Delivery order / 迭代顺序
 
 | Phase | Outcome | Acceptance criteria | Status |
@@ -36,6 +65,91 @@ The product has three surfaces:
 | **0.2.3 Proposal topology** | See the structural effect before accepting a proposal | Added edges green, changed pages amber, conflicts red; base/proposal hashes visible; empty and conflict states tested | Shipped in current iteration |
 | **0.3 Spatial views** | Generate useful diagrams without locking users in | JSON Canvas remains canonical output; optional Excalidraw export uses its open file format; Mermaid/Markmap are derived views; rebuild never overwrites hand-edited positions silently | Planned |
 | **0.4 Source intake** | Turn selected local material into reviewable wiki drafts | Start with Markdown/text; preserve source path/hash; generated pages stay in `.lwc/drafts`; human-approved proposal required | Planned |
+
+## Execution plan / 执行计划
+
+### Now — 0.3 Spatial explanation / 当前：空间化解释
+
+The next release should make the product useful for explaining a knowledge system, not merely inspecting it.
+
+| Increment | User outcome | In scope | Acceptance gate |
+| --- | --- | --- | --- |
+| **0.3.1 Excalidraw export** | Open a generated relationship view in Excalidraw and continue drawing | `lwc build --excalidraw`; page nodes, typed edges, titles, source paths, deterministic IDs | Valid `.excalidraw` file; repeat build is deterministic; exported content contains no absolute path |
+| **0.3.2 Focused diagrams** | Turn a selected page and its neighborhood into a small explainable diagram | Depth 1–2 selection; direction and page-kind filters; Mermaid and Excalidraw output | Same selection produces equivalent nodes/edges in both formats; empty and broken-link states tested |
+| **0.3.3 Position ownership** | Rebuild without destroying a person's layout work | Preserve known coordinates; place only new nodes; surface removed nodes before deletion | Existing coordinates survive byte-for-byte where schema permits; regression fixture covers add/remove/rebuild |
+
+This phase does **not** add collaborative whiteboards, an Excalidraw editor clone, or AI-generated decorative diagrams.
+
+这一阶段不做多人白板、不复制 Excalidraw 编辑器，也不生成缺乏证据的装饰性图片。
+
+### Next — 0.4 Governed source intake / 下一步：受控资料进入知识库
+
+| Increment | User outcome | In scope | Acceptance gate |
+| --- | --- | --- | --- |
+| **0.4.1 Text intake** | Give an Agent a selected Markdown or text file and receive a reviewable draft | Explicit input allowlist; source path, SHA-256, imported time; `.lwc/drafts` output | Source file remains untouched; every draft names its source and hash; duplicates are reported |
+| **0.4.2 Draft workspace** | Inspect generated pages before they become a formal proposal | Draft list, provenance panel, validation errors, exact target paths | Drafts never appear as formal Map nodes; invalid targets cannot become proposals |
+| **0.4.3 Intake-to-proposal** | Convert an inspected draft into the existing review lifecycle | Create proposal from selected draft; show text and topology delta | Zero Vault change before review; hash drift blocks apply; audit record survives rejection |
+
+PDF, OCR, web crawling, office documents, and bulk folder ingestion stay out until the Markdown/text loop proves useful.
+
+PDF、OCR、网页抓取、Office 文档和整目录批量导入暂不进入这一阶段。
+
+### Then — 0.5 Agent compatibility / 随后：Agent 兼容层
+
+No MCP server is required. The canonical integration is a portable Skill plus the `lwc` CLI.
+
+| Host | Integration | Minimum verification |
+| --- | --- | --- |
+| **Codex** | Repository Skill + `AGENTS.md` | Inspect, lint, create proposal, and show evidence without applying |
+| **Claude Code** | Same Skill contract + `CLAUDE.md` example | Equivalent proposal and source citations from the same fixture |
+| **Qoder / TRAE** | Markdown instruction template + shell commands | No proprietary adapter required for the core loop |
+| **WorkBuddy** | Skill/instruction template with explicit workspace root | Same allowlist, draft boundary, and confirmation behavior |
+
+Acceptance requires a public compatibility matrix with reproducible commands. A host is not marked supported merely because it can read Markdown.
+
+验收必须提供可复现的兼容矩阵；“能读取 Markdown”不等于已经兼容完整提案闭环。
+
+### Release — 0.6 Open-source readiness / 发布：开源可用性
+
+- One command starts the example and one command verifies the repository.
+- npm package smoke tests run on supported Node versions and macOS/Linux CI.
+- English and Chinese quick starts describe the same product boundary.
+- Example data is synthetic, useful, and covered by secret scanning.
+- Contribution templates route feature requests into Map, Health, Changes, Canvas, or Intake.
+- A changelog documents graph, proposal, Canvas, and export schema compatibility.
+
+## Release gates / 发布门槛
+
+Every milestone must preserve these invariants:
+
+| Gate | Required evidence |
+| --- | --- |
+| **Local-first** | Default network access is zero; local server binds loopback only. |
+| **Safe writes** | Formal Markdown is unchanged before explicit review and confirmation. |
+| **Determinism** | Same inputs and fixed timestamps produce identical generated artifacts. |
+| **Provenance** | Material generated content points to source path/hash and lifecycle state. |
+| **Portability** | Generated files use open formats and contain no machine-specific absolute paths. |
+| **Quality** | Core tests, package smoke, secret/dependency audits, and desktop/mobile E2E pass. |
+
+## Success measures / 成功指标
+
+These are verifiable product measures, not invented productivity percentages:
+
+- **Time to first map:** a new contributor can open the example Workbench in under two minutes after dependencies are installed.
+- **Review coverage:** every Agent-authored formal change has a proposal ID, exact diff, target hash, and lifecycle state.
+- **Write safety:** automated tests demonstrate zero formal-file mutation before review and rejection.
+- **Rebuild trust:** tracked fixtures remain deterministic and hand-edited spatial positions survive rebuilds.
+- **Host parity:** supported Agent hosts produce the same proposal semantics from the same public fixture.
+
+这些指标只衡量可复现事实，不宣称未经真实用户研究验证的“节省百分比”。
+
+## Prioritization rule / 排序规则
+
+When choosing between two features, prefer the one that improves the closed loop:
+
+`understand → propose → inspect evidence → decide → rebuild`
+
+Features that mainly increase ingestion breadth, chat capability, or infrastructure complexity wait until they improve this loop with measurable evidence.
 
 ## Interface contract / 界面约定
 
