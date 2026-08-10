@@ -92,15 +92,18 @@ Automation maintains connections; people own spatial layout and final communicat
 
 1. Keep `AGENTS.md` and the `llm-wiki-canvas` Skill in the repository.
 2. Ask the Agent to run `report` and `lint` and describe the current state without editing.
-3. Review the proposed pages and relationship changes before allowing writes.
-4. After edits, rerun `report`, `lint`, and `build`, then inspect source and generated diffs.
+3. Let the Agent write only to `.lwc/drafts/<name>`, then run `proposal create` and `proposal show`.
+4. A person runs `proposal review` or `proposal reject`; only a reviewed proposal can be applied.
+5. After apply, rerun `report`, `lint`, and `build`, then inspect source and generated diffs.
 
 Copy-ready task:
 
 ```text
 Use the llm-wiki-canvas Skill. Run report and lint first, then describe the current page scope, connectivity, source metadata, structural diagnostics, and most-connected pages without editing.
-Propose the Markdown files and relationships that would change. Do not write until I approve. After approval, apply only accepted changes, rerun report, lint, and build, and compare the before and after results.
+Write suggested Markdown only under .lwc/drafts/<name>, create and show an lwc proposal, and stop. Do not modify the formal wiki. After a person reviews or rejects it, apply only the reviewed proposal with the exact ID, then rerun report, lint, and build and compare the results.
 ```
+
+See [Reviewed knowledge changes](proposals.md) for exact commands and security limits.
 
 ### Team CI gate
 

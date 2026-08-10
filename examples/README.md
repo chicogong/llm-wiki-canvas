@@ -24,6 +24,7 @@ Build and check it from the repository root:
 pnpm demo:build
 pnpm lint:demo
 pnpm report:demo
+pnpm proposal:demo
 pnpm dev
 ```
 
@@ -35,6 +36,8 @@ Built 8 files · 16 links · 0 broken
 ```
 
 The report additionally verifies **8 / 8 connected pages**, **2 / 8 pages with source metadata**, and the most-connected pages. It uses observed counts and intentionally does not invent a health score.
+
+`proposal:demo` compares [`proposal-draft`](proposal-draft/) with the formal Atlas Wiki, writes an ignored local proposal, and prints a hash-bound diff. It never applies the example change.
 
 Try these three checks in the Viewer:
 
@@ -93,6 +96,7 @@ lwc lint /path/to/wiki
 pnpm demo:build
 pnpm lint:demo
 pnpm report:demo
+pnpm proposal:demo
 pnpm dev
 ```
 
@@ -104,6 +108,8 @@ Built 8 files · 16 links · 0 broken
 ```
 
 报告还会验证 **8 / 8 个页面已连接**、**2 / 8 个页面声明来源元数据**，并列出高连接页面。它只使用实际观测值，不虚构综合健康分。
+
+`proposal:demo` 会把 [`proposal-draft`](proposal-draft/) 与正式 Atlas Wiki 对比，生成一份被忽略的本地 proposal，并打印绑定哈希的 diff；它不会应用示例修改。
 
 在 Viewer 中可以做三个验证：
 

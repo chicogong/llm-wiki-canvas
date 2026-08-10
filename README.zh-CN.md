@@ -84,7 +84,7 @@ LLM Wiki Canvas 有意只做很小的一层：编译并检查已经存在的 Mar
 | 理解陌生知识库 | 逐页打开并沿链接跳转 | 先看完整关系图，再检查节点及其邻居 |
 | 发现结构问题 | 人工检查链接和文件名 | 执行 `lwc lint`，每条诊断都有错误码和源文件路径 |
 | 制作 Obsidian Canvas | 手工创建、连接和维护节点 | 从 Wiki 生成，并保留后续手工调整的位置 |
-| 让 Agent 参与维护 | 开放较大修改范围，再分散审查 | 把仓库规则和 Agent Skill 与 Markdown 放在一起 |
+| 让 Agent 参与维护 | 开放较大修改范围，再分散审查 | 先隔离草稿，审查绑定哈希的 proposal，再明确 apply |
 | 审查生成变化 | 比较不稳定或不透明的输出 | 对稳定节点、关系 ID 生成的 JSON 做 Git diff |
 | 随时退出工具 | 从数据库导出或迁移 | 原始 Markdown 不受影响，生成视图可随时删除重建 |
 
@@ -133,6 +133,19 @@ Obsidian、QMD、Agent Skill 和 CI 的具体用法见[使用指南](docs/usage.
 
 准确设置、兼容边界、权限建议和可直接复制的任务见[与 AI Agent 配合](docs/ai-agents.zh-CN.md)。本地文件权限加 `lwc` 已经足够，这条工作流不需要 MCP Server。
 
+## 审查 Agent 的知识修改
+
+正式 Markdown 修改现在可以一直留在 Vault 外，直到人接受准确内容：
+
+```bash
+lwc proposal create /path/to/vault --from /path/to/draft --summary "Add reviewed notes"
+lwc proposal show /path/to/proposal.json
+lwc proposal review /path/to/proposal.json --approve <proposal-id> --reviewer "Alice"
+lwc proposal apply /path/to/proposal.json /path/to/vault --confirm <proposal-id>
+```
+
+写入前会检查审批内容、review 记录、目标路径和原文件 SHA-256。源文件被并发修改，或者 proposal 在审批后发生变化，apply 都会失败。拒绝流程、安全边界和可运行示例见[审查式知识修改](docs/proposals.zh-CN.md)。
+
 ## 支持的知识库约定
 
 - Markdown 文件和标题
@@ -151,7 +164,8 @@ flowchart LR
   C --> G["graph.json"]
   C --> J["Obsidian JSON Canvas"]
   G --> V["本地关系 Viewer"]
-  S["Codex / Claude / Qoder / TRAE / WorkBuddy"] --> M
+  S["Codex / Claude / Qoder / TRAE / WorkBuddy"] --> P["Proposal 人工审查门"]
+  P --> M
   S --> C
 ```
 
@@ -163,6 +177,7 @@ Markdown 是长期保存的知识；关系图、Canvas 和 Viewer 数据都是�
 - 生成稳定的节点和关系 ID。
 - 报告断链、歧义链接、缺少标题和孤立页面。
 - 基于实际结构生成 Markdown 或 JSON 健康报告，不虚构综合评分。
+- 在应用 Agent 修改前完成 Markdown 草稿隔离、diff、review、reject 和哈希校验。
 - 生成 Obsidian 兼容 `.canvas` 文件。
 - 重新生成时保留 Canvas 手工位置。
 - 在本地 Viewer 中浏览、搜索、筛选并检查关系。
@@ -180,7 +195,7 @@ pnpm verify
 
 ## 后续方向
 
-下一层会是多格式 Visual Compiler：建立统一视觉中间层，并生成 JSON Canvas、Excalidraw、Markmap 和 Mermaid。Agent 修改采用 `propose → diff → review → apply`，而不是静默改写知识库。
+下一层会是多格式 Visual Compiler：建立统一视觉中间层，并生成 JSON Canvas、Excalidraw、Markmap 和 Mermaid。已经交付的 proposal 生命周期下一步会支持删除、重命名和更强的多文件恢复，同时继续强制人工审查。
 
 另见 [贡献指南](CONTRIBUTING.md)、[安全策略](SECURITY.md)和[变更记录](CHANGELOG.md)。
 

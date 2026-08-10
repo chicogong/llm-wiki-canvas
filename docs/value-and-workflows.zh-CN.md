@@ -92,15 +92,18 @@ pnpm lwc build /path/to/vault \
 
 1. 把 `AGENTS.md` 和 `llm-wiki-canvas` Skill 放进仓库。
 2. 要求 Agent 先运行 `report` 和 `lint`，只读描述现状。
-3. Agent 提出准备修改的页面与关系，人确认后再写入。
-4. 修改后重新执行 `report`、`lint` 和 `build`，检查源文件与生成产物 diff。
+3. Agent 只写 `.lwc/drafts/<name>`，再执行 `proposal create` 和 `proposal show`。
+4. 人执行 `proposal review` 或 `proposal reject`；只有 reviewed proposal 才能 apply。
+5. Apply 后重新执行 `report`、`lint` 和 `build`，检查源文件与生成产物 diff。
 
 可直接复制的任务：
 
 ```text
 使用 llm-wiki-canvas Skill。先运行 report 和 lint，只读说明当前页面规模、连接情况、来源元数据、结构诊断和高连接页面。
-提出准备修改的 Markdown 文件与关系变化，在我确认前不要写文件。确认后只应用批准内容，重新运行 report、lint 和 build，并对比修改前后结果。
+建议 Markdown 只写到 .lwc/drafts/<name>，创建并展示 lwc proposal 后停止，不要修改正式 Wiki。人 review 或 reject 后，只用准确 ID apply reviewed proposal，再运行 report、lint 和 build 并对比结果。
 ```
+
+准确命令与安全限制见[审查式知识修改](proposals.zh-CN.md)。
 
 ### 团队 CI 门禁
 

@@ -7,7 +7,8 @@ LLM Wiki Canvas 不是另一个聊天壳。它给 Codex、Claude Code、Qoder、
 ```mermaid
 flowchart LR
   A["Codex / Claude Code / Qoder / TRAE / WorkBuddy"] --> R["仓库规则 + Agent Skill"]
-  R --> M["Markdown 事实源"]
+  R --> P["Proposal 人工审查门"]
+  P --> M["Markdown 事实源"]
   A --> C["lwc scan / lint / build"]
   M --> C
   C --> G["关系 Viewer"]
@@ -39,7 +40,7 @@ flowchart LR
 4. **人工确认**：检查 Agent 的计划或 Changes / diff，再授权写入。
 5. **重建验证**：执行 `lwc build`，检查诊断、Markdown diff、`graph.json` 和 `.canvas` diff。
 
-当前版本还没有内置 `propose → apply` 事务命令，所以“提出修改”和“应用修改”的边界由 Agent 的计划模式、权限确认和 Git diff 实现；不要把未来能力写成已经具备。
+正式知识修改使用已经交付的 `lwc proposal create → show → review/reject → apply` 生命周期。草稿留在正式 Wiki 外，review 用哈希绑定准确内容和审查记录，目标发生漂移时 apply 会拒绝写入。详见[审查式知识修改](proposals.zh-CN.md)。
 
 ## 可以直接复制的任务
 
@@ -53,8 +54,8 @@ flowchart LR
 提出一次可审查的结构整理：
 
 ```text
-使用 llm-wiki-canvas Skill 检查 <vault>。先给出准备修改的文件、每条修改的依据、预期新增或删除的关系，以及仍不确定的地方。
-在我确认前不要写文件。确认后只做已批准的改动，运行 lint 和 build，并展示 Markdown、graph.json 与 Wiki.canvas 的 diff 摘要。
+使用 llm-wiki-canvas Skill 检查 <vault>。建议 Markdown 只写到 <vault>/.lwc/drafts/<name>，然后创建并展示 lwc proposal。
+不要修改正式 Wiki 文件。等待人执行 proposal review 或 reject；只有拿到准确 proposal ID 且状态为 reviewed 后才能 apply，再执行 report、lint 和 build 并总结 diff。
 ```
 
 从笔记生成可视关系图：

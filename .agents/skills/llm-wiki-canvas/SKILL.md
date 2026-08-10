@@ -29,11 +29,14 @@ If the repository package is not installed globally, run `pnpm exec tsx <repo>/s
 ## Ingest or Maintain
 
 1. Preserve raw source files; do not rewrite them as generated prose.
-2. Propose the target pages and links before changing formal wiki content.
-3. Make focused edits. Never regenerate a large `index.md` wholesale.
-4. Add a dated entry to `log.md` describing created, updated, and unresolved items.
-5. Re-run `lwc report`, `lwc lint`, and `lwc build` after approved edits.
-6. Compare the before and after report, then show the source diff and generated diagnostics for review.
+2. Put suggested Markdown under `<root>/.lwc/drafts/<name>/`, preserving its intended relative path. Never write the formal wiki before review.
+3. Run `lwc proposal create <root> --from <draft> --summary <reason>` and `lwc proposal show <proposal>`.
+4. Stop for human review. Only a person should run `proposal review --approve <id>` or `proposal reject --confirm <id>`.
+5. Apply only a `reviewed` proposal with `lwc proposal apply <proposal> <root> --confirm <id>`.
+6. Keep edits focused. Never regenerate a large `index.md` wholesale.
+7. Add a dated entry to `log.md` describing created, updated, and unresolved items through the same proposal.
+8. Re-run `lwc report`, `lwc lint`, and `lwc build` after apply.
+9. Compare the before and after report, then show the source diff and generated diagnostics for review.
 
 ## Visualize
 
@@ -53,6 +56,7 @@ Open `Wiki.canvas` in Obsidian for manual spatial editing. Future builds preserv
 - Never treat `.lwc/graph.json` as a source of truth.
 - Do not add MCP merely to expose local files; the host Agent can read files and run the CLI.
 - Do not silently apply generated wiki rewrites.
+- Never impersonate human review or invent the reviewer name. Creating and showing a proposal is safe; review and apply require explicit human direction.
 - Preserve user-edited Canvas coordinates by building onto the existing Canvas file.
 - Before staging changes, inspect `git status --short` and `git diff`; stage only explicit in-scope paths.
 - Commit sanitized examples and deliberate reproducible fixtures, but never private vaults, `.lwc/` working state, credentials, sessions, caches, logs, absolute personal paths, or unreviewed screenshots.
