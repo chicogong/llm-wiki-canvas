@@ -1,5 +1,6 @@
-import { execFileSync, spawnSync } from "node:child_process";
+import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -16,6 +17,29 @@ function run(command, args, options = {}) {
   return result;
 }
 
+async function freePort() {
+  const server = createServer();
+  await new Promise((resolve, reject) => server.listen(0, "127.0.0.1", resolve).once("error", reject));
+  const address = server.address();
+  if (!address || typeof address === "string") throw new Error("could not reserve a package smoke port");
+  await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+  return address.port;
+}
+
+async function waitForJson(url, child, output) {
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    if (child.exitCode !== null) throw new Error(`packaged server exited early\n${output()}`);
+    try {
+      const response = await fetch(url);
+      if (response.ok) return response.json();
+    } catch {
+      // The process may still be binding the loopback port.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw new Error(`packaged server did not become ready\n${output()}`);
+}
+
 try {
   const packed = execFileSync("pnpm", ["pack", "--pack-destination", scratch], { cwd: project, encoding: "utf8" });
   const tarballName = packed.trim().split("\n").at(-1);
@@ -29,6 +53,7 @@ try {
   const lwc = path.join(consumer, "node_modules", ".bin", "lwc");
   writeFileSync(path.join(wiki, "index.md"), "# Package Smoke\n[[Missing]]\n");
   run(lwc, ["--version"], { cwd: consumer });
+  run(lwc, ["serve", "--help"], { cwd: consumer });
   run(lwc, ["scan", wiki, "-o", path.join(consumer, "graph.json")], { cwd: consumer });
   run(lwc, ["lint", wiki], { cwd: consumer, expectFailure: true });
   writeFileSync(path.join(wiki, "Missing.md"), "# Missing\n[[index]]\n");
@@ -64,6 +89,24 @@ try {
   if (canvas.nodes[0].x !== 4321 || canvas.nodes[0].y !== -1234 || nodeIds.size !== canvas.nodes.length || edgeIds.size !== canvas.edges.length || !validEndpoints) {
     throw new Error("canvas preservation or JSON Canvas integrity check failed");
   }
+  const servePort = await freePort();
+  const served = spawn(lwc, ["serve", wiki, "--port", String(servePort), "--no-watch"], { cwd: consumer, stdio: ["ignore", "pipe", "pipe"] });
+  let serveOutput = "";
+  served.stdout.on("data", (chunk) => { serveOutput += chunk; });
+  served.stderr.on("data", (chunk) => { serveOutput += chunk; });
+  try {
+    const status = await waitForJson(`http://127.0.0.1:${servePort}/__lwc/status`, served, () => serveOutput);
+    const viewer = await fetch(`http://127.0.0.1:${servePort}/`, { redirect: "follow" });
+    if (!status.live || status.watching || !viewer.ok || !(await viewer.text()).includes("LLM Wiki Canvas")) {
+      throw new Error(`packaged server did not expose the expected Workbench\n${serveOutput}`);
+    }
+  } finally {
+    served.kill("SIGTERM");
+    await Promise.race([
+      new Promise((resolve) => served.once("exit", resolve)),
+      new Promise((resolve) => setTimeout(resolve, 2000)),
+    ]);
+  }
   const draft = path.join(consumer, "draft");
   const proposalFile = path.join(consumer, "proposal.json");
   mkdirSync(draft, { recursive: true });
@@ -82,7 +125,7 @@ try {
     throw new Error("packaged CLI did not apply the reviewed proposal");
   }
   run(lwc, ["scan", path.join(scratch, "missing-root")], { cwd: consumer, expectFailure: true });
-  console.log("Packaged CLI smoke passed: bin, scan, lint/strict, report, build, proposal lifecycle, canvas preservation, invalid root");
+  console.log("Packaged CLI smoke passed: bin, scan, lint/strict, report, build, local serve, proposal lifecycle, canvas preservation, invalid root");
 } finally {
   rmSync(scratch, { recursive: true, force: true });
 }

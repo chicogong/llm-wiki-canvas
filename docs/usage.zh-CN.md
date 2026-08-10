@@ -25,7 +25,25 @@ Built 8 files · 16 links · 0 broken
 
 ## 2. 构建已有 Markdown 或 Obsidian Vault
 
-在 LLM Wiki Canvas 仓库中执行：
+日常最短路径只有一条命令。从源码仓库使用时先构建一次，再启动任意 Vault：
+
+```bash
+pnpm build
+pnpm lwc serve /path/to/vault
+```
+
+浏览器打开 <http://127.0.0.1:4173>。服务把图谱保存在内存中、监视 Markdown，并且只在一次完整构建成功后通知 Workbench 刷新；不会在 Vault 里创建 `.lwc` 状态。按 `Ctrl+C` 停止。
+
+常用选项：
+
+```bash
+lwc serve /path/to/vault --port 4180
+lwc serve /path/to/vault --no-watch
+```
+
+默认 host 是 `127.0.0.1`。把 `--host` 设置为网络接口意味着主动暴露；CLI 会警告，因为页面路径、摘要、标签和关系可能属于私有信息。
+
+如果需要持久化 graph 和 Canvas 产物，再执行：
 
 ```bash
 pnpm exec tsx src/cli/index.ts build /path/to/vault \
@@ -34,7 +52,7 @@ pnpm exec tsx src/cli/index.ts build /path/to/vault \
 pnpm dev
 ```
 
-这会生成两种不同视图：
+这会生成两种持久化视图：
 
 - `public/graph.json` 驱动本地关系 Viewer。
 - `/path/to/vault/Wiki.canvas` 可以直接用 Obsidian 打开。

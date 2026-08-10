@@ -25,7 +25,25 @@ Built 8 files · 16 links · 0 broken
 
 ## 2. Build an existing Markdown or Obsidian Vault
 
-From the LLM Wiki Canvas checkout:
+The shortest daily workflow is one command. Build the package once when working from a source checkout, then serve any Vault:
+
+```bash
+pnpm build
+pnpm lwc serve /path/to/vault
+```
+
+Open <http://127.0.0.1:4173>. The server keeps the graph in memory, watches Markdown, and tells the Workbench to refresh only after a complete build succeeds. It does not create `.lwc` state in the Vault. Stop it with `Ctrl+C`.
+
+Useful options:
+
+```bash
+lwc serve /path/to/vault --port 4180
+lwc serve /path/to/vault --no-watch
+```
+
+The default host is `127.0.0.1`. Setting `--host` to a network interface is an explicit exposure decision; the CLI prints a warning because page paths, summaries, tags, and relationships may be private.
+
+To create persistent graph and Canvas artifacts instead:
 
 ```bash
 pnpm exec tsx src/cli/index.ts build /path/to/vault \
@@ -34,7 +52,7 @@ pnpm exec tsx src/cli/index.ts build /path/to/vault \
 pnpm dev
 ```
 
-This produces two different views:
+This produces two persistent views:
 
 - `public/graph.json` drives the local relationship Viewer.
 - `/path/to/vault/Wiki.canvas` opens directly in Obsidian.

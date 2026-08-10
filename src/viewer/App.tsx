@@ -230,20 +230,34 @@ export function App() {
   const [error, setError] = useState<string>();
   const [view, setView] = useState<"map" | "health">("map");
   const [selectedId, setSelectedId] = useState<string>();
+  const live = new URLSearchParams(location.search).get("live") === "1";
 
   useEffect(() => {
     const source = new URLSearchParams(location.search).get("graph") ?? "/graph.json";
-    fetch(source).then((response) => {
-      if (!response.ok) throw new Error(`Unable to read graph: HTTP ${response.status}`);
-      if (!response.headers.get("content-type")?.includes("application/json")) {
-        throw new Error("Graph response is not JSON. Run pnpm demo:build or check the graph query parameter.");
+    let active = true;
+    const load = async () => {
+      try {
+        const response = await fetch(source, { cache: "no-store" });
+        if (!response.ok) throw new Error(`Unable to read graph: HTTP ${response.status}`);
+        if (!response.headers.get("content-type")?.includes("application/json")) {
+          throw new Error("Graph response is not JSON. Run pnpm demo:build or check the graph query parameter.");
+        }
+        const value = await response.json() as WikiGraph;
+        if (!active) return;
+        setGraph(value);
+        setError(undefined);
+        setSelectedId((current) => value.nodes.some((node) => node.id === current)
+          ? current
+          : value.nodes.find((node) => node.kind === "index")?.id ?? value.nodes[0]?.id);
+      } catch (reason) {
+        if (active) setError(reason instanceof Error ? reason.message : String(reason));
       }
-      return response.json();
-    }).then((value: WikiGraph) => {
-      setGraph(value);
-      setSelectedId(value.nodes.find((node) => node.kind === "index")?.id ?? value.nodes[0]?.id);
-    }).catch((reason: Error) => setError(reason.message));
-  }, []);
+    };
+    void load();
+    const events = live ? new EventSource("/__lwc/events") : undefined;
+    events?.addEventListener("graph", () => { void load(); });
+    return () => { active = false; events?.close(); };
+  }, [live]);
 
   if (error) return <main className="status-screen"><div className="status-mark">!</div><p className="section-kicker">Graph unavailable</p><h1>The knowledge map could not open.</h1><p>{error}</p><code>pnpm demo:build</code></main>;
   if (!graph) return <main className="status-screen"><div className="loading-mark" /><p className="section-kicker">Reading local knowledge</p><h1>Opening workspace…</h1></main>;
@@ -255,14 +269,14 @@ export function App() {
       <div className="brand"><span className="brand-mark">L</span><div><strong>LLM Wiki Canvas</strong><small>Local knowledge workbench</small></div></div>
       <div className="vault-label"><span>Workspace</span><strong>{graph.rootName}</strong></div>
       <AppNavigation view={view} onView={setView} />
-      <div className="sidebar-note"><span className="status-dot" /><div><strong>Local only</strong><small>Markdown stays on this machine</small></div></div>
+      <div className="sidebar-note"><span className="status-dot" /><div><strong>{live ? "Watching locally" : "Local only"}</strong><small>{live ? "Refreshes when Markdown changes" : "Markdown stays on this machine"}</small></div></div>
     </aside>
 
     <section className="workbench">
       <header className="topbar">
         <div className="mobile-brand"><span className="brand-mark">L</span><strong>{graph.rootName}</strong></div>
         <div className="breadcrumb"><span>{graph.rootName}</span><b>/</b><strong>{view === "map" ? "Knowledge map" : "Vault health"}</strong></div>
-        <div className="topbar-meta"><span className="status-dot" />Generated {graph.generatedAt.slice(0, 10)}</div>
+        <div className="topbar-meta"><span className="status-dot" />{live ? "Live" : "Generated"} {graph.generatedAt.slice(0, 10)}</div>
       </header>
       <div className="mobile-nav"><AppNavigation view={view} onView={setView} /></div>
       {view === "map" ? <MapView graph={graph} selectedId={selectedId} onSelect={setSelectedId} /> : <HealthView graph={graph} onOpenPage={switchToPage} />}

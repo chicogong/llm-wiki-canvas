@@ -99,6 +99,8 @@ Run `pnpm report:demo` to reproduce the full structural snapshot, including conn
 During development:
 
 ```bash
+pnpm build
+pnpm lwc serve /path/to/vault
 pnpm lwc report /path/to/vault
 pnpm lwc build /path/to/vault \
   --graph public/graph.json \
@@ -108,6 +110,7 @@ pnpm lwc build /path/to/vault \
 After `pnpm build`, the package exposes both `llm-wiki-canvas` and `lwc`:
 
 ```bash
+lwc serve /path/to/vault
 lwc scan /path/to/vault -o .lwc/graph.json
 lwc lint /path/to/vault
 lwc report /path/to/vault
@@ -116,6 +119,8 @@ lwc build /path/to/vault \
   --graph .lwc/graph.json \
   --canvas /path/to/vault/Wiki.canvas
 ```
+
+`lwc serve` opens the complete Workbench at <http://127.0.0.1:4173> and refreshes its graph after Markdown changes. It binds to loopback by default, keeps the last valid graph if a rebuild fails, and does not write generated state into the Vault. Use `--port <number>` to change the port or `--no-watch` for a fixed snapshot.
 
 For reproducible checked-in fixtures, pass `--generated-at <ISO timestamp>` to `lwc build`. It fixes graph generation and node modification timestamps for that output.
 

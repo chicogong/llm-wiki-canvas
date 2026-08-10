@@ -99,6 +99,8 @@ LLM Wiki Canvas 有意只做很小的一层：编译并检查已经存在的 Mar
 开发环境可以直接执行：
 
 ```bash
+pnpm build
+pnpm lwc serve /path/to/vault
 pnpm lwc report /path/to/vault
 pnpm lwc build /path/to/vault \
   --graph public/graph.json \
@@ -108,6 +110,7 @@ pnpm lwc build /path/to/vault \
 执行 `pnpm build` 后，包会暴露 `llm-wiki-canvas` 和 `lwc` 两个命令：
 
 ```bash
+lwc serve /path/to/vault
 lwc scan /path/to/vault -o .lwc/graph.json
 lwc lint /path/to/vault
 lwc report /path/to/vault
@@ -116,6 +119,8 @@ lwc build /path/to/vault \
   --graph .lwc/graph.json \
   --canvas /path/to/vault/Wiki.canvas
 ```
+
+`lwc serve` 会在 <http://127.0.0.1:4173> 打开完整 Workbench，并在 Markdown 变化后刷新图谱。默认只监听本机回环地址；重建失败时保留上一份有效图，也不会向 Vault 写入临时生成状态。可用 `--port <端口>` 修改端口，或用 `--no-watch` 查看固定快照。
 
 如果要把生成结果提交到 Git，请给 `lwc build` 传入 `--generated-at <ISO 时间>`，固定该次输出中的生成时间和节点修改时间。
 
