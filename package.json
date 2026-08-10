@@ -22,11 +22,12 @@
     "test:e2e:prod": "playwright test --config playwright.prod.config.ts --reporter=list",
     "test:package": "node scripts/package-smoke.mjs",
     "audit:secrets": "node scripts/scan-secrets.mjs",
-    "audit:deps": "pnpm audit --prod --audit-level high",
-    "demo:build": "tsx src/cli/index.ts build examples/atlas-wiki --graph public/graph.json --canvas examples/atlas-wiki/Atlas.canvas",
+    "audit:deps": "pnpm audit --audit-level low",
+    "demo:build": "tsx src/cli/index.ts build examples/atlas-wiki --graph public/graph.json --canvas examples/atlas-wiki/Atlas.canvas --generated-at 2026-08-10T00:00:00.000Z",
+    "generated:check": "git diff --exit-code -- public/graph.json examples/atlas-wiki/Atlas.canvas",
     "lint:demo": "tsx src/cli/index.ts lint examples/atlas-wiki",
     "validate:skill": "node scripts/validate-skill.mjs",
-    "check": "pnpm test && pnpm demo:build && pnpm build && pnpm validate:skill",
+    "check": "pnpm test && pnpm demo:build && pnpm generated:check && pnpm build && pnpm validate:skill",
     "verify": "pnpm audit:secrets && pnpm audit:deps && pnpm check && pnpm test:package && pnpm test:e2e:prod"
   },
   "dependencies": {

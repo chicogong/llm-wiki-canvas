@@ -21,6 +21,13 @@ async function readCanvas(target?: string): Promise<JsonCanvas | undefined> {
   }
 }
 
+function generatedAt(value?: string): Date {
+  if (!value) return new Date();
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) throw new Error(`Invalid --generated-at value: ${value}`);
+  return date;
+}
+
 const program = new Command()
   .name("llm-wiki-canvas")
   .alias("lwc")
@@ -68,9 +75,10 @@ program.command("build")
   .argument("[root]", "wiki root", ".")
   .option("--graph <file>", "graph JSON output", ".lwc/graph.json")
   .option("--canvas <file>", "JSON Canvas output", "Wiki.canvas")
+  .option("--generated-at <iso>", "fixed ISO timestamp for reproducible graph output")
   .description("Generate both graph JSON and JSON Canvas")
   .action(async (root, options) => {
-    const graph = await buildGraph(root);
+    const graph = await buildGraph(root, generatedAt(options.generatedAt));
     const previous = await readCanvas(options.canvas);
     await Promise.all([
       writeJson(options.graph, graph),

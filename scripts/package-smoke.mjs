@@ -43,6 +43,7 @@ try {
   writeFileSync(path.join(consumer, "Wiki.canvas"), `${JSON.stringify(editableCanvas)}\n`);
   run(lwc, ["canvas", wiki, "-o", path.join(consumer, "Wiki.canvas")], { cwd: consumer });
   run(lwc, ["build", wiki, "--graph", path.join(consumer, "built-graph.json"), "--canvas", path.join(consumer, "Built.canvas")], { cwd: consumer });
+  run(lwc, ["build", wiki, "--generated-at", "not-a-date"], { cwd: consumer, expectFailure: true });
   const graph = JSON.parse(readFileSync(path.join(consumer, "graph.json"), "utf8"));
   const canvas = JSON.parse(readFileSync(path.join(consumer, "Wiki.canvas"), "utf8"));
   const builtGraph = JSON.parse(readFileSync(path.join(consumer, "built-graph.json"), "utf8"));

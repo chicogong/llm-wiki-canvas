@@ -44,6 +44,8 @@ Run the complete release-style verification, including a packed npm install and 
 pnpm verify
 ```
 
+For reproducible checked-in graph fixtures, pass `--generated-at <ISO timestamp>` to `lwc build`.
+
 After `pnpm build`, the package also exposes `llm-wiki-canvas` and `lwc`:
 
 ```bash
