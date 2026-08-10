@@ -17,6 +17,7 @@ import {
   type JsonCanvas,
   type KnowledgeProposal,
 } from "../core/index.js";
+import { startWikiServer } from "./serve.js";
 
 async function writeJson(target: string, value: unknown): Promise<void> {
   const absolute = path.resolve(target);
@@ -207,6 +208,31 @@ program.command("build")
     console.log(`Built ${graph.stats.files} files · ${graph.stats.links} links · ${graph.stats.brokenLinks} broken`);
     console.log(`Graph → ${options.graph}`);
     console.log(`Canvas → ${options.canvas}`);
+  });
+
+program.command("serve")
+  .argument("[root]", "wiki root", ".")
+  .option("--host <address>", "listen address", "127.0.0.1")
+  .option("-p, --port <port>", "listen port", "4173")
+  .option("--no-watch", "disable automatic Markdown rebuilds")
+  .description("Serve the local Workbench and rebuild when Markdown changes")
+  .action(async (root, options) => {
+    const port = Number.parseInt(options.port, 10);
+    if (!Number.isInteger(port) || String(port) !== String(options.port) || port < 1 || port > 65535) {
+      throw new Error(`Invalid --port value: ${options.port}`);
+    }
+    if (options.host !== "127.0.0.1" && options.host !== "::1" && options.host !== "localhost") {
+      console.warn(`Warning: --host ${options.host} may expose private wiki metadata to the network`);
+    }
+    const server = await startWikiServer({ root, host: options.host, port, watch: options.watch });
+    console.log(`LLM Wiki Canvas → ${server.url}`);
+    console.log(options.watch ? `Watching ${path.resolve(root)} for Markdown changes` : "Markdown watch disabled");
+    console.log("Press Ctrl+C to stop");
+    await new Promise<void>((resolve, reject) => {
+      const shutdown = () => { void server.close().then(resolve, reject); };
+      process.once("SIGINT", shutdown);
+      process.once("SIGTERM", shutdown);
+    });
   });
 
 program.parseAsync().catch((error: unknown) => {
