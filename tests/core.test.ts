@@ -33,6 +33,14 @@ describe("wiki graph compiler", () => {
     expect(rebuilt.nodes.find((node) => node.id === previous.nodes[0].id)).toMatchObject({ x: 1234, y: -456, width: 777 });
   });
 
+  it("can fix generated and modified timestamps for reproducible fixtures", async () => {
+    const root = await fixture();
+    const fixed = new Date("2026-08-10T00:00:00Z");
+    const graph = await buildGraph(root, fixed, fixed);
+    expect(graph.generatedAt).toBe("2026-08-10T00:00:00.000Z");
+    expect(new Set(graph.nodes.map((node) => node.modifiedAt))).toEqual(new Set(["2026-08-10T00:00:00.000Z"]));
+  });
+
   it("emits valid file nodes that point to real Markdown", async () => {
     const root = await fixture();
     const canvas = graphToCanvas(await buildGraph(root));

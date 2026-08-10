@@ -78,7 +78,8 @@ program.command("build")
   .option("--generated-at <iso>", "fixed ISO timestamp for reproducible graph output")
   .description("Generate both graph JSON and JSON Canvas")
   .action(async (root, options) => {
-    const graph = await buildGraph(root, generatedAt(options.generatedAt));
+    const fixedTime = options.generatedAt ? generatedAt(options.generatedAt) : undefined;
+    const graph = await buildGraph(root, fixedTime ?? new Date(), fixedTime);
     const previous = await readCanvas(options.canvas);
     await Promise.all([
       writeJson(options.graph, graph),

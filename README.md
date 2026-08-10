@@ -44,7 +44,7 @@ Run the complete release-style verification, including a packed npm install and 
 pnpm verify
 ```
 
-For reproducible checked-in graph fixtures, pass `--generated-at <ISO timestamp>` to `lwc build`.
+For reproducible checked-in graph fixtures, pass `--generated-at <ISO timestamp>` to `lwc build`; this fixes both graph generation and node modification timestamps in that output.
 
 After `pnpm build`, the package also exposes `llm-wiki-canvas` and `lwc`:
 

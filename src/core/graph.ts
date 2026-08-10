@@ -51,7 +51,7 @@ function extractLinks(content: string): RawLink[] {
   return links;
 }
 
-export async function buildGraph(root: string, now = new Date()): Promise<WikiGraph> {
+export async function buildGraph(root: string, now = new Date(), fixedModifiedAt?: Date): Promise<WikiGraph> {
   const absoluteRoot = path.resolve(root);
   const rootInfo = await stat(absoluteRoot).catch(() => undefined);
   if (!rootInfo?.isDirectory()) throw new Error(`Wiki root is not a directory: ${absoluteRoot}`);
@@ -79,7 +79,7 @@ export async function buildGraph(root: string, now = new Date()): Promise<WikiGr
       summary: String(parsed.data.summary ?? firstParagraph(parsed.content)),
       headings: [...parsed.content.matchAll(/^#{2,6}\s+(.+)$/gm)].map((match) => match[1].trim()),
       wordCount: parsed.content.trim().split(/\s+|(?<=[\u4e00-\u9fff])/).filter(Boolean).length,
-      modifiedAt: info.mtime.toISOString(),
+      modifiedAt: (fixedModifiedAt ?? info.mtime).toISOString(),
       source: parsed.data.source ? String(parsed.data.source) : undefined,
       rawLinks: extractLinks(parsed.content),
       missingTitle: !parsed.data.title && !heading,

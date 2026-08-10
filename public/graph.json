@@ -15,7 +15,7 @@
       "summary": "Coding agents read local rules, inspect the graph, propose focused edits, and rebuild disposable views.",
       "headings": [],
       "wordCount": 17,
-      "modifiedAt": "2026-08-10T09:45:22.391Z"
+      "modifiedAt": "2026-08-10T00:00:00.000Z"
     },
     {
       "id": "node-ba7753d60e35",
@@ -29,7 +29,7 @@
       "summary": "Agent changes remain proposals until a person reviews their evidence and diff.",
       "headings": [],
       "wordCount": 15,
-      "modifiedAt": "2026-08-10T09:45:22.390Z"
+      "modifiedAt": "2026-08-10T00:00:00.000Z"
     },
     {
       "id": "node-8dc4d7918bf9",
@@ -45,7 +45,7 @@
         "Operations"
       ],
       "wordCount": 35,
-      "modifiedAt": "2026-08-10T09:45:22.389Z"
+      "modifiedAt": "2026-08-10T00:00:00.000Z"
     },
     {
       "id": "node-fc94fa44f573",
@@ -59,7 +59,7 @@
       "summary": "Relationships become a navigable atlas while Markdown remains the durable source of truth.",
       "headings": [],
       "wordCount": 26,
-      "modifiedAt": "2026-08-10T09:45:22.390Z"
+      "modifiedAt": "2026-08-10T00:00:00.000Z"
     },
     {
       "id": "node-e540cdd1328b",
@@ -73,7 +73,7 @@
       "summary": "A small working atlas showing how local sources, concepts, and agent workflows connect.",
       "headings": [],
       "wordCount": 38,
-      "modifiedAt": "2026-08-10T10:35:40.543Z"
+      "modifiedAt": "2026-08-10T00:00:00.000Z"
     },
     {
       "id": "node-7babc233de26",
@@ -88,7 +88,7 @@
         "2026-08-10"
       ],
       "wordCount": 23,
-      "modifiedAt": "2026-08-10T09:45:22.391Z"
+      "modifiedAt": "2026-08-10T00:00:00.000Z"
     },
     {
       "id": "node-c3ba326f222d",
@@ -102,7 +102,7 @@
       "summary": "Raw sources, a generated wiki, and a schema form a compact knowledge programming environment.",
       "headings": [],
       "wordCount": 19,
-      "modifiedAt": "2026-08-10T09:45:22.390Z",
+      "modifiedAt": "2026-08-10T00:00:00.000Z",
       "source": "https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f"
     },
     {
@@ -117,7 +117,7 @@
       "summary": "JSON Canvas is an open file format for infinite-canvas data using nodes and edges.",
       "headings": [],
       "wordCount": 19,
-      "modifiedAt": "2026-08-10T09:45:22.390Z",
+      "modifiedAt": "2026-08-10T00:00:00.000Z",
       "source": "https://jsoncanvas.org/spec/1.0/"
     }
   ],
