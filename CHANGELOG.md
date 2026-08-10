@@ -16,3 +16,4 @@ All notable changes will be documented here. This project follows Semantic Versi
 - Explicit open-source commit boundaries for reproducible public artifacts versus private or machine-local state.
 - English and Chinese comparison and usage guides covering Obsidian, QMD, LLM Wiki, WeKnora, Agent Skills, and CI workflows.
 - English and Chinese AI Agent integration guides, shared `AGENTS.md` rules, and native Skill adapters for Codex, TRAE, Qoder, and Claude Code, with an explicit Tencent WorkBuddy workspace workflow.
+- A tested `lwc report` command for Markdown or JSON structure snapshots, a source-checkout `pnpm lwc` entry point, and bilingual benefit and workflow guides grounded in reproducible counts.

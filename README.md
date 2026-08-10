@@ -30,6 +30,7 @@ The checked-in **Agent Knowledge Atlas** is a small, inspectable wiki about LLM 
 git clone https://github.com/chicogong/llm-wiki-canvas.git
 cd llm-wiki-canvas
 pnpm install
+pnpm report:demo
 pnpm demo:build
 pnpm dev
 ```
@@ -89,12 +90,15 @@ This project does not claim an invented percentage or time saving. The compariso
 
 For the included example, one deterministic build turns **8 source pages and 16 resolved links** into both a searchable graph and an editable Canvas, with **0 broken links**. Those figures come from the compiler, not a benchmark estimate.
 
+Run `pnpm report:demo` to reproduce the full structural snapshot, including connected pages, source metadata, diagnostics, page types, and the most-connected pages. See [Benefits and workflows](docs/value-and-workflows.md) for personal Vault, Agent, and CI usage patterns.
+
 ## Use it on your own vault
 
 During development:
 
 ```bash
-pnpm exec tsx src/cli/index.ts build /path/to/vault \
+pnpm lwc report /path/to/vault
+pnpm lwc build /path/to/vault \
   --graph public/graph.json \
   --canvas /path/to/vault/Wiki.canvas
 ```
@@ -104,6 +108,7 @@ After `pnpm build`, the package exposes both `llm-wiki-canvas` and `lwc`:
 ```bash
 lwc scan /path/to/vault -o .lwc/graph.json
 lwc lint /path/to/vault
+lwc report /path/to/vault
 lwc canvas /path/to/vault -o /path/to/vault/Wiki.canvas
 lwc build /path/to/vault \
   --graph .lwc/graph.json \
@@ -157,6 +162,7 @@ Markdown is durable knowledge. The graph, Canvas, and Viewer data are disposable
 - Parse Markdown, YAML frontmatter, WikiLinks, embeds, and `.md` links.
 - Generate stable node and edge IDs.
 - Report broken and ambiguous links, missing titles, and orphan pages.
+- Produce Markdown or JSON health reports from observed structure without inventing a score.
 - Generate an Obsidian-compatible `.canvas` file.
 - Preserve manual Canvas positions on regeneration.
 - Browse, search, filter, and inspect relationships in the local Viewer.

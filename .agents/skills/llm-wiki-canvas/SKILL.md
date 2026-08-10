@@ -12,8 +12,9 @@ Treat Markdown, source files, and review records as truth. Treat generated graph
 1. Locate the wiki root and read its `AGENTS.md` or `CLAUDE.md` if present.
 2. Read `index.md` to learn the intended information architecture.
 3. Run `lwc scan <root> -o <root>/.lwc/graph.json` to compile relationships.
-4. Run `lwc lint <root>` before proposing structural changes.
-5. Report exact file paths for broken, ambiguous, and orphaned pages.
+4. Run `lwc report <root>` for a factual structure and provenance snapshot.
+5. Run `lwc lint <root>` before proposing structural changes.
+6. Report exact file paths for broken, ambiguous, and orphaned pages.
 
 If the repository package is not installed globally, run `pnpm exec tsx <repo>/src/cli/index.ts` in place of `lwc`.
 
@@ -31,8 +32,8 @@ If the repository package is not installed globally, run `pnpm exec tsx <repo>/s
 2. Propose the target pages and links before changing formal wiki content.
 3. Make focused edits. Never regenerate a large `index.md` wholesale.
 4. Add a dated entry to `log.md` describing created, updated, and unresolved items.
-5. Re-run `lwc lint` and `lwc build` after approved edits.
-6. Show the diff and generated diagnostics for review.
+5. Re-run `lwc report`, `lwc lint`, and `lwc build` after approved edits.
+6. Compare the before and after report, then show the source diff and generated diagnostics for review.
 
 ## Visualize
 

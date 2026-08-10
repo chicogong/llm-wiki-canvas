@@ -30,6 +30,7 @@ LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性�
 git clone https://github.com/chicogong/llm-wiki-canvas.git
 cd llm-wiki-canvas
 pnpm install
+pnpm report:demo
 pnpm demo:build
 pnpm dev
 ```
@@ -89,12 +90,15 @@ LLM Wiki Canvas 有意只做很小的一层：编译并检查已经存在的 Mar
 
 对仓库自带示例而言，一次确定性构建会把 **8 个源页面、16 条有效关系**同时生成可搜索图谱和可编辑 Canvas，并确认 **0 条断链**。这些数字来自编译器实际输出，不是估算基准。
 
+执行 `pnpm report:demo` 可以复现完整结构快照，包括页面连接情况、来源元数据、诊断、页面类型和高连接页面。个人 Vault、Agent 和 CI 的具体收益与使用流程见[收益与使用场景](docs/value-and-workflows.zh-CN.md)。
+
 ## 用在自己的 Vault
 
 开发环境可以直接执行：
 
 ```bash
-pnpm exec tsx src/cli/index.ts build /path/to/vault \
+pnpm lwc report /path/to/vault
+pnpm lwc build /path/to/vault \
   --graph public/graph.json \
   --canvas /path/to/vault/Wiki.canvas
 ```
@@ -104,6 +108,7 @@ pnpm exec tsx src/cli/index.ts build /path/to/vault \
 ```bash
 lwc scan /path/to/vault -o .lwc/graph.json
 lwc lint /path/to/vault
+lwc report /path/to/vault
 lwc canvas /path/to/vault -o /path/to/vault/Wiki.canvas
 lwc build /path/to/vault \
   --graph .lwc/graph.json \
@@ -157,6 +162,7 @@ Markdown 是长期保存的知识；关系图、Canvas 和 Viewer 数据都是�
 - 解析 Markdown、YAML frontmatter、WikiLink、嵌入与 `.md` 链接。
 - 生成稳定的节点和关系 ID。
 - 报告断链、歧义链接、缺少标题和孤立页面。
+- 基于实际结构生成 Markdown 或 JSON 健康报告，不虚构综合评分。
 - 生成 Obsidian 兼容 `.canvas` 文件。
 - 重新生成时保留 Canvas 手工位置。
 - 在本地 Viewer 中浏览、搜索、筛选并检查关系。

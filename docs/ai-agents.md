@@ -34,7 +34,7 @@ Local files and the CLI are already the common interface for these agents, so th
 ## Recommended workflow
 
 1. **Inspect read-only:** read `AGENTS.md`, the wiki `index.md`, and relevant sources before editing.
-2. **Check structure:** run `lwc lint <vault>` and use `lwc scan` when the full relationship graph is needed.
+2. **Measure and check structure:** run `lwc report <vault>` and `lwc lint <vault>`; use `lwc scan` when the full relationship graph is needed.
 3. **Propose changes:** list the pages, WikiLinks, evidence, and unresolved questions that would change.
 4. **Review:** inspect the plan or Changes / diff before authorizing writes.
 5. **Rebuild and verify:** run `lwc build`; inspect diagnostics and the Markdown, `graph.json`, and `.canvas` diffs.
@@ -47,7 +47,7 @@ Read-only orientation:
 
 ```text
 Use the llm-wiki-canvas Skill. Read AGENTS.md and <vault>/index.md first. Analyze only; do not edit files.
-Run lwc lint <vault>, then explain the core pages, direct relationships, broken links, ambiguous links, and orphans. Cite an exact source path for every material claim.
+Run lwc report <vault> and lwc lint <vault>, then explain the scope, connectivity, source metadata, core pages, direct relationships, broken links, ambiguous links, and orphans. Cite an exact source path for every material claim.
 ```
 
 Propose a reviewable cleanup:

@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { buildGraph, graphToCanvas, type JsonCanvas } from "../src/core/index.js";
+import { buildGraph, buildWikiReport, graphToCanvas, reportToMarkdown, type JsonCanvas } from "../src/core/index.js";
 
 async function fixture(): Promise<string> {
   const root = await mkdtemp(path.join(tmpdir(), "lwc-test-"));
@@ -45,6 +45,16 @@ describe("wiki graph compiler", () => {
     const root = await fixture();
     const canvas = graphToCanvas(await buildGraph(root));
     for (const node of canvas.nodes) await expect(readFile(path.join(root, node.file), "utf8")).resolves.toContain("#");
+  });
+
+  it("builds a factual wiki report without an arbitrary score", async () => {
+    const graph = await buildGraph(await fixture(), new Date("2026-08-10T00:00:00Z"));
+    const report = buildWikiReport(graph, 1);
+    expect(report.summary).toMatchObject({ pages: 2, relationships: 2, connectedPages: 2, errors: 1, warnings: 0 });
+    expect(report.mostConnected).toHaveLength(1);
+    expect(report.mostConnected[0]).toMatchObject({ incoming: 1, outgoing: 1, total: 2 });
+    expect(reportToMarkdown(report)).toContain("This report uses observed counts, not an arbitrary health score.");
+    expect(reportToMarkdown(report)).toContain("| BROKEN_LINK | 1 |");
   });
 
   it("supports spaces, encoded paths, embeds, aliases, and literal percent signs", async () => {
@@ -97,6 +107,8 @@ describe("wiki graph compiler", () => {
     const graph = await buildGraph(root);
     expect(graph.stats).toEqual({ files: 0, links: 0, brokenLinks: 0, orphanNodes: 0 });
     expect(graphToCanvas(graph)).toEqual({ nodes: [], edges: [] });
+    expect(buildWikiReport(graph).summary).toMatchObject({ pages: 0, relationships: 0, connectedPages: 0 });
+    expect(reportToMarkdown(buildWikiReport(graph))).toContain("No Markdown pages were found.");
   });
 
   it("rejects a missing wiki root instead of reporting a false empty success", async () => {

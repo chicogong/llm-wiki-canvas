@@ -34,7 +34,7 @@ flowchart LR
 ## 推荐工作流
 
 1. **只读理解**：读 `AGENTS.md`、Wiki 的 `index.md` 和相关来源，先不修改。
-2. **结构检查**：执行 `lwc lint <vault>`；需要全局关系时执行 `lwc scan`。
+2. **衡量并检查结构**：执行 `lwc report <vault>` 和 `lwc lint <vault>`；需要全局关系时执行 `lwc scan`。
 3. **提出修改**：列出准备修改的页面、WikiLink、依据和未解决问题。
 4. **人工确认**：检查 Agent 的计划或 Changes / diff，再授权写入。
 5. **重建验证**：执行 `lwc build`，检查诊断、Markdown diff、`graph.json` 和 `.canvas` diff。
@@ -47,7 +47,7 @@ flowchart LR
 
 ```text
 使用 llm-wiki-canvas Skill。先读 AGENTS.md 和 <vault>/index.md，只读分析，不修改文件。
-运行 lwc lint <vault>，说明核心页面、直接关系、断链、歧义链接和孤立页面；每个结论引用准确源文件路径。
+运行 lwc report <vault> 和 lwc lint <vault>，说明范围、连接情况、来源元数据、核心页面、直接关系、断链、歧义链接和孤立页面；每个结论引用准确源文件路径。
 ```
 
 提出一次可审查的结构整理：
