@@ -1,0 +1,29 @@
+name: Feature request
+description: Propose a focused local-first knowledge workflow improvement.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use case
+      description: Which local wiki or Agent workflow needs this?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe inputs, outputs, and the smallest useful workflow.
+    validations:
+      required: true
+  - type: dropdown
+    id: truth
+    attributes:
+      label: Source-of-truth impact
+      options:
+        - Generated view only
+        - Proposes Markdown changes for review
+        - Changes the Markdown schema
+    validations:
+      required: true

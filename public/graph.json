@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "rootName": "atlas-wiki",
+  "generatedAt": "2026-08-10T10:47:54.200Z",
+  "nodes": [
+    {
+      "id": "node-d83f4c48e4e6",
+      "path": "Agent Workflow.md",
+      "title": "Agent Workflow",
+      "kind": "note",
+      "tags": [
+        "codex",
+        "workflow"
+      ],
+      "summary": "Coding agents read local rules, inspect the graph, propose focused edits, and rebuild disposable views.",
+      "headings": [],
+      "wordCount": 17,
+      "modifiedAt": "2026-08-10T09:45:22.391Z"
+    },
+    {
+      "id": "node-ba7753d60e35",
+      "path": "concepts/Human Review.md",
+      "title": "Human Review",
+      "kind": "concept",
+      "tags": [
+        "governance",
+        "trust"
+      ],
+      "summary": "Agent changes remain proposals until a person reviews their evidence and diff.",
+      "headings": [],
+      "wordCount": 15,
+      "modifiedAt": "2026-08-10T09:45:22.390Z"
+    },
+    {
+      "id": "node-8dc4d7918bf9",
+      "path": "concepts/LLM Wiki.md",
+      "title": "LLM Wiki",
+      "kind": "concept",
+      "tags": [
+        "compiler",
+        "knowledge"
+      ],
+      "summary": "Treat a maintained wiki like a codebase that an LLM can inspect, edit, lint, and improve.",
+      "headings": [
+        "Operations"
+      ],
+      "wordCount": 35,
+      "modifiedAt": "2026-08-10T09:45:22.389Z"
+    },
+    {
+      "id": "node-fc94fa44f573",
+      "path": "concepts/Visual Knowledge.md",
+      "title": "Visual Knowledge",
+      "kind": "concept",
+      "tags": [
+        "graph",
+        "canvas"
+      ],
+      "summary": "Relationships become a navigable atlas while Markdown remains the durable source of truth.",
+      "headings": [],
+      "wordCount": 26,
+      "modifiedAt": "2026-08-10T09:45:22.390Z"
+    },
+    {
+      "id": "node-e540cdd1328b",
+      "path": "index.md",
+      "title": "Agent Knowledge Atlas",
+      "kind": "index",
+      "tags": [
+        "llm-wiki",
+        "local-first"
+      ],
+      "summary": "A small working atlas showing how local sources, concepts, and agent workflows connect.",
+      "headings": [],
+      "wordCount": 38,
+      "modifiedAt": "2026-08-10T10:35:40.543Z"
+    },
+    {
+      "id": "node-7babc233de26",
+      "path": "log.md",
+      "title": "Atlas Log",
+      "kind": "note",
+      "tags": [
+        "maintenance"
+      ],
+      "summary": "Append-only maintenance notes for the demo wiki.",
+      "headings": [
+        "2026-08-10"
+      ],
+      "wordCount": 23,
+      "modifiedAt": "2026-08-10T09:45:22.391Z"
+    },
+    {
+      "id": "node-c3ba326f222d",
+      "path": "sources/Karpathy Pattern.md",
+      "title": "Karpathy LLM Wiki Pattern",
+      "kind": "source",
+      "tags": [
+        "source",
+        "llm-wiki"
+      ],
+      "summary": "Raw sources, a generated wiki, and a schema form a compact knowledge programming environment.",
+      "headings": [],
+      "wordCount": 19,
+      "modifiedAt": "2026-08-10T09:45:22.390Z",
+      "source": "https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f"
+    },
+    {
+      "id": "node-1ab2e511f573",
+      "path": "sources/Obsidian Canvas.md",
+      "title": "Obsidian JSON Canvas",
+      "kind": "source",
+      "tags": [
+        "source",
+        "obsidian"
+      ],
+      "summary": "JSON Canvas is an open file format for infinite-canvas data using nodes and edges.",
+      "headings": [],
+      "wordCount": 19,
+      "modifiedAt": "2026-08-10T09:45:22.390Z",
+      "source": "https://jsoncanvas.org/spec/1.0/"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-292e93f89901",
+      "source": "node-d83f4c48e4e6",
+      "target": "node-ba7753d60e35",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-95ad0482fff9",
+      "source": "node-d83f4c48e4e6",
+      "target": "node-c3ba326f222d",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-430476576a64",
+      "source": "node-ba7753d60e35",
+      "target": "node-d83f4c48e4e6",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-5dd492f65dda",
+      "source": "node-8dc4d7918bf9",
+      "target": "node-ba7753d60e35",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-fae25d2ab6ca",
+      "source": "node-8dc4d7918bf9",
+      "target": "node-c3ba326f222d",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-8b4002e95474",
+      "source": "node-fc94fa44f573",
+      "target": "node-1ab2e511f573",
+      "kind": "wikilink",
+      "label": "JSON Canvas"
+    },
+    {
+      "id": "edge-bbde2aa98093",
+      "source": "node-fc94fa44f573",
+      "target": "node-8dc4d7918bf9",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-3c60efebee41",
+      "source": "node-e540cdd1328b",
+      "target": "node-8dc4d7918bf9",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-7b40ff5e98ad",
+      "source": "node-e540cdd1328b",
+      "target": "node-fc94fa44f573",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-bdd29a14c2c7",
+      "source": "node-e540cdd1328b",
+      "target": "node-ba7753d60e35",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-f6e1f6242187",
+      "source": "node-e540cdd1328b",
+      "target": "node-c3ba326f222d",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-3dbb27ddae38",
+      "source": "node-e540cdd1328b",
+      "target": "node-1ab2e511f573",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-359b5061574a",
+      "source": "node-e540cdd1328b",
+      "target": "node-d83f4c48e4e6",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-8ccf741046bb",
+      "source": "node-e540cdd1328b",
+      "target": "node-7babc233de26",
+      "kind": "wikilink",
+      "label": "Atlas Log"
+    },
+    {
+      "id": "edge-c5ed6b2d395e",
+      "source": "node-c3ba326f222d",
+      "target": "node-8dc4d7918bf9",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-a8fc6651989b",
+      "source": "node-1ab2e511f573",
+      "target": "node-fc94fa44f573",
+      "kind": "wikilink"
+    }
+  ],
+  "diagnostics": [],
+  "stats": {
+    "files": 8,
+    "links": 16,
+    "brokenLinks": 0,
+    "orphanNodes": 0
+  }
+}

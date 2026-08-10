@@ -1,0 +1,24 @@
+# Wiki Contract
+
+## Supported source conventions
+
+- Markdown files under the selected root.
+- YAML frontmatter fields: `title`, `type`, `tags`, `summary`, and `source`.
+- Node types: `index`, `concept`, `source`, and `note`.
+- Obsidian WikiLinks: `[[Page]]`, `[[Page|Label]]`, and `![[Page]]`.
+- Relative Markdown file links: `[Label](path/Page.md)`.
+
+## Generated artifacts
+
+- `graph.json` uses schema version 1 and contains nodes, edges, diagnostics, and aggregate stats.
+- `.canvas` follows the JSON Canvas 1.0 shape with file nodes and directed edges.
+- Node IDs derive from normalized relative paths and stay stable across builds.
+- Existing Canvas coordinates, dimensions, and colors are retained by node ID.
+
+## Recommended wiki files
+
+- `index.md`: small hand-maintained navigation entry point.
+- `log.md`: append-only maintenance and ingestion log.
+- `sources/`: immutable or minimally transformed source notes.
+- `concepts/`: synthesized concept pages with source links.
+- `AGENTS.md`: local schema, style, and review rules.

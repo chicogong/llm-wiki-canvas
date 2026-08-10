@@ -1,0 +1,57 @@
+---
+name: llm-wiki-canvas
+description: Build, inspect, lint, and visualize a local Markdown or Obsidian knowledge wiki. Use when Codex needs to ingest notes into an LLM Wiki structure, analyze WikiLinks and relationships, find broken links or orphan pages, generate an Obsidian JSON Canvas, or maintain index.md and log.md without adding MCP, a database, or an embedded LLM. Do not use for cloud RAG systems, silent bulk rewrites of source notes, or applying unreviewed Agent changes.
+---
+
+# LLM Wiki Canvas
+
+Treat Markdown, source files, and review records as truth. Treat generated graph and canvas files as disposable views.
+
+## Inspect the Wiki
+
+1. Locate the wiki root and read its `AGENTS.md` or `CLAUDE.md` if present.
+2. Read `index.md` to learn the intended information architecture.
+3. Run `lwc scan <root> -o <root>/.lwc/graph.json` to compile relationships.
+4. Run `lwc lint <root>` before proposing structural changes.
+5. Report exact file paths for broken, ambiguous, and orphaned pages.
+
+If the repository package is not installed globally, run `pnpm exec tsx <repo>/src/cli/index.ts` in place of `lwc`.
+
+## Query and Explain
+
+1. Start from the smallest relevant page or index.
+2. Traverse direct WikiLinks before widening the search.
+3. Cite the local file path for each material claim.
+4. Distinguish source facts from generated summaries.
+5. Say when the wiki has no evidence instead of inventing a relationship.
+
+## Ingest or Maintain
+
+1. Preserve raw source files; do not rewrite them as generated prose.
+2. Propose the target pages and links before changing formal wiki content.
+3. Make focused edits. Never regenerate a large `index.md` wholesale.
+4. Add a dated entry to `log.md` describing created, updated, and unresolved items.
+5. Re-run `lwc lint` and `lwc build` after approved edits.
+6. Show the diff and generated diagnostics for review.
+
+## Visualize
+
+Run:
+
+```bash
+lwc build <root> \
+  --graph <viewer-public>/graph.json \
+  --canvas <root>/Wiki.canvas
+```
+
+Open `Wiki.canvas` in Obsidian for manual spatial editing. Future builds preserve positions when the same output canvas is used. Use the local Viewer for filtering and relationship inspection.
+
+## Safety Rules
+
+- Keep Agent-authored content reviewable and attributable.
+- Never treat `.lwc/graph.json` as a source of truth.
+- Do not add MCP merely to expose local files; the host Agent can read files and run the CLI.
+- Do not silently apply generated wiki rewrites.
+- Preserve user-edited Canvas coordinates by building onto the existing Canvas file.
+
+Read [wiki-contract.md](references/wiki-contract.md) for supported conventions and generated artifact schemas.

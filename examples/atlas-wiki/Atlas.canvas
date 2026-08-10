@@ -1,0 +1,200 @@
+{
+  "nodes": [
+    {
+      "id": "node-e540cdd1328b",
+      "type": "file",
+      "file": "index.md",
+      "x": 0,
+      "y": 0,
+      "width": 360,
+      "height": 220,
+      "color": "4"
+    },
+    {
+      "id": "node-8dc4d7918bf9",
+      "type": "file",
+      "file": "concepts/LLM Wiki.md",
+      "x": 0,
+      "y": -520,
+      "width": 360,
+      "height": 220,
+      "color": "5"
+    },
+    {
+      "id": "node-d83f4c48e4e6",
+      "type": "file",
+      "file": "Agent Workflow.md",
+      "x": 368,
+      "y": -368,
+      "width": 360,
+      "height": 220,
+      "color": "2"
+    },
+    {
+      "id": "node-ba7753d60e35",
+      "type": "file",
+      "file": "concepts/Human Review.md",
+      "x": 520,
+      "y": 0,
+      "width": 360,
+      "height": 220,
+      "color": "5"
+    },
+    {
+      "id": "node-fc94fa44f573",
+      "type": "file",
+      "file": "concepts/Visual Knowledge.md",
+      "x": 368,
+      "y": 368,
+      "width": 360,
+      "height": 220,
+      "color": "5"
+    },
+    {
+      "id": "node-c3ba326f222d",
+      "type": "file",
+      "file": "sources/Karpathy Pattern.md",
+      "x": 0,
+      "y": 520,
+      "width": 360,
+      "height": 220,
+      "color": "6"
+    },
+    {
+      "id": "node-1ab2e511f573",
+      "type": "file",
+      "file": "sources/Obsidian Canvas.md",
+      "x": -368,
+      "y": 368,
+      "width": 360,
+      "height": 220,
+      "color": "6"
+    },
+    {
+      "id": "node-7babc233de26",
+      "type": "file",
+      "file": "log.md",
+      "x": -368,
+      "y": -368,
+      "width": 360,
+      "height": 220,
+      "color": "2"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-292e93f89901",
+      "fromNode": "node-d83f4c48e4e6",
+      "toNode": "node-ba7753d60e35",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-95ad0482fff9",
+      "fromNode": "node-d83f4c48e4e6",
+      "toNode": "node-c3ba326f222d",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-430476576a64",
+      "fromNode": "node-ba7753d60e35",
+      "toNode": "node-d83f4c48e4e6",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-5dd492f65dda",
+      "fromNode": "node-8dc4d7918bf9",
+      "toNode": "node-ba7753d60e35",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-fae25d2ab6ca",
+      "fromNode": "node-8dc4d7918bf9",
+      "toNode": "node-c3ba326f222d",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-8b4002e95474",
+      "fromNode": "node-fc94fa44f573",
+      "toNode": "node-1ab2e511f573",
+      "fromEnd": "none",
+      "toEnd": "arrow",
+      "label": "JSON Canvas"
+    },
+    {
+      "id": "edge-bbde2aa98093",
+      "fromNode": "node-fc94fa44f573",
+      "toNode": "node-8dc4d7918bf9",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-3c60efebee41",
+      "fromNode": "node-e540cdd1328b",
+      "toNode": "node-8dc4d7918bf9",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-7b40ff5e98ad",
+      "fromNode": "node-e540cdd1328b",
+      "toNode": "node-fc94fa44f573",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-bdd29a14c2c7",
+      "fromNode": "node-e540cdd1328b",
+      "toNode": "node-ba7753d60e35",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-f6e1f6242187",
+      "fromNode": "node-e540cdd1328b",
+      "toNode": "node-c3ba326f222d",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-3dbb27ddae38",
+      "fromNode": "node-e540cdd1328b",
+      "toNode": "node-1ab2e511f573",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-359b5061574a",
+      "fromNode": "node-e540cdd1328b",
+      "toNode": "node-d83f4c48e4e6",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-8ccf741046bb",
+      "fromNode": "node-e540cdd1328b",
+      "toNode": "node-7babc233de26",
+      "fromEnd": "none",
+      "toEnd": "arrow",
+      "label": "Atlas Log"
+    },
+    {
+      "id": "edge-c5ed6b2d395e",
+      "fromNode": "node-c3ba326f222d",
+      "toNode": "node-8dc4d7918bf9",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-a8fc6651989b",
+      "fromNode": "node-1ab2e511f573",
+      "toNode": "node-fc94fa44f573",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    }
+  ]
+}

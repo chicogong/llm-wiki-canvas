@@ -1,0 +1,5 @@
+interface:
+  display_name: "LLM Wiki Canvas"
+  short_description: "Build and inspect a local visual LLM wiki"
+  brand_color: "#163A5F"
+  default_prompt: "Use $llm-wiki-canvas to scan this local wiki, lint its links, and generate a reviewable knowledge canvas."
