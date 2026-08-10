@@ -14,3 +14,4 @@ All notable changes will be documented here. This project follows Semantic Versi
 - Complete English and Simplified Chinese project guides, an Atlas screenshot, and a reproducible example walkthrough with benefit comparisons.
 - Deterministic topology layout with low-noise relationship highlighting and a dark local-instrument Viewer theme.
 - Explicit open-source commit boundaries for reproducible public artifacts versus private or machine-local state.
+- English and Chinese comparison and usage guides covering Obsidian, QMD, LLM Wiki, WeKnora, Agent Skills, and CI workflows.
