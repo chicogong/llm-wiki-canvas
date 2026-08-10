@@ -53,5 +53,8 @@ Open `Wiki.canvas` in Obsidian for manual spatial editing. Future builds preserv
 - Do not add MCP merely to expose local files; the host Agent can read files and run the CLI.
 - Do not silently apply generated wiki rewrites.
 - Preserve user-edited Canvas coordinates by building onto the existing Canvas file.
+- Before staging changes, inspect `git status --short` and `git diff`; stage only explicit in-scope paths.
+- Commit sanitized examples and deliberate reproducible fixtures, but never private vaults, `.lwc/` working state, credentials, sessions, caches, logs, absolute personal paths, or unreviewed screenshots.
+- Treat generated artifacts as ignored by default. Commit one only when tests or public documentation depend on it and its provenance is documented.
 
 Read [wiki-contract.md](references/wiki-contract.md) for supported conventions and generated artifact schemas.

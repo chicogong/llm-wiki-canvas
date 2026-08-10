@@ -24,15 +24,31 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
         ...graph.edges.map((edge) => ({ data: { id: edge.id, source: edge.source, target: edge.target, kind: edge.kind } })),
       ],
       style: [
-        { selector: "node", style: { "background-color": "#f3efe4", "border-color": "#163a5f", "border-width": 2, label: "data(label)", color: "#15202b", "font-family": "Avenir Next, sans-serif", "font-size": "11px", "text-wrap": "wrap", "text-max-width": "92px", "text-valign": "bottom", "text-margin-y": 9, width: 24, height: 24 } },
-        { selector: "node[kind = 'index']", style: { "background-color": "#f26b4a", width: 38, height: 38, "border-width": 4 } },
-        { selector: "node[kind = 'concept']", style: { "background-color": "#e8c86a", shape: "diamond", width: 30, height: 30 } },
-        { selector: "node[kind = 'source']", style: { "background-color": "#547a5a", shape: "round-rectangle" } },
-        { selector: "edge", style: { width: 1.3, "line-color": "#8e9aa3", "target-arrow-color": "#8e9aa3", "target-arrow-shape": "triangle", "curve-style": "bezier", opacity: 0.65 } },
-        { selector: ":selected", style: { "border-color": "#f26b4a", "border-width": 5, "underlay-color": "#f26b4a", "underlay-opacity": 0.12, "underlay-padding": 8 } },
-        { selector: ".muted", style: { opacity: 0.08 } },
+        { selector: "node", style: { "background-color": "#0c1b2a", "border-color": "#7f96aa", "border-width": 2, label: "data(label)", color: "#dce8f2", "font-family": "SFMono-Regular, Consolas, monospace", "font-size": "11px", "font-weight": 600, "text-wrap": "wrap", "text-max-width": "122px", "text-valign": "bottom", "text-margin-y": 12, "text-background-color": "#07111f", "text-background-opacity": 0.88, "text-background-padding": "4px", width: 20, height: 20 } },
+        { selector: "node[kind = 'index']", style: { "background-color": "#5ee7f7", "border-color": "#dffcff", shape: "hexagon", width: 46, height: 46, "border-width": 3, color: "#ffffff", "font-size": "12px", "text-max-width": "150px" } },
+        { selector: "node[kind = 'concept']", style: { "background-color": "#9ba7ff", "border-color": "#d7dcff", shape: "diamond", width: 30, height: 30 } },
+        { selector: "node[kind = 'source']", style: { "background-color": "#ffb35c", "border-color": "#ffe0b8", shape: "round-rectangle", width: 28, height: 22 } },
+        { selector: "node[kind = 'note']", style: { "background-color": "#07111f", "border-color": "#7f96aa", shape: "ellipse", width: 22, height: 22 } },
+        { selector: "edge", style: { width: 1, "line-color": "#4f7189", "target-arrow-color": "#4f7189", "target-arrow-shape": "triangle", "arrow-scale": 0.65, "curve-style": "bezier", opacity: 0.3 } },
+        { selector: "edge.context", style: { width: 2, "line-color": "#5ee7f7", "target-arrow-color": "#5ee7f7", opacity: 0.9, "z-index": 20 } },
+        { selector: "node.context", style: { "border-color": "#5ee7f7", "border-width": 3 } },
+        { selector: ":selected", style: { "border-color": "#ffffff", "border-width": 4, "underlay-color": "#5ee7f7", "underlay-opacity": 0.2, "underlay-padding": 11 } },
+        { selector: ".muted", style: { opacity: 0.09 } },
       ],
-      layout: { name: "cose", animate: false, fit: true, padding: 58, nodeRepulsion: () => 14000, idealEdgeLength: () => 145, nodeOverlap: 28, componentSpacing: 110 },
+      layout: {
+        name: "concentric",
+        animate: false,
+        fit: true,
+        padding: 82,
+        avoidOverlap: true,
+        nodeDimensionsIncludeLabels: true,
+        minNodeSpacing: 88,
+        spacingFactor: 1.2,
+        equidistant: true,
+        startAngle: -Math.PI / 2,
+        concentric: (node) => node.data("kind") === "index" ? 10 : 1,
+        levelWidth: () => 5,
+      },
       minZoom: 0.25,
       maxZoom: 2.4,
     });
@@ -50,11 +66,15 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
 
   useEffect(() => {
     const cy = cyRef.current;
-    if (!cy || !selectedId) return;
+    if (!cy) return;
     cy.$(":selected").unselect();
+    cy.elements().removeClass("context");
+    if (!selectedId) return;
     const node = cy.getElementById(selectedId);
     node.select();
-    cy.animate({ center: { eles: node }, duration: 220 });
+    node.addClass("context");
+    node.connectedEdges().addClass("context");
+    node.neighborhood("node").addClass("context");
   }, [selectedId]);
 
   return <div ref={ref} className="graph-canvas" data-testid="graph-canvas" aria-label="Wiki 关系图" />;
@@ -98,7 +118,7 @@ export function App() {
   return <main className="atlas-shell">
     <header className="masthead">
       <div>
-        <p className="eyebrow">LOCAL KNOWLEDGE ATLAS · PLATE 001</p>
+        <p className="eyebrow">KNOWLEDGE TOPOLOGY · LOCAL / DETERMINISTIC</p>
         <h1>LLM Wiki <i>Canvas</i></h1>
       </div>
       <div className="edition"><span>本地只读</span><strong>{graph.rootName}</strong><small>{graph.generatedAt.slice(0, 10)}</small></div>
@@ -116,7 +136,7 @@ export function App() {
 
     <section className="workspace">
       <div className="plate">
-        <div className="plate-label"><span>关系视野</span><b>{visibleIds.size.toString().padStart(2, "0")} / {graph.nodes.length.toString().padStart(2, "0")}</b></div>
+        <div className="plate-label"><span>拓扑视野</span><b>{visibleIds.size.toString().padStart(2, "0")} / {graph.nodes.length.toString().padStart(2, "0")}</b></div>
         <GraphStage graph={graph} visibleIds={visibleIds} selectedId={selectedId} onSelect={setSelectedId} />
         <div className="legend" aria-label="图例"><span><i className="dot index" />索引</span><span><i className="dot concept" />概念</span><span><i className="dot source" />来源</span><span><i className="dot note" />笔记</span></div>
       </div>
