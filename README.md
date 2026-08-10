@@ -61,6 +61,8 @@ public/graph.json            # Deterministic Viewer input
 
 See [Examples](examples/README.md) for a guided walkthrough and commands you can copy.
 
+See the bilingual [product roadmap](ROADMAP.md) for the Workbench, one-command local serving, proposal review, topology overlays, and optional Excalidraw/Mermaid views.
+
 ## How it compares
 
 LLM Wiki Canvas occupies a deliberately small layer. It compiles and checks an existing Markdown wiki; it does not ingest every document format, generate the wiki with an LLM, or answer questions with RAG.

@@ -61,6 +61,8 @@ public/graph.json            # 确定性的 Viewer 输入
 
 更完整的操作步骤见 [Examples](examples/README.md)。
 
+Workbench、单命令本地服务、proposal 审查、关系变更叠层，以及可选 Excalidraw/Mermaid 视图的规划见[双语产品路线图](ROADMAP.md)。
+
 ## 与其他工具怎么选
 
 LLM Wiki Canvas 有意只做很小的一层：编译并检查已经存在的 Markdown Wiki；它不负责导入所有文档格式，不用 LLM 自动生成整个 Wiki，也不提供 RAG 问答。

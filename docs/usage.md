@@ -168,6 +168,6 @@ Use a deliberate fixed timestamp only for checked-in fixtures. Do not hide real 
 
 ## 10. What the current Viewer does and does not do
 
-The Viewer supports graph browsing, metadata search, page-kind filters, node evidence cards, and direct-neighbor navigation. It does not currently render Markdown bodies, perform semantic search, edit source files, or call an LLM.
+The Workbench has two factual views. **Map** supports graph browsing, metadata search, page-kind filters, node evidence cards, relationship direction, and direct-neighbor navigation. **Health** reports compiled page/link totals, broken links, orphan pages, diagnostics, page-type distribution, and the most-connected pages. It does not currently render Markdown bodies, perform semantic search, edit source files, or call an LLM.
 
 For failures, run `lwc lint` first, check that the Viewer graph path returns JSON, and verify that the Wiki root contains readable `.md` files.
