@@ -65,6 +65,13 @@ describe("wiki graph compiler", () => {
     await writeFile(path.join(root, "index.md"), "# Home\n[[Topic]] and again [[Topic]].\n");
     await writeFile(path.join(root, "Topic.md"), "# Topic\n");
     await writeFile(path.join(root, "AGENTS.md"), "# Instructions\n");
+    await writeFile(path.join(root, "CLAUDE.md"), "@AGENTS.md\n");
+    await mkdir(path.join(root, ".agents", "skills"), { recursive: true });
+    await mkdir(path.join(root, ".claude", "skills"), { recursive: true });
+    await mkdir(path.join(root, ".qoder", "skills"), { recursive: true });
+    await writeFile(path.join(root, ".agents", "skills", "shared.md"), "# Shared Skill\n");
+    await writeFile(path.join(root, ".claude", "skills", "claude.md"), "# Claude Skill\n");
+    await writeFile(path.join(root, ".qoder", "skills", "qoder.md"), "# Qoder Skill\n");
     const graph = await buildGraph(root);
     expect(graph.nodes.map((node) => node.path)).toEqual(["Topic.md", "index.md"]);
     expect(graph.edges).toHaveLength(1);
