@@ -100,6 +100,10 @@ pnpm lwc proposal apply /path/to/proposal.json /path/to/vault \
 
 create、show、review、reject 都不会修改正式 Markdown。Apply 写入前检查内容、review、路径和原目标哈希。完整状态模型和限制见[审查式知识修改](proposals.zh-CN.md)。
 
+运行 `lwc serve /path/to/vault` 后，可以在 **Changes** 中检查 `<vault>/.lwc/proposals/` 下的 proposal。Inbox 会明确区分 proposed、reviewed、applied 和 rejected 状态，并展示精确文件 diff 和完整 SHA-256。无效 JSON 或属于另一个 Vault 的 proposal 会被隔离成单独 issue，不会导致整个 Inbox 失败。
+
+Changes 有意保持只读。Review、reject 和 apply 仍然必须通过明确的 CLI 操作完成，因此 Workbench 不能冒充 reviewer，也不能静默修改 Markdown。
+
 ## 5. 单独扫描、检查或生成 Canvas
 
 开发时直接运行源码 CLI：
@@ -186,6 +190,6 @@ git diff --exit-code -- ./fixtures/graph.json ./wiki/Wiki.canvas
 
 ## 10. 当前 Viewer 能做和不能做什么
 
-Workbench 有两个完全基于编译事实的视图。**Map** 支持关系图浏览、元数据搜索、页面类型筛选、节点证据卡、关系方向和直接邻居跳转；**Health** 展示页面与关系总数、断链、孤立页面、诊断、页面类型分布和高连接页面。当前不渲染 Markdown 正文、不做语义搜索、不编辑源文件，也不调用 LLM。
+Workbench 有三个基于本地事实的视图。**Map** 支持关系图浏览、元数据搜索、页面类型筛选、节点证据卡、关系方向和直接邻居跳转；**Health** 展示页面与关系总数、断链、孤立页面、诊断、页面类型分布和高连接页面；**Changes** 展示本地 proposal 生命周期、哈希和精确 diff，但不替人做审查决定。当前不渲染完整 Markdown 页面、不做语义搜索、不编辑源文件，也不调用 LLM。
 
 遇到问题时先执行 `lwc lint`，确认 Viewer 的 graph 路径返回 JSON，并检查 Wiki 根目录中是否存在可读 `.md` 文件。

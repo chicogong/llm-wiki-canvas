@@ -64,6 +64,8 @@ lwc proposal show /path/to/proposal.json
 
 输出包含状态、路径、两侧哈希和 Markdown diff。审查人还应检查草稿依据与来源；哈希只能证明内容没有变化，不能证明内容真实。
 
+要在一个只读队列里检查全部 proposal，运行 `lwc serve /path/to/vault` 并打开 **Changes**。Workbench 读取默认 `.lwc/proposals/` 目录，分开开放和已结束的生命周期状态，并展示相同的哈希与 diff 证据。它会给出下一次合法状态转换的命令，但绝不会直接执行 review、reject 或 apply。
+
 ## 4. Review 或 reject
 
 复制 `create` 打印出的完整 proposal ID：

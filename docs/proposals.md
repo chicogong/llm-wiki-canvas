@@ -64,6 +64,8 @@ lwc proposal show /path/to/proposal.json
 
 The output contains status, paths, both hashes, and a Markdown diff. A reviewer must still inspect evidence and sources. Hashes prove that content did not change; they do not prove that it is true.
 
+To inspect every proposal in one read-only queue, run `lwc serve /path/to/vault` and open **Changes**. The Workbench reads the default `.lwc/proposals/` directory, separates open and closed lifecycle states, and shows the same hashes and diff evidence. It displays commands for the next valid transition but never runs review, reject, or apply.
+
 ## 4. Review or reject
 
 Copy the complete proposal ID printed by `create`:

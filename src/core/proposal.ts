@@ -162,6 +162,21 @@ export function parseKnowledgeProposal(value: unknown): KnowledgeProposal {
       throw new Error(`Invalid update proposal: ${change.path}`);
     }
   }
+  if (["reviewed", "applied"].includes(proposal.status)) {
+    if (!proposal.review) throw new Error(`Proposal in ${proposal.status} state is missing its review record`);
+    const expectedProposalHash = proposalHash(proposal);
+    if (proposal.review.proposalHash !== expectedProposalHash) throw new Error("Proposal changed after review; review it again before apply");
+    if (proposal.review.reviewHash !== reviewHash(expectedProposalHash, proposal.review.reviewer, proposal.review.reviewedAt, proposal.review.note)) {
+      throw new Error("Review record changed after approval; review it again before apply");
+    }
+  }
+  if (proposal.status === "applied") {
+    if (!proposal.application) throw new Error("Applied proposal is missing its application record");
+    if (proposal.application.proposalHash !== proposal.review?.proposalHash || proposal.application.reviewHash !== proposal.review?.reviewHash) {
+      throw new Error("Application record does not match the reviewed proposal");
+    }
+  }
+  if (proposal.status === "rejected" && !proposal.rejection) throw new Error("Rejected proposal is missing its rejection record");
   return proposal;
 }
 
@@ -244,7 +259,12 @@ export async function applyKnowledgeProposal(root: string, proposalValue: unknow
   };
 }
 
-function diffBlock(change: ProposalChange): string[] {
+export interface ProposalDiffLine {
+  kind: "context" | "add" | "remove";
+  text: string;
+}
+
+export function proposalDiff(change: ProposalChange): ProposalDiffLine[] {
   const before = (change.baseContent ?? "").split("\n");
   const after = change.content.split("\n");
   let prefix = 0;
@@ -256,10 +276,10 @@ function diffBlock(change: ProposalChange): string[] {
   const afterEnd = after.length - suffix;
   const suffixEnd = Math.min(before.length, beforeEnd + 2);
   return [
-    ...before.slice(contextStart, prefix).map((line) => ` ${line}`),
-    ...before.slice(prefix, beforeEnd).map((line) => `-${line}`),
-    ...after.slice(prefix, afterEnd).map((line) => `+${line}`),
-    ...before.slice(beforeEnd, suffixEnd).map((line) => ` ${line}`),
+    ...before.slice(contextStart, prefix).map((text) => ({ kind: "context" as const, text })),
+    ...before.slice(prefix, beforeEnd).map((text) => ({ kind: "remove" as const, text })),
+    ...after.slice(prefix, afterEnd).map((text) => ({ kind: "add" as const, text })),
+    ...before.slice(beforeEnd, suffixEnd).map((text) => ({ kind: "context" as const, text })),
   ];
 }
 
@@ -286,7 +306,7 @@ export function proposalToMarkdown(proposalValue: unknown): string {
       `Proposed SHA-256: \`${change.contentHash}\``,
       "",
       "```diff",
-      ...diffBlock(change),
+      ...proposalDiff(change).map((line) => `${line.kind === "add" ? "+" : line.kind === "remove" ? "-" : " "}${line.text}`),
       "```",
     );
   }

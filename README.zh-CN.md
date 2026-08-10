@@ -20,6 +20,7 @@ LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性�
 - **知识库质量可以测试。** 断链、歧义链接、缺少标题和孤立页面都有准确路径。
 - **Canvas 仍然可编辑。** 重新生成时保留用户手工调整过的节点位置。
 - **Agent 遵循同一套仓库契约。** 内置 Skill 指导 Agent 以文件为中心、经人工审查地工作，不依赖 MCP。
+- **Proposal 生命周期可以直接检查。** Changes 展示状态、文件动作、完整哈希、精确 diff 和安全 CLI 下一步，但 UI 本身不执行 apply。
 - **生成视图可复现。** 稳定的节点和边 ID，让图谱 fixture 与 Git diff 有实际意义。
 
 ## 运行真实示例
@@ -120,7 +121,7 @@ lwc build /path/to/vault \
   --canvas /path/to/vault/Wiki.canvas
 ```
 
-`lwc serve` 会在 <http://127.0.0.1:4173> 打开完整 Workbench，并在 Markdown 变化后刷新图谱。默认只监听本机回环地址；重建失败时保留上一份有效图，也不会向 Vault 写入临时生成状态。可用 `--port <端口>` 修改端口，或用 `--no-watch` 查看固定快照。
+`lwc serve` 会在 <http://127.0.0.1:4173> 打开包含 Map、Health 和 Changes 的完整 Workbench，并在 Markdown 或 proposal 变化后刷新。默认只监听本机回环地址；重建失败时保留上一份有效图，也不会向 Vault 写入临时生成状态。可用 `--port <端口>` 修改端口，或用 `--no-watch` 查看固定快照。
 
 如果要把生成结果提交到 Git，请给 `lwc build` 传入 `--generated-at <ISO 时间>`，固定该次输出中的生成时间和节点修改时间。
 

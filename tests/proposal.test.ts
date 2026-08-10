@@ -6,6 +6,7 @@ import {
   applyKnowledgeProposal,
   createKnowledgeProposal,
   proposalToMarkdown,
+  readProposalInbox,
   rejectKnowledgeProposal,
   reviewKnowledgeProposal,
 } from "../src/core/index.js";
@@ -86,5 +87,42 @@ describe("knowledge proposal lifecycle", () => {
     await mkdir(path.join(hidden, ".secret"));
     await writeFile(path.join(hidden, ".secret", "Note.md"), "# Secret\n");
     await expect(createKnowledgeProposal(root, hidden, "Hidden")).rejects.toThrow("no changed Markdown files");
+  });
+
+  it("builds a read-only inbox with exact diffs and isolated invalid files", async () => {
+    const { root, draft } = await proposalFixture();
+    const proposal = await createKnowledgeProposal(root, draft, "Inbox review", new Date("2026-08-10T00:00:00Z"));
+    const proposalsRoot = path.join(root, ".lwc", "proposals");
+    await mkdir(proposalsRoot, { recursive: true });
+    await writeFile(path.join(proposalsRoot, "valid.json"), `${JSON.stringify(proposal)}\n`);
+    await writeFile(path.join(proposalsRoot, "invalid.json"), "{not-json\n");
+    await writeFile(path.join(proposalsRoot, "wrong-root.json"), `${JSON.stringify({ ...proposal, rootName: "other-vault" })}\n`);
+    await writeFile(path.join(proposalsRoot, "fake-reviewed.json"), `${JSON.stringify({ ...proposal, status: "reviewed" })}\n`);
+
+    const inbox = await readProposalInbox(root);
+    expect(inbox.proposals).toHaveLength(1);
+    expect(inbox.proposals[0]).toMatchObject({
+      file: ".lwc/proposals/valid.json",
+      id: proposal.id,
+      status: "proposed",
+      changes: [
+        { path: "concepts/Existing.md", operation: "update" },
+        { path: "concepts/New.md", operation: "create", baseHash: null },
+      ],
+    });
+    expect(inbox.proposals[0].changes[0].diff).toEqual(expect.arrayContaining([
+      { kind: "remove", text: "Old text." },
+      { kind: "add", text: "Reviewed text." },
+    ]));
+    expect(inbox.issues).toEqual(expect.arrayContaining([
+      { file: ".lwc/proposals/invalid.json", message: expect.stringContaining("JSON") },
+      { file: ".lwc/proposals/wrong-root.json", message: expect.stringContaining("other-vault") },
+      { file: ".lwc/proposals/fake-reviewed.json", message: expect.stringContaining("missing its review record") },
+    ]));
+  });
+
+  it("returns an empty inbox when a Vault has no proposal directory", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "lwc-empty-inbox-"));
+    await expect(readProposalInbox(root)).resolves.toEqual({ proposals: [], issues: [] });
   });
 });

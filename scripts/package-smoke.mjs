@@ -89,6 +89,14 @@ try {
   if (canvas.nodes[0].x !== 4321 || canvas.nodes[0].y !== -1234 || nodeIds.size !== canvas.nodes.length || edgeIds.size !== canvas.edges.length || !validEndpoints) {
     throw new Error("canvas preservation or JSON Canvas integrity check failed");
   }
+  const draft = path.join(consumer, "draft");
+  const proposalFile = path.join(wiki, ".lwc", "proposals", "package.json");
+  mkdirSync(draft, { recursive: true });
+  writeFileSync(path.join(draft, "Missing.md"), "# Missing\n[[index]]\n\nReviewed addition.\n");
+  writeFileSync(path.join(draft, "Reviewed.md"), "# Reviewed\n[[index]]\n");
+  run(lwc, ["proposal", "create", wiki, "--from", draft, "--summary", "Package proposal", "--created-at", "2026-08-10T00:00:00.000Z", "-o", proposalFile], { cwd: consumer });
+  const proposed = JSON.parse(readFileSync(proposalFile, "utf8"));
+  if (proposed.status !== "proposed" || proposed.changes.length !== 2) throw new Error("packaged CLI did not create the expected proposal");
   const servePort = await freePort();
   const served = spawn(lwc, ["serve", wiki, "--port", String(servePort), "--no-watch"], { cwd: consumer, stdio: ["ignore", "pipe", "pipe"] });
   let serveOutput = "";
@@ -96,9 +104,10 @@ try {
   served.stderr.on("data", (chunk) => { serveOutput += chunk; });
   try {
     const status = await waitForJson(`http://127.0.0.1:${servePort}/__lwc/status`, served, () => serveOutput);
+    const inbox = await fetch(`http://127.0.0.1:${servePort}/__lwc/proposals`).then((response) => response.json());
     const viewer = await fetch(`http://127.0.0.1:${servePort}/`, { redirect: "follow" });
-    if (!status.live || status.watching || !viewer.ok || !(await viewer.text()).includes("LLM Wiki Canvas")) {
-      throw new Error(`packaged server did not expose the expected Workbench\n${serveOutput}`);
+    if (!status.live || status.watching || status.proposals !== 1 || inbox.proposals[0]?.id !== proposed.id || !viewer.ok || !(await viewer.text()).includes("LLM Wiki Canvas")) {
+      throw new Error(`packaged server did not expose the expected Workbench inbox\n${serveOutput}`);
     }
   } finally {
     served.kill("SIGTERM");
@@ -107,14 +116,6 @@ try {
       new Promise((resolve) => setTimeout(resolve, 2000)),
     ]);
   }
-  const draft = path.join(consumer, "draft");
-  const proposalFile = path.join(consumer, "proposal.json");
-  mkdirSync(draft, { recursive: true });
-  writeFileSync(path.join(draft, "Missing.md"), "# Missing\n[[index]]\n\nReviewed addition.\n");
-  writeFileSync(path.join(draft, "Reviewed.md"), "# Reviewed\n[[index]]\n");
-  run(lwc, ["proposal", "create", wiki, "--from", draft, "--summary", "Package proposal", "--created-at", "2026-08-10T00:00:00.000Z", "-o", proposalFile], { cwd: consumer });
-  const proposed = JSON.parse(readFileSync(proposalFile, "utf8"));
-  if (proposed.status !== "proposed" || proposed.changes.length !== 2) throw new Error("packaged CLI did not create the expected proposal");
   const shown = run(lwc, ["proposal", "show", proposalFile], { cwd: consumer }).stdout;
   if (!shown.includes("Reviewed addition") || !shown.includes("Base SHA-256")) throw new Error("packaged CLI proposal diff is incomplete");
   run(lwc, ["proposal", "apply", proposalFile, wiki, "--confirm", proposed.id], { cwd: consumer, expectFailure: true });

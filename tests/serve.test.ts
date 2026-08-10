@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { startWikiServer, type WikiServer } from "../src/cli/serve.js";
-import type { WikiGraph } from "../src/core/index.js";
+import { createKnowledgeProposal, type ProposalInbox, type WikiGraph } from "../src/core/index.js";
 
 const scratchDirectories: string[] = [];
 const servers: WikiServer[] = [];
@@ -57,6 +57,8 @@ describe("local Workbench server", () => {
 
     const status = await fetch(`${server.url}/__lwc/status`).then((response) => response.json()) as { live: boolean; watching: boolean };
     expect(status).toMatchObject({ live: true, watching: false });
+    const inbox = await fetch(`${server.url}/__lwc/proposals`).then((response) => response.json()) as ProposalInbox;
+    expect(inbox).toEqual({ proposals: [], issues: [] });
 
     const post = await fetch(`${server.url}/graph.json`, { method: "POST" });
     expect(post.status).toBe(405);
@@ -95,6 +97,31 @@ describe("local Workbench server", () => {
       if (chunk?.value) eventText += new TextDecoder().decode(chunk.value);
     }
     expect(eventText).toContain("event: graph");
+
+    const draft = path.join(path.dirname(root), "draft");
+    const proposalsRoot = path.join(root, ".lwc", "proposals");
+    await Promise.all([mkdir(draft), mkdir(proposalsRoot, { recursive: true })]);
+    await writeFile(path.join(draft, "Concept.md"), "# Concept\n[[index]]\n\nReviewed addition.\n", "utf8");
+    const proposal = await createKnowledgeProposal(root, draft, "Serve inbox", new Date("2026-08-10T00:00:00Z"));
+    await writeFile(path.join(proposalsRoot, "serve.json"), `${JSON.stringify(proposal)}\n`, "utf8");
+    let inbox = await fetch(`${server.url}/__lwc/proposals`).then((response) => response.json()) as ProposalInbox;
+    const inboxDeadline = Date.now() + 3000;
+    while (inbox.proposals.length !== 1 && Date.now() < inboxDeadline) {
+      await new Promise((resolve) => setTimeout(resolve, 40));
+      inbox = await fetch(`${server.url}/__lwc/proposals`).then((response) => response.json()) as ProposalInbox;
+    }
+    expect(inbox.proposals[0]).toMatchObject({ id: proposal.id, status: "proposed", summary: "Serve inbox" });
+    eventText = "";
+    const proposalEventDeadline = Date.now() + 1000;
+    while (!eventText.includes("event: proposals") && Date.now() < proposalEventDeadline && eventsReader) {
+      const chunk = await Promise.race([
+        eventsReader.read(),
+        new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 100)),
+      ]);
+      if (chunk?.value) eventText += new TextDecoder().decode(chunk.value);
+    }
+    expect(eventText).toContain("event: proposals");
+    expect(messages).toContain("Proposal inbox refreshed: 1 proposal(s) · 0 issue(s)");
     eventsController.abort();
   });
 

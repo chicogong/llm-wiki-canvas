@@ -20,6 +20,7 @@ It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
 - **Wiki quality becomes testable.** Broken links, ambiguous links, missing titles, and orphan pages have exact paths.
 - **The Canvas stays editable.** Rebuilds preserve manually adjusted node positions.
 - **Agents use the same repository contract.** The included Skill guides file-first, human-reviewed changes without requiring MCP.
+- **Proposals have a visible lifecycle.** Changes shows status, file actions, full hashes, exact diff lines, and safe CLI next steps without applying anything from the UI.
 - **Generated views are reproducible.** Stable node and edge IDs make graph fixtures and Git diffs meaningful.
 
 ## Try the working example
@@ -120,7 +121,7 @@ lwc build /path/to/vault \
   --canvas /path/to/vault/Wiki.canvas
 ```
 
-`lwc serve` opens the complete Workbench at <http://127.0.0.1:4173> and refreshes its graph after Markdown changes. It binds to loopback by default, keeps the last valid graph if a rebuild fails, and does not write generated state into the Vault. Use `--port <number>` to change the port or `--no-watch` for a fixed snapshot.
+`lwc serve` opens the complete Map, Health, and Changes Workbench at <http://127.0.0.1:4173>. It refreshes after Markdown or proposal changes, binds to loopback by default, keeps the last valid graph if a rebuild fails, and does not write generated state into the Vault. Use `--port <number>` to change the port or `--no-watch` for a fixed snapshot.
 
 For reproducible checked-in fixtures, pass `--generated-at <ISO timestamp>` to `lwc build`. It fixes graph generation and node modification timestamps for that output.
 
