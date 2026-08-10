@@ -267,6 +267,42 @@ function Lifecycle({ proposal }: { proposal: ProposalInboxItem }) {
   </ol>;
 }
 
+function TopologyPreview({ proposal }: { proposal: ProposalInboxItem }) {
+  const { addedLinks, removedLinks, conflicts } = proposal.topology;
+  const linkChanges = addedLinks.length + removedLinks.length;
+  return <section className={`topology-preview ${conflicts.length ? "has-conflicts" : ""}`} data-testid="topology-preview">
+    <div className="topology-heading">
+      <div><p className="section-kicker">Relationship impact</p><h3>Change blueprint</h3></div>
+      <div className="topology-totals" aria-label="Proposal impact totals">
+        <span><b>{proposal.changes.length}</b> pages</span>
+        <span><b>{linkChanges}</b> links</span>
+        <span className={conflicts.length ? "danger" : "safe"}><b>{conflicts.length}</b> conflicts</span>
+      </div>
+    </div>
+    {conflicts.length > 0 && <div className="conflict-banner" role="alert"><strong>Target state changed</strong><span>Review again before apply: {conflicts.join(", ")}</span></div>}
+    <div className="topology-board">
+      <div className="changed-pages">
+        <span className="blueprint-label">Changed pages</span>
+        {proposal.changes.map((change) => <div className={`page-chip ${change.targetState}`} key={change.path}>
+          <i aria-hidden="true" />
+          <span><strong>{change.path}</strong><small>{change.operation} · {change.targetState === "unchanged" ? "base verified" : change.targetState === "matches-proposal" ? "matches proposal" : "hash conflict"}</small></span>
+        </div>)}
+      </div>
+      <div className="topology-links">
+        <span className="blueprint-label">Relationship delta</span>
+        {addedLinks.map((link) => <div className="topology-link added" key={`add-${link.source}-${link.kind}-${link.target}`}>
+          <span className="link-sign">+</span><code>{link.source}</code><span className="link-arrow">→</span><strong>{link.target}</strong><small>{link.kind}</small>
+        </div>)}
+        {removedLinks.map((link) => <div className="topology-link removed" key={`remove-${link.source}-${link.kind}-${link.target}`}>
+          <span className="link-sign">−</span><code>{link.source}</code><span className="link-arrow">→</span><strong>{link.target}</strong><small>{link.kind}</small>
+        </div>)}
+        {linkChanges === 0 && <div className="topology-stable"><span>＝</span><div><strong>No relationship changes</strong><small>The proposal changes content without changing links.</small></div></div>}
+      </div>
+    </div>
+    <div className="topology-legend"><span><i className="amber" />Page changed</span><span><i className="green" />Link added</span><span><i className="red" />Link removed or conflicted</span></div>
+  </section>;
+}
+
 function ProposalDossier({ proposal }: { proposal: ProposalInboxItem }) {
   const commands = proposalCommands(proposal);
   return <article className="proposal-dossier" data-testid="proposal-dossier">
@@ -276,6 +312,8 @@ function ProposalDossier({ proposal }: { proposal: ProposalInboxItem }) {
     </header>
 
     <Lifecycle proposal={proposal} />
+
+    <TopologyPreview proposal={proposal} />
 
     {(proposal.review || proposal.rejection || proposal.application) && <section className="decision-record">
       <h3>Decision record</h3>
@@ -288,7 +326,7 @@ function ProposalDossier({ proposal }: { proposal: ProposalInboxItem }) {
       <div className="review-heading"><div><p className="section-kicker">Exact file diff</p><h3>{proposal.changes.length} changed {proposal.changes.length === 1 ? "file" : "files"}</h3></div><span>Read-only evidence</span></div>
       {proposal.changes.map((change, index) => <details key={change.path} open={index === 0}>
         <summary><span className={`operation ${change.operation}`}>{change.operation}</span><strong>{change.path}</strong><small>{change.diff.filter((line) => line.kind === "add").length}+ · {change.diff.filter((line) => line.kind === "remove").length}−</small></summary>
-        <div className="hash-pair"><div><span>Base SHA-256</span><code>{change.baseHash ?? "missing"}</code></div><div><span>Proposed SHA-256</span><code>{change.contentHash}</code></div></div>
+        <div className={`hash-pair ${change.targetState === "conflict" ? "conflict" : ""}`}><div><span>Base SHA-256</span><code>{change.baseHash ?? "missing"}</code></div><div><span>Proposed SHA-256</span><code>{change.contentHash}</code></div>{change.targetState === "conflict" && <div><span>Current SHA-256</span><code>{change.currentHash ?? "missing"}</code></div>}</div>
         <pre className="diff-block" aria-label={`Diff for ${change.path}`}>{change.diff.map((line, lineIndex) => <span className={line.kind} key={`${line.kind}-${lineIndex}`}><b>{line.kind === "add" ? "+" : line.kind === "remove" ? "−" : " "}</b>{line.text || " "}</span>)}</pre>
       </details>)}
     </section>

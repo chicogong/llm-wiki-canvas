@@ -21,6 +21,7 @@ It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
 - **The Canvas stays editable.** Rebuilds preserve manually adjusted node positions.
 - **Agents use the same repository contract.** The included Skill guides file-first, human-reviewed changes without requiring MCP.
 - **Proposals have a visible lifecycle.** Changes shows status, file actions, full hashes, exact diff lines, and safe CLI next steps without applying anything from the UI.
+- **Relationship impact is visible before review.** The Change blueprint marks affected pages, added or removed links, and target-hash conflicts before anything is applied.
 - **Generated views are reproducible.** Stable node and edge IDs make graph fixtures and Git diffs meaningful.
 
 ## Try the working example

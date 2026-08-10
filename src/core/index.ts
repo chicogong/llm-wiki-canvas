@@ -3,7 +3,7 @@ export { graphToCanvas } from "./canvas.js";
 export { buildWikiReport, reportToMarkdown } from "./report.js";
 export type { WikiReport } from "./report.js";
 export { readProposalInbox } from "./inbox.js";
-export type { ProposalInbox, ProposalInboxChange, ProposalInboxIssue, ProposalInboxItem } from "./inbox.js";
+export type { ProposalInbox, ProposalInboxChange, ProposalInboxIssue, ProposalInboxItem, ProposalTopology, ProposalTopologyLink } from "./inbox.js";
 export {
   applyKnowledgeProposal,
   createKnowledgeProposal,

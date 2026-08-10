@@ -21,6 +21,7 @@ LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性�
 - **Canvas 仍然可编辑。** 重新生成时保留用户手工调整过的节点位置。
 - **Agent 遵循同一套仓库契约。** 内置 Skill 指导 Agent 以文件为中心、经人工审查地工作，不依赖 MCP。
 - **Proposal 生命周期可以直接检查。** Changes 展示状态、文件动作、完整哈希、精确 diff 和安全 CLI 下一步，但 UI 本身不执行 apply。
+- **审核前即可看到关系影响。** Change blueprint 会标出受影响页面、新增或删除的链接，以及目标哈希冲突，且不会写入正式知识。
 - **生成视图可复现。** 稳定的节点和边 ID，让图谱 fixture 与 Git diff 有实际意义。
 
 ## 运行真实示例

@@ -34,12 +34,19 @@ async function openChangesFixture(page: Page): Promise<string[]> {
           operation: "update",
           baseHash: "a".repeat(64),
           contentHash: "b".repeat(64),
+          targetState: "unchanged",
+          currentHash: "a".repeat(64),
           diff: [
             { kind: "context", text: "# Human Review" },
             { kind: "remove", text: "Apply changes directly." },
             { kind: "add", text: "Review the exact diff before apply." },
           ],
         }],
+        topology: {
+          addedLinks: [{ source: "concepts/Human Review.md", target: "Source Provenance", kind: "wikilink" }],
+          removedLinks: [],
+          conflicts: [],
+        },
       }],
       issues: [],
     }),
@@ -80,6 +87,9 @@ test("@smoke reviews proposal lifecycle, hashes, and exact diff without applying
   await expect(page.getByText("Add reviewed source guidance").first()).toBeVisible();
   await expect(page.getByText("Needs review").first()).toBeVisible();
   await expect(page.getByText("Human decision required")).toBeVisible();
+  await expect(page.getByTestId("topology-preview")).toContainText("Change blueprint");
+  await expect(page.getByTestId("topology-preview")).toContainText("Source Provenance");
+  await expect(page.getByTestId("topology-preview")).toContainText("0 conflicts");
   await expect(page.getByText("a".repeat(64))).toBeVisible();
   await expect(page.getByText("b".repeat(64))).toBeVisible();
   await expect(page.getByLabel("Diff for concepts/Human Review.md")).toContainText("Apply changes directly.");

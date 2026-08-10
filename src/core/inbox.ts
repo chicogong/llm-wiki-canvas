@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import fg from "fast-glob";
@@ -15,6 +16,20 @@ export interface ProposalInboxChange {
   baseHash: string | null;
   contentHash: string;
   diff: ProposalDiffLine[];
+  targetState: "unchanged" | "matches-proposal" | "conflict";
+  currentHash: string | null;
+}
+
+export interface ProposalTopologyLink {
+  source: string;
+  target: string;
+  kind: "wikilink" | "markdown" | "embed";
+}
+
+export interface ProposalTopology {
+  addedLinks: ProposalTopologyLink[];
+  removedLinks: ProposalTopologyLink[];
+  conflicts: string[];
 }
 
 export interface ProposalInboxItem {
@@ -25,6 +40,7 @@ export interface ProposalInboxItem {
   status: ProposalStatus;
   createdAt: string;
   changes: ProposalInboxChange[];
+  topology: ProposalTopology;
   review?: KnowledgeProposal["review"];
   rejection?: KnowledgeProposal["rejection"];
   application?: KnowledgeProposal["application"];
@@ -42,8 +58,52 @@ export interface ProposalInbox {
 
 const statusOrder: Record<ProposalStatus, number> = { proposed: 0, reviewed: 1, applied: 2, rejected: 3 };
 const unix = (value: string) => value.split(path.sep).join("/");
+const hash = (value: string) => createHash("sha256").update(value).digest("hex");
 
-function toInboxItem(file: string, proposal: KnowledgeProposal): ProposalInboxItem {
+function extractLinks(source: string, content: string): ProposalTopologyLink[] {
+  const links: ProposalTopologyLink[] = [];
+  const wiki = /(!)?\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]/g;
+  for (const match of content.matchAll(wiki)) {
+    links.push({ source, target: match[2].trim(), kind: match[1] ? "embed" : "wikilink" });
+  }
+  const markdown = /(?<!!)\[[^\]]+\]\(\s*(?:<([^>]+)>|([^)]+?))\s*\)/g;
+  for (const match of content.matchAll(markdown)) {
+    const href = String(match[1] ?? match[2]).trim().replace(/\s+["'][^"']*["']$/, "");
+    if (/\.md(?:#.*)?$/i.test(href)) links.push({ source, target: href.split("#")[0], kind: "markdown" });
+  }
+  return [...new Map(links.map((link) => [`${link.source}\u0000${link.kind}\u0000${link.target}`, link])).values()];
+}
+
+function difference(left: ProposalTopologyLink[], right: ProposalTopologyLink[]): ProposalTopologyLink[] {
+  const keys = new Set(right.map((link) => `${link.source}\u0000${link.kind}\u0000${link.target}`));
+  return left.filter((link) => !keys.has(`${link.source}\u0000${link.kind}\u0000${link.target}`));
+}
+
+async function currentContent(root: string, relative: string): Promise<string | null> {
+  try {
+    return await readFile(path.join(root, ...relative.split("/")), "utf8");
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+async function toInboxItem(root: string, file: string, proposal: KnowledgeProposal): Promise<ProposalInboxItem> {
+  const changes = await Promise.all(proposal.changes.map(async (change) => {
+    const current = await currentContent(root, change.path);
+    const currentHash = current === null ? null : hash(current);
+    return {
+      path: change.path,
+      operation: change.operation,
+      baseHash: change.baseHash,
+      contentHash: change.contentHash,
+      diff: proposalDiff(change),
+      targetState: currentHash === change.contentHash ? "matches-proposal" as const : currentHash === change.baseHash ? "unchanged" as const : "conflict" as const,
+      currentHash,
+    };
+  }));
+  const beforeLinks = proposal.changes.flatMap((change) => extractLinks(change.path, change.baseContent ?? ""));
+  const afterLinks = proposal.changes.flatMap((change) => extractLinks(change.path, change.content));
   return {
     file: unix(path.join(".lwc", "proposals", file)),
     id: proposal.id,
@@ -51,13 +111,12 @@ function toInboxItem(file: string, proposal: KnowledgeProposal): ProposalInboxIt
     summary: proposal.summary,
     status: proposal.status,
     createdAt: proposal.createdAt,
-    changes: proposal.changes.map((change) => ({
-      path: change.path,
-      operation: change.operation,
-      baseHash: change.baseHash,
-      contentHash: change.contentHash,
-      diff: proposalDiff(change),
-    })),
+    changes,
+    topology: {
+      addedLinks: difference(afterLinks, beforeLinks),
+      removedLinks: difference(beforeLinks, afterLinks),
+      conflicts: changes.filter((change) => change.targetState === "conflict").map((change) => change.path),
+    },
     review: proposal.review,
     rejection: proposal.rejection,
     application: proposal.application,
@@ -80,7 +139,7 @@ export async function readProposalInbox(root: string): Promise<ProposalInbox> {
       if (proposal.rootName !== path.basename(absoluteRoot)) {
         throw new Error(`Proposal belongs to ${proposal.rootName}, not ${path.basename(absoluteRoot)}`);
       }
-      proposals.push(toInboxItem(file, proposal));
+      proposals.push(await toInboxItem(absoluteRoot, file, proposal));
     } catch (error) {
       issues.push({ file: unix(path.join(".lwc", "proposals", file)), message: error instanceof Error ? error.message : String(error) });
     }

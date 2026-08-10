@@ -211,6 +211,40 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(49, 89, 232,
 .decision-record dl div { padding: 5px 0; display: grid; grid-template-columns: 90px minmax(0,1fr); gap: 10px; }
 .decision-record dt { color: var(--muted); font-size: 9px; }.decision-record dd { margin: 0; overflow-wrap: anywhere; font-size: 9px; }
 .decision-record code, .decision-record p { font-size: 8px; line-height: 1.45; }
+.topology-preview { margin-bottom: 25px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--paper); box-shadow: var(--shadow); }
+.topology-preview.has-conflicts { border-color: #e0aaa4; }
+.topology-heading { min-height: 74px; padding: 16px 18px; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--line); }
+.topology-heading h3 { margin: 0; font-size: 18px; letter-spacing: -.025em; }
+.topology-totals { display: flex; gap: 7px; }
+.topology-totals span { min-width: 66px; padding: 7px 9px; display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 5px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); background: var(--canvas); font-size: 8px; }
+.topology-totals b { color: var(--ink); font: 700 15px/1 ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.topology-totals .safe b { color: var(--green); }.topology-totals .danger b { color: var(--red); }
+.conflict-banner { padding: 10px 18px; display: flex; align-items: baseline; gap: 12px; border-bottom: 1px solid #edc8c4; color: #75362f; background: var(--red-soft); }
+.conflict-banner strong { font-size: 10px; white-space: nowrap; }.conflict-banner span { overflow-wrap: anywhere; font-size: 9px; line-height: 1.45; }
+.topology-board { position: relative; min-height: 180px; padding: 20px 18px 17px; display: grid; grid-template-columns: minmax(190px, .82fr) minmax(0, 1.18fr); gap: 34px; background-color: #f7f8f5; background-image: linear-gradient(rgba(197,204,198,.24) 1px, transparent 1px), linear-gradient(90deg, rgba(197,204,198,.24) 1px, transparent 1px); background-size: 18px 18px; }
+.topology-board::before { content: ""; position: absolute; left: calc(41% + 3px); top: 45px; bottom: 24px; border-left: 1px dashed #b9c2bc; }
+.changed-pages, .topology-links { min-width: 0; display: grid; align-content: start; gap: 8px; }
+.blueprint-label { margin-bottom: 3px; color: var(--faint); font: 700 8px/1.2 ui-monospace, "SFMono-Regular", Consolas, monospace; letter-spacing: .1em; text-transform: uppercase; }
+.page-chip { min-width: 0; padding: 9px 10px; display: grid; grid-template-columns: 9px minmax(0,1fr); align-items: center; gap: 9px; border: 1px solid #e0bd81; border-radius: 7px; background: rgba(255,242,217,.88); box-shadow: 0 2px 6px rgba(94,67,25,.05); }
+.page-chip > i { width: 8px; height: 24px; border-radius: 3px; background: var(--amber); }
+.page-chip > span { min-width: 0; display: grid; gap: 3px; }
+.page-chip strong { overflow: hidden; font: 600 9px/1.3 ui-monospace, "SFMono-Regular", Consolas, monospace; text-overflow: ellipsis; white-space: nowrap; }
+.page-chip small { color: #876428; font-size: 8px; }
+.page-chip.matches-proposal { border-color: #9dcdb7; background: rgba(226,243,235,.9); }.page-chip.matches-proposal > i { background: var(--green); }.page-chip.matches-proposal small { color: var(--green); }
+.page-chip.conflict { border-color: #e0aaa4; background: rgba(251,232,229,.92); }.page-chip.conflict > i { background: var(--red); }.page-chip.conflict small { color: var(--red); }
+.topology-link { min-width: 0; min-height: 39px; padding: 7px 9px; display: grid; grid-template-columns: 20px minmax(70px,.9fr) auto minmax(70px,1fr) auto; align-items: center; gap: 6px; border: 1px solid #a7cfbc; border-radius: 7px; background: rgba(241,249,245,.92); }
+.topology-link.removed { border-color: #e3b2ad; background: rgba(252,240,238,.94); }
+.link-sign { width: 19px; height: 19px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--green); font: 800 12px/1 ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.removed .link-sign { background: var(--red); }
+.topology-link code, .topology-link strong { min-width: 0; overflow: hidden; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+.topology-link code { color: var(--muted); }.topology-link strong { font-weight: 700; }
+.link-arrow { color: var(--green); font-size: 12px; }.removed .link-arrow { color: var(--red); }
+.topology-link small { color: var(--faint); font: 600 7px/1 ui-monospace, "SFMono-Regular", Consolas, monospace; text-transform: uppercase; }
+.topology-stable { min-height: 77px; padding: 13px; display: flex; align-items: center; gap: 11px; border: 1px dashed var(--line-strong); border-radius: 7px; background: rgba(251,252,250,.8); }
+.topology-stable > span { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 50%; color: var(--blue); background: var(--blue-soft); font-weight: 800; }
+.topology-stable div { display: grid; gap: 4px; }.topology-stable strong { font-size: 10px; }.topology-stable small { color: var(--muted); font-size: 8px; }
+.topology-legend { padding: 9px 18px; display: flex; gap: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 8px; }
+.topology-legend span { display: flex; align-items: center; gap: 5px; }.topology-legend i { width: 7px; height: 7px; border-radius: 2px; }.topology-legend .amber { background: var(--amber); }.topology-legend .green { background: var(--green); }.topology-legend .red { background: var(--red); }
 .review-heading { padding: 4px 0 13px; display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1px solid var(--line-strong); }
 .review-heading h3 { margin: 0; font-size: 17px; }
 .review-heading > span { color: var(--faint); font: 600 8px/1.2 ui-monospace, "SFMono-Regular", Consolas, monospace; text-transform: uppercase; }
@@ -223,7 +257,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(49, 89, 232,
 .file-review summary small { color: var(--faint); font: 600 8px/1 ui-monospace, "SFMono-Regular", Consolas, monospace; white-space: nowrap; }
 .operation { padding: 3px 5px; border-radius: 4px; color: var(--blue); background: var(--blue-soft); font: 700 7px/1 ui-monospace, "SFMono-Regular", Consolas, monospace; text-transform: uppercase; }
 .operation.create { color: var(--green); background: var(--green-soft); }
-.hash-pair { padding: 10px 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid var(--line); background: var(--canvas); }
+.hash-pair { padding: 10px 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; border-top: 1px solid var(--line); background: var(--canvas); }
+.hash-pair.conflict { grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--red-soft); }
 .hash-pair > div { min-width: 0; display: grid; gap: 4px; }
 .hash-pair span { color: var(--faint); font-size: 7px; font-weight: 700; text-transform: uppercase; }
 .hash-pair code { overflow-wrap: anywhere; color: var(--muted); font-size: 7px; line-height: 1.35; }
@@ -300,6 +335,11 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(49, 89, 232,
   .inbox-panel { border-right: 0; border-bottom: 1px solid var(--line); }
   .proposal-list { max-height: 330px; overflow: auto; }
   .proposal-dossier { width: calc(100% - 28px); padding: 28px 0 45px; }
+  .topology-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .topology-totals { width: 100%; }.topology-totals span { flex: 1; }
+  .topology-board { grid-template-columns: 1fr; gap: 20px; }.topology-board::before { display: none; }
+  .topology-legend { flex-wrap: wrap; gap: 8px 14px; }
+  .hash-pair.conflict { grid-template-columns: 1fr; }
   .dossier-empty, .changes-unavailable { min-height: 440px; }
 }
 
@@ -318,6 +358,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(49, 89, 232,
   .mobile-nav .app-nav { width: max-content; min-width: 100%; }
   .mobile-nav { overflow-x: auto; }
   .lifecycle { grid-template-columns: 1fr; }
+  .topology-link { grid-template-columns: 20px minmax(0,1fr) auto; }
+  .topology-link .link-arrow { display: none; }.topology-link strong { grid-column: 2; }.topology-link small { grid-column: 3; grid-row: 1 / span 2; }
   .lifecycle.rejected { grid-template-columns: 1fr; }
   .lifecycle li { border-right: 0; border-bottom: 1px solid var(--line); }
   .lifecycle li:last-child { border-bottom: 0; }

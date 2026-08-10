@@ -114,11 +114,22 @@ describe("knowledge proposal lifecycle", () => {
       { kind: "remove", text: "Old text." },
       { kind: "add", text: "Reviewed text." },
     ]));
+    expect(inbox.proposals[0].changes.map((change) => change.targetState)).toEqual(["unchanged", "unchanged"]);
+    expect(inbox.proposals[0].topology).toMatchObject({
+      addedLinks: [{ source: "concepts/New.md", target: "Existing", kind: "wikilink" }],
+      removedLinks: [],
+      conflicts: [],
+    });
     expect(inbox.issues).toEqual(expect.arrayContaining([
       { file: ".lwc/proposals/invalid.json", message: expect.stringContaining("JSON") },
       { file: ".lwc/proposals/wrong-root.json", message: expect.stringContaining("other-vault") },
       { file: ".lwc/proposals/fake-reviewed.json", message: expect.stringContaining("missing its review record") },
     ]));
+
+    await writeFile(path.join(root, "concepts/Existing.md"), "# Existing\n\nConcurrent edit.\n");
+    const conflicted = await readProposalInbox(root);
+    expect(conflicted.proposals[0].changes[0].targetState).toBe("conflict");
+    expect(conflicted.proposals[0].topology.conflicts).toEqual(["concepts/Existing.md"]);
   });
 
   it("returns an empty inbox when a Vault has no proposal directory", async () => {
