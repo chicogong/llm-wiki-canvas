@@ -12,3 +12,5 @@ All notable changes will be documented here. This project follows Semantic Versi
 - Repository-scoped Agent Skill for ingest, query, lint, and visualization workflows.
 - Release-style verification for source, package, CLI, production Viewer, and sensitive information.
 - Complete English and Simplified Chinese project guides, an Atlas screenshot, and a reproducible example walkthrough with benefit comparisons.
+- Deterministic topology layout with low-noise relationship highlighting and a dark local-instrument Viewer theme.
+- Explicit open-source commit boundaries for reproducible public artifacts versus private or machine-local state.
