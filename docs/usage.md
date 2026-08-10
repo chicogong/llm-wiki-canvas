@@ -100,6 +100,10 @@ pnpm lwc proposal apply /path/to/proposal.json /path/to/vault \
 
 No source Markdown changes during create, show, review, or reject. Apply checks payload, review, path, and original-target hashes before writing. See [Reviewed knowledge changes](proposals.md) for the state model and limits.
 
+When `lwc serve /path/to/vault` is running, open **Changes** to inspect proposal files stored under `<vault>/.lwc/proposals/`. The Inbox separates proposed, reviewed, applied, and rejected states and shows exact file diffs with complete SHA-256 values. Invalid JSON and proposals belonging to another Vault appear as isolated inbox issues.
+
+Changes is deliberately read-only. Review, reject, and apply remain explicit CLI operations so the Workbench cannot impersonate a reviewer or silently modify Markdown.
+
 ## 5. Scan, lint, or generate only one artifact
 
 Use the source CLI during development:
@@ -186,6 +190,6 @@ Use a deliberate fixed timestamp only for checked-in fixtures. Do not hide real 
 
 ## 10. What the current Viewer does and does not do
 
-The Workbench has two factual views. **Map** supports graph browsing, metadata search, page-kind filters, node evidence cards, relationship direction, and direct-neighbor navigation. **Health** reports compiled page/link totals, broken links, orphan pages, diagnostics, page-type distribution, and the most-connected pages. It does not currently render Markdown bodies, perform semantic search, edit source files, or call an LLM.
+The Workbench has three factual views. **Map** supports graph browsing, metadata search, page-kind filters, node evidence cards, relationship direction, and direct-neighbor navigation. **Health** reports compiled page/link totals, broken links, orphan pages, diagnostics, page-type distribution, and the most-connected pages. **Changes** renders the local proposal lifecycle, hashes, and exact diffs without making the review decision. It does not currently render full Markdown pages, perform semantic search, edit source files, or call an LLM.
 
 For failures, run `lwc lint` first, check that the Viewer graph path returns JSON, and verify that the Wiki root contains readable `.md` files.

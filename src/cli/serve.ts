@@ -3,7 +3,7 @@ import { access, readFile, stat } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import fg from "fast-glob";
-import { buildGraph, type WikiGraph } from "../core/index.js";
+import { buildGraph, readProposalInbox, type ProposalInbox, type WikiGraph } from "../core/index.js";
 
 const IGNORED_MARKDOWN = [
   ".git/**", ".lwc/**", ".agents/**", ".claude/**", ".qoder/**", "node_modules/**",
@@ -37,6 +37,7 @@ export interface WikiServer {
   url: string;
   port: number;
   rebuild: () => Promise<WikiGraph>;
+  refreshInbox: () => Promise<ProposalInbox>;
   close: () => Promise<void>;
 }
 
@@ -66,6 +67,15 @@ async function markdownFingerprint(root: string): Promise<string> {
   return entries.join("|");
 }
 
+async function proposalFingerprint(root: string): Promise<string> {
+  const files = await fg([".lwc/proposals/**/*.json"], { cwd: root, onlyFiles: true, dot: false, followSymbolicLinks: false });
+  const entries = await Promise.all(files.sort().map(async (relative) => {
+    const info = await stat(path.join(root, relative));
+    return `${relative}:${info.size}:${info.mtimeMs}`;
+  }));
+  return entries.join("|");
+}
+
 function securityHeaders(): Record<string, string> {
   return {
     "Content-Security-Policy": "default-src 'self'; connect-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
@@ -87,7 +97,9 @@ export async function startWikiServer(options: WikiServerOptions): Promise<WikiS
 
   const viewerDirectory = await resolveViewerDirectory(options.viewerDirectory);
   let currentGraph = await buildGraph(root);
+  let currentInbox = await readProposalInbox(root);
   let fingerprint = await markdownFingerprint(root);
+  let inboxFingerprint = await proposalFingerprint(root);
   let rebuilding = false;
   let closed = false;
   const eventClients = new Set<ServerResponse>();
@@ -96,6 +108,13 @@ export async function startWikiServer(options: WikiServerOptions): Promise<WikiS
     const next = await buildGraph(root);
     currentGraph = next;
     for (const client of eventClients) client.write(`event: graph\ndata: ${next.generatedAt}\n\n`);
+    return next;
+  };
+
+  const refreshInbox = async (): Promise<ProposalInbox> => {
+    const next = await readProposalInbox(root);
+    currentInbox = next;
+    for (const client of eventClients) client.write(`event: proposals\ndata: ${new Date().toISOString()}\n\n`);
     return next;
   };
 
@@ -117,8 +136,14 @@ export async function startWikiServer(options: WikiServerOptions): Promise<WikiS
         response.end(method === "HEAD" ? undefined : body);
         return;
       }
+      if (requestUrl.pathname === "/__lwc/proposals") {
+        const body = `${JSON.stringify(currentInbox)}\n`;
+        response.writeHead(200, { "Content-Type": CONTENT_TYPES[".json"], "Cache-Control": "no-store", "Content-Length": Buffer.byteLength(body), ...securityHeaders() });
+        response.end(method === "HEAD" ? undefined : body);
+        return;
+      }
       if (requestUrl.pathname === "/__lwc/status") {
-        const body = `${JSON.stringify({ live: true, watching: watch, generatedAt: currentGraph.generatedAt, stats: currentGraph.stats })}\n`;
+        const body = `${JSON.stringify({ live: true, watching: watch, generatedAt: currentGraph.generatedAt, stats: currentGraph.stats, proposals: currentInbox.proposals.length, proposalIssues: currentInbox.issues.length })}\n`;
         response.writeHead(200, { "Content-Type": CONTENT_TYPES[".json"], "Cache-Control": "no-store", "Content-Length": Buffer.byteLength(body), ...securityHeaders() });
         response.end(method === "HEAD" ? undefined : body);
         return;
@@ -174,6 +199,7 @@ export async function startWikiServer(options: WikiServerOptions): Promise<WikiS
     rebuilding = true;
     try {
       const nextFingerprint = await markdownFingerprint(root);
+      const nextInboxFingerprint = await proposalFingerprint(root);
       if (nextFingerprint !== fingerprint) {
         fingerprint = nextFingerprint;
         try {
@@ -182,6 +208,11 @@ export async function startWikiServer(options: WikiServerOptions): Promise<WikiS
         } catch (error) {
           log(`Rebuild failed; keeping the last valid graph: ${error instanceof Error ? error.message : error}`);
         }
+      }
+      if (nextInboxFingerprint !== inboxFingerprint) {
+        inboxFingerprint = nextInboxFingerprint;
+        const inbox = await refreshInbox();
+        log(`Proposal inbox refreshed: ${inbox.proposals.length} proposal(s) · ${inbox.issues.length} issue(s)`);
       }
     } catch (error) {
       log(`Watch scan failed; keeping the last valid graph: ${error instanceof Error ? error.message : error}`);
@@ -199,5 +230,5 @@ export async function startWikiServer(options: WikiServerOptions): Promise<WikiS
     await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
   };
 
-  return { url: `http://${host}:${address.port}`, port: address.port, rebuild, close };
+  return { url: `http://${host}:${address.port}`, port: address.port, rebuild, refreshInbox, close };
 }

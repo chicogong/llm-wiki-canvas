@@ -50,6 +50,8 @@ lwc build <root> \
 
 Open `Wiki.canvas` in Obsidian for manual spatial editing. Future builds preserve positions when the same output canvas is used. Use the local Viewer for filtering and relationship inspection.
 
+For a live local Workbench, run `lwc serve <root>`. Use Map for relationships, Health for compiler facts, and Changes to inspect proposal lifecycle, hashes, and diffs. Changes is evidence only: never claim that viewing a proposal reviewed, rejected, or applied it, and run those state transitions only after the person gives explicit direction.
+
 ## Safety Rules
 
 - Keep Agent-authored content reviewable and attributable.

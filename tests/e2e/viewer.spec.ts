@@ -11,6 +11,46 @@ async function openWorkbench(page: Page): Promise<string[]> {
   return errors;
 }
 
+async function openChangesFixture(page: Page): Promise<string[]> {
+  const errors: string[] = [];
+  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.addInitScript(() => {
+    class SilentEventSource { addEventListener() {} close() {} }
+    Object.defineProperty(window, "EventSource", { configurable: true, value: SilentEventSource });
+  });
+  await page.route("**/__lwc/proposals", async (route) => route.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify({
+      proposals: [{
+        file: ".lwc/proposals/review.json",
+        id: "proposal-123456789abc",
+        rootName: "atlas-wiki",
+        summary: "Add reviewed source guidance",
+        status: "proposed",
+        createdAt: "2026-08-10T00:00:00.000Z",
+        changes: [{
+          path: "concepts/Human Review.md",
+          operation: "update",
+          baseHash: "a".repeat(64),
+          contentHash: "b".repeat(64),
+          diff: [
+            { kind: "context", text: "# Human Review" },
+            { kind: "remove", text: "Apply changes directly." },
+            { kind: "add", text: "Review the exact diff before apply." },
+          ],
+        }],
+      }],
+      issues: [],
+    }),
+  }));
+  await page.goto("/?live=1");
+  await page.waitForLoadState("networkidle");
+  await page.getByRole("button", { name: /Changes/ }).click();
+  await expect(page.getByTestId("changes-view")).toBeVisible();
+  return errors;
+}
+
 test("@smoke filters the map and opens a relationship", async ({ page }) => {
   const errors = await openWorkbench(page);
   await page.getByRole("searchbox", { name: "Search pages" }).fill("review");
@@ -32,6 +72,23 @@ test("@smoke health view reports only compiled graph facts", async ({ page }) =>
   await page.getByRole("button", { name: /Agent Knowledge Atlas/ }).click();
   await expect(page.getByTestId("map-view")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Agent Knowledge Atlas" })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("@smoke reviews proposal lifecycle, hashes, and exact diff without applying", async ({ page }, testInfo) => {
+  const errors = await openChangesFixture(page);
+  await expect(page.getByText("Add reviewed source guidance").first()).toBeVisible();
+  await expect(page.getByText("Needs review").first()).toBeVisible();
+  await expect(page.getByText("Human decision required")).toBeVisible();
+  await expect(page.getByText("a".repeat(64))).toBeVisible();
+  await expect(page.getByText("b".repeat(64))).toBeVisible();
+  await expect(page.getByLabel("Diff for concepts/Human Review.md")).toContainText("Apply changes directly.");
+  await expect(page.getByLabel("Diff for concepts/Human Review.md")).toContainText("Review the exact diff before apply.");
+  await expect(page.getByText("The Workbench does not make this decision.")).toBeVisible();
+  await expect(page.getByText(/lwc proposal review/)).toBeVisible();
+  expect(await page.getByRole("button", { name: /apply/i }).count()).toBe(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("changes.png"), fullPage: true });
   expect(errors).toEqual([]);
 });
 

@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import cytoscape, { type Core } from "cytoscape";
+import type { ProposalInbox, ProposalInboxItem, ProposalStatus } from "../core/index.js";
 import type { NodeKind, WikiGraph, WikiNode } from "../core/types";
+
+type WorkbenchView = "map" | "health" | "changes";
 
 const KINDS: Array<{ value: "all" | NodeKind; label: string }> = [
   { value: "all", label: "All" },
@@ -23,6 +26,7 @@ function Icon({ children }: { children: ReactNode }) {
 
 const mapIcon = <Icon><circle cx="12" cy="12" r="2.5" /><circle cx="5" cy="6" r="2" /><circle cx="19" cy="6" r="2" /><path d="m6.7 7 3.5 3.4M17.3 7l-3.5 3.4M12 14.5V20" /></Icon>;
 const healthIcon = <Icon><path d="M4 12h4l2-6 4 12 2-6h4" /></Icon>;
+const changesIcon = <Icon><path d="M7 4h10M7 12h10M7 20h10" /><circle cx="4" cy="4" r="1" fill="currentColor" stroke="none" /><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="4" cy="20" r="1" fill="currentColor" stroke="none" /></Icon>;
 
 function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
   graph: WikiGraph;
@@ -98,13 +102,16 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
   return <div ref={ref} className="graph-canvas" data-testid="graph-canvas" aria-label="Wiki relationship map" />;
 }
 
-function AppNavigation({ view, onView }: { view: "map" | "health"; onView: (view: "map" | "health") => void }) {
+function AppNavigation({ view, onView, changes }: { view: WorkbenchView; onView: (view: WorkbenchView) => void; changes: number }) {
   return <nav className="app-nav" aria-label="Workspace views">
     <button className={view === "map" ? "active" : ""} onClick={() => onView("map")} aria-current={view === "map" ? "page" : undefined}>
       {mapIcon}<span>Map</span>
     </button>
     <button className={view === "health" ? "active" : ""} onClick={() => onView("health")} aria-current={view === "health" ? "page" : undefined}>
       {healthIcon}<span>Health</span>
+    </button>
+    <button className={view === "changes" ? "active" : ""} onClick={() => onView("changes")} aria-current={view === "changes" ? "page" : undefined}>
+      {changesIcon}<span>Changes</span>{changes > 0 && <b className="nav-count" aria-label={`${changes} open proposals`}>{changes}</b>}
     </button>
   </nav>;
 }
@@ -225,10 +232,118 @@ function HealthView({ graph, onOpenPage }: { graph: WikiGraph; onOpenPage: (id: 
   </div>;
 }
 
+const STATUS_LABEL: Record<ProposalStatus, string> = {
+  proposed: "Needs review",
+  reviewed: "Ready to apply",
+  applied: "Applied",
+  rejected: "Rejected",
+};
+
+function shellQuote(value: string): string {
+  return `'${value.replaceAll("'", `'"'"'`)}'`;
+}
+
+function proposalCommands(proposal: ProposalInboxItem): Array<{ label: string; command: string }> {
+  if (proposal.status === "proposed") return [
+    { label: "Review after checking every file", command: `lwc proposal review ${shellQuote(proposal.file)} --approve ${proposal.id} --reviewer "<name>"` },
+    { label: "Or reject with a recorded reason", command: `lwc proposal reject ${shellQuote(proposal.file)} --confirm ${proposal.id} --reason "<reason>"` },
+  ];
+  if (proposal.status === "reviewed") return [
+    { label: "Apply after rechecking the target state", command: `lwc proposal apply ${shellQuote(proposal.file)} "<vault>" --confirm ${proposal.id}` },
+  ];
+  return [];
+}
+
+function Lifecycle({ proposal }: { proposal: ProposalInboxItem }) {
+  const applied = proposal.status === "applied";
+  const reviewed = proposal.status === "reviewed" || applied;
+  const rejected = proposal.status === "rejected";
+  return <ol className={`lifecycle ${rejected ? "rejected" : ""}`} aria-label="Proposal lifecycle">
+    <li className="complete"><i>✓</i><span><strong>Proposed</strong><small>{proposal.createdAt.slice(0, 10)}</small></span></li>
+    {rejected ? <li className="current rejected"><i>×</i><span><strong>Rejected</strong><small>{proposal.rejection?.rejectedAt.slice(0, 10) ?? "Decision recorded"}</small></span></li> : <>
+      <li className={reviewed ? "complete" : "current"}><i>{reviewed ? "✓" : "2"}</i><span><strong>Reviewed</strong><small>{proposal.review?.reviewedAt.slice(0, 10) ?? "Human decision required"}</small></span></li>
+      <li className={applied ? "complete" : reviewed ? "current" : "pending"}><i>{applied ? "✓" : "3"}</i><span><strong>Applied</strong><small>{proposal.application?.appliedAt.slice(0, 10) ?? "Source files unchanged"}</small></span></li>
+    </>}
+  </ol>;
+}
+
+function ProposalDossier({ proposal }: { proposal: ProposalInboxItem }) {
+  const commands = proposalCommands(proposal);
+  return <article className="proposal-dossier" data-testid="proposal-dossier">
+    <header className="dossier-header">
+      <div><p className="section-kicker">{proposal.id}</p><h2>{proposal.summary}</h2></div>
+      <span className={`proposal-status ${proposal.status}`}>{STATUS_LABEL[proposal.status]}</span>
+    </header>
+
+    <Lifecycle proposal={proposal} />
+
+    {(proposal.review || proposal.rejection || proposal.application) && <section className="decision-record">
+      <h3>Decision record</h3>
+      {proposal.review && <dl><div><dt>Reviewer</dt><dd>{proposal.review.reviewer}</dd></div><div><dt>Review note</dt><dd>{proposal.review.note || "—"}</dd></div><div><dt>Review SHA-256</dt><dd><code>{proposal.review.reviewHash}</code></dd></div></dl>}
+      {proposal.rejection && <p><strong>Reason:</strong> {proposal.rejection.reason}</p>}
+      {proposal.application && <p>Applied at <code>{proposal.application.appliedAt}</code>.</p>}
+    </section>}
+
+    <section className="file-review">
+      <div className="review-heading"><div><p className="section-kicker">Exact file diff</p><h3>{proposal.changes.length} changed {proposal.changes.length === 1 ? "file" : "files"}</h3></div><span>Read-only evidence</span></div>
+      {proposal.changes.map((change, index) => <details key={change.path} open={index === 0}>
+        <summary><span className={`operation ${change.operation}`}>{change.operation}</span><strong>{change.path}</strong><small>{change.diff.filter((line) => line.kind === "add").length}+ · {change.diff.filter((line) => line.kind === "remove").length}−</small></summary>
+        <div className="hash-pair"><div><span>Base SHA-256</span><code>{change.baseHash ?? "missing"}</code></div><div><span>Proposed SHA-256</span><code>{change.contentHash}</code></div></div>
+        <pre className="diff-block" aria-label={`Diff for ${change.path}`}>{change.diff.map((line, lineIndex) => <span className={line.kind} key={`${line.kind}-${lineIndex}`}><b>{line.kind === "add" ? "+" : line.kind === "remove" ? "−" : " "}</b>{line.text || " "}</span>)}</pre>
+      </details>)}
+    </section>
+
+    {commands.length > 0 && <section className="next-step">
+      <div><p className="section-kicker">Safe next step</p><h3>The Workbench does not make this decision.</h3><p>Run a command in the Vault after reviewing the hashes and every changed line.</p></div>
+      <div className="command-list">{commands.map((item) => <div key={item.label}><span>{item.label}</span><code>{item.command}</code></div>)}</div>
+    </section>}
+  </article>;
+}
+
+function ChangesView({ inbox, error, live }: { inbox?: ProposalInbox; error?: string; live: boolean }) {
+  const [filter, setFilter] = useState<"all" | "open" | "closed">("all");
+  const [selectedId, setSelectedId] = useState<string>();
+  const proposals = inbox?.proposals ?? [];
+  const filtered = proposals.filter((proposal) => filter === "all" || (filter === "open" ? ["proposed", "reviewed"].includes(proposal.status) : ["applied", "rejected"].includes(proposal.status)));
+
+  useEffect(() => {
+    if (!filtered.some((proposal) => proposal.id === selectedId)) setSelectedId(filtered[0]?.id);
+  }, [filter, inbox, selectedId]);
+  const selected = proposals.find((proposal) => proposal.id === selectedId);
+
+  if (!live) return <div className="changes-unavailable" data-testid="changes-view"><div className="empty-symbol">↗</div><p className="section-kicker">Local server required</p><h2>Open Changes with live Vault context.</h2><p>The static Viewer has no access to local proposal files. Start the loopback-only Workbench to inspect them.</p><code>lwc serve &lt;vault&gt;</code></div>;
+  if (error) return <div className="changes-unavailable" data-testid="changes-view"><div className="empty-symbol issue">!</div><p className="section-kicker">Inbox unavailable</p><h2>Proposal files could not be read.</h2><p>{error}</p></div>;
+  if (!inbox) return <div className="changes-unavailable" data-testid="changes-view"><div className="loading-mark" /><p className="section-kicker">Reading proposals</p><h2>Opening the review queue…</h2></div>;
+
+  return <div className="changes-view" data-testid="changes-view">
+    <aside className="inbox-panel">
+      <header><div><p className="section-kicker">Agent changes</p><h2>Inbox</h2></div><strong>{proposals.length}</strong></header>
+      <div className="inbox-filters" role="group" aria-label="Filter proposals">
+        <button className={filter === "all" ? "active" : ""} onClick={() => setFilter("all")}>All</button>
+        <button className={filter === "open" ? "active" : ""} onClick={() => setFilter("open")}>Open</button>
+        <button className={filter === "closed" ? "active" : ""} onClick={() => setFilter("closed")}>Closed</button>
+      </div>
+      <div className="proposal-list">
+        {filtered.map((proposal) => <button key={proposal.id} className={proposal.id === selectedId ? "active" : ""} onClick={() => setSelectedId(proposal.id)}>
+          <span className={`proposal-status ${proposal.status}`}>{STATUS_LABEL[proposal.status]}</span>
+          <strong>{proposal.summary}</strong>
+          <small>{proposal.changes.length} {proposal.changes.length === 1 ? "file" : "files"} · {proposal.createdAt.slice(0, 10)}</small>
+          <code>{proposal.id}</code>
+        </button>)}
+        {!filtered.length && <div className="inbox-empty"><strong>{proposals.length ? "No proposals in this state" : "No proposals yet"}</strong><p>{proposals.length ? "Choose another filter." : "Agent drafts remain outside the Vault until a proposal is created."}</p>{!proposals.length && <code>lwc proposal create &lt;vault&gt; --from &lt;draft&gt;</code>}</div>}
+      </div>
+      {inbox.issues.length > 0 && <section className="inbox-issues"><h3>Unreadable files <span>{inbox.issues.length}</span></h3>{inbox.issues.map((issue) => <div key={issue.file}><strong>{issue.file}</strong><small>{issue.message}</small></div>)}</section>}
+    </aside>
+    <div className="dossier-panel">{selected ? <ProposalDossier proposal={selected} /> : <div className="dossier-empty"><span>←</span><p>Select a proposal to inspect its exact evidence.</p></div>}</div>
+  </div>;
+}
+
 export function App() {
   const [graph, setGraph] = useState<WikiGraph>();
   const [error, setError] = useState<string>();
-  const [view, setView] = useState<"map" | "health">("map");
+  const [inbox, setInbox] = useState<ProposalInbox>();
+  const [inboxError, setInboxError] = useState<string>();
+  const [view, setView] = useState<WorkbenchView>("map");
   const [selectedId, setSelectedId] = useState<string>();
   const live = new URLSearchParams(location.search).get("live") === "1";
 
@@ -253,9 +368,24 @@ export function App() {
         if (active) setError(reason instanceof Error ? reason.message : String(reason));
       }
     };
+    const loadInbox = async () => {
+      if (!live) return;
+      try {
+        const response = await fetch("/__lwc/proposals", { cache: "no-store" });
+        if (!response.ok) throw new Error(`Unable to read proposals: HTTP ${response.status}`);
+        const value = await response.json() as ProposalInbox;
+        if (!active) return;
+        setInbox(value);
+        setInboxError(undefined);
+      } catch (reason) {
+        if (active) setInboxError(reason instanceof Error ? reason.message : String(reason));
+      }
+    };
     void load();
+    void loadInbox();
     const events = live ? new EventSource("/__lwc/events") : undefined;
     events?.addEventListener("graph", () => { void load(); });
+    events?.addEventListener("proposals", () => { void loadInbox(); });
     return () => { active = false; events?.close(); };
   }, [live]);
 
@@ -263,23 +393,27 @@ export function App() {
   if (!graph) return <main className="status-screen"><div className="loading-mark" /><p className="section-kicker">Reading local knowledge</p><h1>Opening workspace…</h1></main>;
 
   const switchToPage = (id: string) => { setSelectedId(id); setView("map"); };
+  const openChanges = inbox?.proposals.filter((proposal) => proposal.status === "proposed" || proposal.status === "reviewed").length ?? 0;
+  const viewTitle = view === "map" ? "Knowledge map" : view === "health" ? "Vault health" : "Changes inbox";
 
   return <main className="workbench-shell">
     <aside className="sidebar">
       <div className="brand"><span className="brand-mark">L</span><div><strong>LLM Wiki Canvas</strong><small>Local knowledge workbench</small></div></div>
       <div className="vault-label"><span>Workspace</span><strong>{graph.rootName}</strong></div>
-      <AppNavigation view={view} onView={setView} />
+      <AppNavigation view={view} onView={setView} changes={openChanges} />
       <div className="sidebar-note"><span className="status-dot" /><div><strong>{live ? "Watching locally" : "Local only"}</strong><small>{live ? "Refreshes when Markdown changes" : "Markdown stays on this machine"}</small></div></div>
     </aside>
 
     <section className="workbench">
       <header className="topbar">
         <div className="mobile-brand"><span className="brand-mark">L</span><strong>{graph.rootName}</strong></div>
-        <div className="breadcrumb"><span>{graph.rootName}</span><b>/</b><strong>{view === "map" ? "Knowledge map" : "Vault health"}</strong></div>
+        <div className="breadcrumb"><span>{graph.rootName}</span><b>/</b><strong>{viewTitle}</strong></div>
         <div className="topbar-meta"><span className="status-dot" />{live ? "Live" : "Generated"} {graph.generatedAt.slice(0, 10)}</div>
       </header>
-      <div className="mobile-nav"><AppNavigation view={view} onView={setView} /></div>
-      {view === "map" ? <MapView graph={graph} selectedId={selectedId} onSelect={setSelectedId} /> : <HealthView graph={graph} onOpenPage={switchToPage} />}
+      <div className="mobile-nav"><AppNavigation view={view} onView={setView} changes={openChanges} /></div>
+      {view === "map" && <MapView graph={graph} selectedId={selectedId} onSelect={setSelectedId} />}
+      {view === "health" && <HealthView graph={graph} onOpenPage={switchToPage} />}
+      {view === "changes" && <ChangesView inbox={inbox} error={inboxError} live={live} />}
     </section>
   </main>;
 }
