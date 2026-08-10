@@ -7,7 +7,7 @@
 
 **面向 Agent 管理的 Markdown 知识库的本地优先可视化编译器。**
 
-LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性的关系图和可继续编辑的 Obsidian JSON Canvas。Codex、Claude Code、WorkBuddy 仍然操作普通文件；人可以查看全局关系、定位知识库问题并审查生成产物。
+LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性的关系图和可继续编辑的 Obsidian JSON Canvas。Codex、Claude Code、Qoder、TRAE 和腾讯 WorkBuddy 仍然操作普通文件；人可以查看全局关系、定位知识库问题并审查生成产物。
 
 项目不内置 LLM、向量数据库、聊天界面、云服务或 MCP Server。
 
@@ -114,6 +114,20 @@ lwc build /path/to/vault \
 
 Obsidian、QMD、Agent Skill 和 CI 的具体用法见[使用指南](docs/usage.zh-CN.md)。
 
+## 与 AI 编码 Agent 配合
+
+仓库现在提供一份共享 Agent 契约，并在各工具要求的位置提供原生入口：
+
+| Agent | 已经可以使用的仓库文件 |
+| --- | --- |
+| Codex | `AGENTS.md` + `.agents/skills/llm-wiki-canvas/` |
+| TRAE | `AGENTS.md` + 同一个 `.agents/skills/` Skill |
+| Qoder | `AGENTS.md` + `.qoder/skills/llm-wiki-canvas/` 适配入口 |
+| Claude Code | `CLAUDE.md` + `.claude/skills/llm-wiki-canvas/` 适配入口 |
+| 腾讯 WorkBuddy | 选择仓库为工作区，并用 `@` 引用 `AGENTS.md` 和共享 Skill |
+
+准确设置、兼容边界、权限建议和可直接复制的任务见[与 AI Agent 配合](docs/ai-agents.zh-CN.md)。本地文件权限加 `lwc` 已经足够，这条工作流不需要 MCP Server。
+
 ## 支持的知识库约定
 
 - Markdown 文件和标题
@@ -122,7 +136,7 @@ Obsidian、QMD、Agent Skill 和 CI 的具体用法见[使用指南](docs/usage.
 - 指向 `.md` 文件的 Markdown 链接
 - 页面类型：`index`、`concept`、`source`、`note`
 - Obsidian 兼容 JSON Canvas
-- `AGENTS.md`、`CLAUDE.md`、`.agents/` 等仓库规则不会混入知识图谱
+- `AGENTS.md`、`CLAUDE.md`、`.agents/`、`.claude/`、`.qoder/` 等仓库规则不会混入知识图谱
 
 ## 架构
 
@@ -132,7 +146,7 @@ flowchart LR
   C --> G["graph.json"]
   C --> J["Obsidian JSON Canvas"]
   G --> V["本地关系 Viewer"]
-  S["Codex / Claude Code / WorkBuddy Skill"] --> M
+  S["Codex / Claude / Qoder / TRAE / WorkBuddy"] --> M
   S --> C
 ```
 

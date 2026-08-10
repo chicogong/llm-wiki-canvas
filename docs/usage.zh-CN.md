@@ -86,7 +86,7 @@ pnpm exec tsx src/cli/index.ts build /path/to/vault \
 
 QMD 负责关键词、语义和重排检索；LLM Wiki Canvas 负责显式链接拓扑、结构诊断和 JSON Canvas 生成。
 
-## 6. 与 Codex、Claude Code、WorkBuddy 配合
+## 6. 与 AI Agent 配合
 
 如果 Agent 支持仓库 Skill，把公开 Skill 复制到目标仓库：
 
@@ -106,6 +106,8 @@ QMD 负责关键词、语义和重排检索；LLM Wiki Canvas 负责显式链接
 5. 只有经过人工审查后才应用知识修改。
 
 不需要 MCP Server。Agent 使用已有工作区权限读取文件并调用 CLI。
+
+Codex 和 TRAE 直接使用共享 `.agents/skills` 入口；Qoder 和 Claude Code 使用仓库内置的 `.qoder/skills` 与 `.claude/skills` 适配入口；腾讯 WorkBuddy 选择仓库为工作目录，再用 `@` 引用规则和 Skill 文件。准确兼容矩阵、各工具设置、权限建议和可复制提示词见[与 AI Agent 配合](ai-agents.zh-CN.md)。
 
 ## 7. 在 CI 中使用
 

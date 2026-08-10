@@ -59,7 +59,7 @@ export async function buildGraph(root: string, now = new Date(), fixedModifiedAt
     cwd: absoluteRoot,
     onlyFiles: true,
     dot: false,
-    ignore: [".git/**", ".lwc/**", ".agents/**", "node_modules/**", "**/AGENTS.md", "**/CLAUDE.md"],
+    ignore: [".git/**", ".lwc/**", ".agents/**", ".claude/**", ".qoder/**", "node_modules/**", "**/AGENTS.md", "**/CLAUDE.md"],
   });
   const drafts: Draft[] = await Promise.all(files.sort().map(async (relative) => {
     const absolute = path.join(absoluteRoot, relative);

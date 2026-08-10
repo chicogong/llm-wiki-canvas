@@ -7,7 +7,7 @@
 
 **A local-first visual compiler for Agent-managed Markdown knowledge bases.**
 
-LLM Wiki Canvas turns Markdown, frontmatter, and WikiLinks into a deterministic relationship graph and an editable Obsidian JSON Canvas. Codex, Claude Code, and WorkBuddy keep working with ordinary files; people get a visual map, diagnostics, and reviewable generated artifacts.
+LLM Wiki Canvas turns Markdown, frontmatter, and WikiLinks into a deterministic relationship graph and an editable Obsidian JSON Canvas. Codex, Claude Code, Qoder, TRAE, and Tencent WorkBuddy keep working with ordinary files; people get a visual map, diagnostics, and reviewable generated artifacts.
 
 It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
 
@@ -114,6 +114,20 @@ For reproducible checked-in fixtures, pass `--generated-at <ISO timestamp>` to `
 
 For Obsidian, QMD, Agent Skill, and CI workflows, see the [usage guide](docs/usage.md).
 
+## Use it with AI coding agents
+
+The repository now includes one shared Agent contract plus native entry points where each tool expects them:
+
+| Agent | Ready-to-use repository files |
+| --- | --- |
+| Codex | `AGENTS.md` + `.agents/skills/llm-wiki-canvas/` |
+| TRAE | `AGENTS.md` + the same `.agents/skills/` Skill |
+| Qoder | `AGENTS.md` + `.qoder/skills/llm-wiki-canvas/` adapter |
+| Claude Code | `CLAUDE.md` + `.claude/skills/llm-wiki-canvas/` adapter |
+| Tencent WorkBuddy | Select the repository as workspace and `@`-reference `AGENTS.md` and the shared Skill |
+
+See [Using AI agents](docs/ai-agents.md) for exact setup, compatibility limits, permissions, and copy-ready tasks. Local file access plus `lwc` is sufficient; no MCP server is required for this workflow.
+
 ## Supported knowledge conventions
 
 - Markdown files and headings
@@ -122,7 +136,7 @@ For Obsidian, QMD, Agent Skill, and CI workflows, see the [usage guide](docs/usa
 - Markdown links to `.md` files
 - Page kinds: `index`, `concept`, `source`, and `note`
 - Obsidian-compatible JSON Canvas
-- Repository instructions such as `AGENTS.md`, `CLAUDE.md`, and `.agents/` are excluded from the knowledge graph
+- Repository instructions such as `AGENTS.md`, `CLAUDE.md`, `.agents/`, `.claude/`, and `.qoder/` are excluded from the knowledge graph
 
 ## Architecture
 
@@ -132,7 +146,7 @@ flowchart LR
   C --> G["graph.json"]
   C --> J["Obsidian JSON Canvas"]
   G --> V["Local relationship Viewer"]
-  S["Codex / Claude Code / WorkBuddy Skill"] --> M
+  S["Codex / Claude / Qoder / TRAE / WorkBuddy"] --> M
   S --> C
 ```
 

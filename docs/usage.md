@@ -86,7 +86,7 @@ pnpm exec tsx src/cli/index.ts build /path/to/vault \
 
 Use QMD for keyword, semantic, and reranked retrieval. Use LLM Wiki Canvas for explicit link topology, structural diagnostics, and JSON Canvas generation.
 
-## 6. Use it with Codex, Claude Code, or WorkBuddy
+## 6. Use it with AI agents
 
 Copy the public Skill into the target repository when that Agent supports repository Skills:
 
@@ -106,6 +106,8 @@ Then ask the Agent to:
 5. apply knowledge changes only after human review.
 
 No MCP server is required. The Agent reads files and invokes the CLI using its existing workspace permissions.
+
+Codex and TRAE use the shared `.agents/skills` entry directly. Qoder and Claude Code use the included `.qoder/skills` and `.claude/skills` adapters. Tencent WorkBuddy should use the repository as its working directory and `@`-reference the rule and Skill files. See [Using AI agents](ai-agents.md) for the exact matrix, tool-specific setup, permissions, and copy-ready prompts.
 
 ## 7. Use it in CI
 
