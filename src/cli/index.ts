@@ -3,7 +3,20 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { Command } from "commander";
-import { buildGraph, buildWikiReport, graphToCanvas, reportToMarkdown, type JsonCanvas } from "../core/index.js";
+import {
+  applyKnowledgeProposal,
+  buildGraph,
+  buildWikiReport,
+  createKnowledgeProposal,
+  graphToCanvas,
+  parseKnowledgeProposal,
+  proposalToMarkdown,
+  rejectKnowledgeProposal,
+  reportToMarkdown,
+  reviewKnowledgeProposal,
+  type JsonCanvas,
+  type KnowledgeProposal,
+} from "../core/index.js";
 
 async function writeJson(target: string, value: unknown): Promise<void> {
   const absolute = path.resolve(target);
@@ -23,6 +36,15 @@ async function readCanvas(target?: string): Promise<JsonCanvas | undefined> {
     return JSON.parse(await readFile(path.resolve(target), "utf8")) as JsonCanvas;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
+    throw error;
+  }
+}
+
+async function readProposal(target: string): Promise<KnowledgeProposal> {
+  try {
+    return parseKnowledgeProposal(JSON.parse(await readFile(path.resolve(target), "utf8")));
+  } catch (error) {
+    if (error instanceof SyntaxError) throw new Error(`Proposal is not valid JSON: ${target}`);
     throw error;
   }
 }
@@ -85,6 +107,75 @@ program.command("report")
     } else {
       process.stdout.write(output);
     }
+  });
+
+const proposal = program.command("proposal")
+  .description("Create, review, reject, and safely apply Markdown knowledge proposals");
+
+proposal.command("create")
+  .argument("[root]", "wiki root", ".")
+  .requiredOption("--from <directory>", "draft directory whose Markdown paths map into the wiki")
+  .option("-o, --output <file>", "proposal JSON output; defaults to <root>/.lwc/proposals/<id>.json")
+  .option("--summary <text>", "short reason for the knowledge change", "Knowledge update")
+  .option("--created-at <iso>", "fixed ISO timestamp for reproducible proposal fixtures")
+  .description("Create a proposed change without modifying the wiki")
+  .action(async (root, options) => {
+    const createdAt = options.createdAt ? generatedAt(options.createdAt) : new Date();
+    const value = await createKnowledgeProposal(root, options.from, options.summary, createdAt);
+    const output = options.output ?? path.join(root, ".lwc", "proposals", `${value.id}.json`);
+    await writeJson(output, value);
+    console.log(`Proposed ${value.changes.length} Markdown change(s) → ${output}`);
+    console.log(`Proposal id: ${value.id}`);
+    console.log(`Review with: lwc proposal show ${output}`);
+  });
+
+proposal.command("show")
+  .argument("<proposal>", "proposal JSON file")
+  .description("Render proposal metadata, hashes, and a review diff")
+  .action(async (proposalFile) => {
+    process.stdout.write(proposalToMarkdown(await readProposal(proposalFile)));
+  });
+
+proposal.command("review")
+  .argument("<proposal>", "proposal JSON file")
+  .requiredOption("--approve <proposal-id>", "exact proposal id confirming human review")
+  .requiredOption("--reviewer <name>", "person responsible for the review")
+  .option("--note <text>", "review note")
+  .option("--reviewed-at <iso>", "fixed ISO timestamp for reproducible proposal fixtures")
+  .description("Mark a proposed change as reviewed without modifying the wiki")
+  .action(async (proposalFile, options) => {
+    const reviewedAt = options.reviewedAt ? generatedAt(options.reviewedAt) : new Date();
+    const value = reviewKnowledgeProposal(await readProposal(proposalFile), options.approve, options.reviewer, options.note, reviewedAt);
+    await writeJson(proposalFile, value);
+    console.log(`Reviewed ${value.id}; source files are still unchanged`);
+  });
+
+proposal.command("reject")
+  .argument("<proposal>", "proposal JSON file")
+  .requiredOption("--confirm <proposal-id>", "exact proposal id confirming rejection")
+  .requiredOption("--reason <text>", "reason recorded with the rejection")
+  .option("--rejected-at <iso>", "fixed ISO timestamp for reproducible proposal fixtures")
+  .description("Reject a proposed or reviewed change without modifying the wiki")
+  .action(async (proposalFile, options) => {
+    const rejectedAt = options.rejectedAt ? generatedAt(options.rejectedAt) : new Date();
+    const value = rejectKnowledgeProposal(await readProposal(proposalFile), options.confirm, options.reason, rejectedAt);
+    await writeJson(proposalFile, value);
+    console.log(`Rejected ${value.id}; source files are unchanged`);
+  });
+
+proposal.command("apply")
+  .argument("<proposal>", "reviewed proposal JSON file")
+  .argument("[root]", "wiki root", ".")
+  .requiredOption("--confirm <proposal-id>", "exact reviewed proposal id confirming apply")
+  .option("--applied-at <iso>", "fixed ISO timestamp for reproducible proposal fixtures")
+  .description("Apply a reviewed proposal after integrity and target-hash checks")
+  .action(async (proposalFile, root, options) => {
+    const appliedAt = options.appliedAt ? generatedAt(options.appliedAt) : new Date();
+    const value = await applyKnowledgeProposal(root, await readProposal(proposalFile), options.confirm, appliedAt);
+    await writeJson(proposalFile, value);
+    const graph = await buildGraph(root);
+    console.log(`Applied ${value.id}: ${value.changes.length} Markdown change(s)`);
+    console.log(`${graph.stats.files} files · ${graph.stats.links} links · ${graph.diagnostics.length} diagnostic(s)`);
   });
 
 program.command("canvas")

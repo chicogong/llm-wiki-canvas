@@ -12,4 +12,6 @@ Expect an initial acknowledgement within seven days. A fix timeline depends on s
 
 ## Local data model
 
-LLM Wiki Canvas reads the explicitly selected local wiki root and writes only requested graph or Canvas outputs. Generated artifacts should not be treated as authoritative source material. Review paths and output locations before running the CLI against sensitive vaults.
+LLM Wiki Canvas reads the explicitly selected local wiki root. Scan, lint, report, and build commands write only their requested generated outputs. `proposal apply` is the only workflow that writes knowledge Markdown: it requires a reviewed proposal, exact proposal-ID confirmation, an unchanged reviewed payload, and unchanged target-file hashes. Proposal targets cannot escape the selected root, cross symbolic-link directories, modify hidden paths, or replace repository instruction files.
+
+Generated artifacts and proposal drafts should not be treated as authoritative source material. Review the rendered proposal diff, paths, hashes, and output locations before running the CLI against sensitive vaults. Keep `.lwc/` local unless a sanitized proposal is deliberately retained as a review record.

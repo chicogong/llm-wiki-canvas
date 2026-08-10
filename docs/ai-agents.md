@@ -7,7 +7,8 @@ LLM Wiki Canvas is not another chat shell. It gives Codex, Claude Code, Qoder, T
 ```mermaid
 flowchart LR
   A["Codex / Claude Code / Qoder / TRAE / WorkBuddy"] --> R["Repository rules + Agent Skill"]
-  R --> M["Markdown source of truth"]
+  R --> P["Proposal review gate"]
+  P --> M["Markdown source of truth"]
   A --> C["lwc scan / lint / build"]
   M --> C
   C --> G["Relationship Viewer"]
@@ -39,7 +40,7 @@ Local files and the CLI are already the common interface for these agents, so th
 4. **Review:** inspect the plan or Changes / diff before authorizing writes.
 5. **Rebuild and verify:** run `lwc build`; inspect diagnostics and the Markdown, `graph.json`, and `.canvas` diffs.
 
-The current release does not include a transactional `propose → apply` command. For now, keep that boundary with the agent's plan mode, permission confirmations, and Git diff; do not describe a roadmap feature as shipped.
+Use the shipped `lwc proposal create → show → review/reject → apply` lifecycle for formal knowledge changes. Draft content stays outside the source wiki, review binds the exact content and review record to hashes, and apply refuses target drift. See [Reviewed knowledge changes](proposals.md).
 
 ## Copy-ready tasks
 
@@ -53,8 +54,8 @@ Run lwc report <vault> and lwc lint <vault>, then explain the scope, connectivit
 Propose a reviewable cleanup:
 
 ```text
-Use the llm-wiki-canvas Skill to inspect <vault>. First list the files you would change, the evidence for each change, the expected relationship changes, and remaining uncertainty.
-Do not write until I approve. After approval, make only the accepted changes, run lint and build, and summarize the Markdown, graph.json, and Wiki.canvas diffs.
+Use the llm-wiki-canvas Skill to inspect <vault>. Write suggested Markdown only under <vault>/.lwc/drafts/<name>, then create and show an lwc proposal.
+Do not edit formal wiki files. Wait for a person to run proposal review or reject. Apply only a reviewed proposal with the exact printed ID, then run report, lint, and build and summarize the resulting diffs.
 ```
 
 Generate visual relationships from notes:

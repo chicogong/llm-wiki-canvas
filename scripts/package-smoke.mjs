@@ -64,8 +64,25 @@ try {
   if (canvas.nodes[0].x !== 4321 || canvas.nodes[0].y !== -1234 || nodeIds.size !== canvas.nodes.length || edgeIds.size !== canvas.edges.length || !validEndpoints) {
     throw new Error("canvas preservation or JSON Canvas integrity check failed");
   }
+  const draft = path.join(consumer, "draft");
+  const proposalFile = path.join(consumer, "proposal.json");
+  mkdirSync(draft, { recursive: true });
+  writeFileSync(path.join(draft, "Missing.md"), "# Missing\n[[index]]\n\nReviewed addition.\n");
+  writeFileSync(path.join(draft, "Reviewed.md"), "# Reviewed\n[[index]]\n");
+  run(lwc, ["proposal", "create", wiki, "--from", draft, "--summary", "Package proposal", "--created-at", "2026-08-10T00:00:00.000Z", "-o", proposalFile], { cwd: consumer });
+  const proposed = JSON.parse(readFileSync(proposalFile, "utf8"));
+  if (proposed.status !== "proposed" || proposed.changes.length !== 2) throw new Error("packaged CLI did not create the expected proposal");
+  const shown = run(lwc, ["proposal", "show", proposalFile], { cwd: consumer }).stdout;
+  if (!shown.includes("Reviewed addition") || !shown.includes("Base SHA-256")) throw new Error("packaged CLI proposal diff is incomplete");
+  run(lwc, ["proposal", "apply", proposalFile, wiki, "--confirm", proposed.id], { cwd: consumer, expectFailure: true });
+  run(lwc, ["proposal", "review", proposalFile, "--approve", proposed.id, "--reviewer", "Package Smoke", "--reviewed-at", "2026-08-10T01:00:00.000Z"], { cwd: consumer });
+  run(lwc, ["proposal", "apply", proposalFile, wiki, "--confirm", proposed.id, "--applied-at", "2026-08-10T02:00:00.000Z"], { cwd: consumer });
+  const applied = JSON.parse(readFileSync(proposalFile, "utf8"));
+  if (applied.status !== "applied" || !readFileSync(path.join(wiki, "Reviewed.md"), "utf8").includes("# Reviewed")) {
+    throw new Error("packaged CLI did not apply the reviewed proposal");
+  }
   run(lwc, ["scan", path.join(scratch, "missing-root")], { cwd: consumer, expectFailure: true });
-  console.log("Packaged CLI smoke passed: bin, scan, lint/strict, report, build, canvas preservation, invalid root");
+  console.log("Packaged CLI smoke passed: bin, scan, lint/strict, report, build, proposal lifecycle, canvas preservation, invalid root");
 } finally {
   rmSync(scratch, { recursive: true, force: true });
 }

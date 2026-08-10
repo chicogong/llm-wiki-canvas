@@ -60,7 +60,29 @@ pnpm lwc report /path/to/vault \
 
 报告包含实际观测到的页面、关系、连接情况、来源元数据、诊断和连接度，不提供任意定义的综合健康分。各指标解释和对比方法见[收益与使用场景](value-and-workflows.zh-CN.md)。
 
-## 4. 单独扫描、检查或生成 Canvas
+## 4. 写入前审查 Agent 修改
+
+把建议 Markdown 留在独立草稿目录，创建并检查 proposal：
+
+```bash
+pnpm lwc proposal create /path/to/vault \
+  --from /path/to/vault/.lwc/drafts/change-name \
+  --summary "Explain the intended knowledge change"
+pnpm lwc proposal show /path/to/proposal.json
+```
+
+人重复输入打印出的 proposal ID 来 review 或 reject。只有 reviewed proposal 才能 apply：
+
+```bash
+pnpm lwc proposal review /path/to/proposal.json \
+  --approve <proposal-id> --reviewer "Alice"
+pnpm lwc proposal apply /path/to/proposal.json /path/to/vault \
+  --confirm <proposal-id>
+```
+
+create、show、review、reject 都不会修改正式 Markdown。Apply 写入前检查内容、review、路径和原目标哈希。完整状态模型和限制见[审查式知识修改](proposals.zh-CN.md)。
+
+## 5. 单独扫描、检查或生成 Canvas
 
 开发时直接运行源码 CLI：
 
@@ -76,7 +98,7 @@ pnpm exec tsx src/cli/index.ts canvas /path/to/vault \
 
 存在断链时，`lint` 会非零退出。增加 `--strict` 后，歧义链接、缺少标题、孤立页面等 warning 也会让检查失败。
 
-## 5. 与 Obsidian 配合
+## 6. 与 Obsidian 配合
 
 推荐的职责划分：
 
@@ -89,7 +111,7 @@ Git 负责审查和历史。
 
 如果 `Wiki.canvas` 是经过人工维护的共享视图，可以提交到 Vault；`.lwc/` 中的临时扫描数据应保持忽略。
 
-## 6. 与 QMD 配合
+## 7. 与 QMD 配合
 
 两个工具可以指向同一个 Markdown 根目录，但各自维护索引：
 
@@ -106,7 +128,7 @@ pnpm exec tsx src/cli/index.ts build /path/to/vault \
 
 QMD 负责关键词、语义和重排检索；LLM Wiki Canvas 负责显式链接拓扑、结构诊断和 JSON Canvas 生成。
 
-## 7. 与 AI Agent 配合
+## 8. 与 AI Agent 配合
 
 如果 Agent 支持仓库 Skill，把公开 Skill 复制到目标仓库：
 
@@ -129,7 +151,7 @@ QMD 负责关键词、语义和重排检索；LLM Wiki Canvas 负责显式链接
 
 Codex 和 TRAE 直接使用共享 `.agents/skills` 入口；Qoder 和 Claude Code 使用仓库内置的 `.qoder/skills` 与 `.claude/skills` 适配入口；腾讯 WorkBuddy 选择仓库为工作目录，再用 `@` 引用规则和 Skill 文件。准确兼容矩阵、各工具设置、权限建议和可复制提示词见[与 AI Agent 配合](ai-agents.zh-CN.md)。
 
-## 8. 在 CI 中使用
+## 9. 在 CI 中使用
 
 如果目标仓库已经安装或引入 CLI，核心质量门禁如下：
 
@@ -144,7 +166,7 @@ git diff --exit-code -- ./fixtures/graph.json ./wiki/Wiki.canvas
 
 固定时间只应用于明确提交的 fixture。不要让 CI 自动提交生成文件，从而掩盖真实来源变化。
 
-## 9. 当前 Viewer 能做和不能做什么
+## 10. 当前 Viewer 能做和不能做什么
 
 Viewer 支持关系图浏览、元数据搜索、页面类型筛选、节点证据卡和直接邻居跳转。当前不渲染 Markdown 正文、不做语义搜索、不编辑源文件，也不调用 LLM。
 

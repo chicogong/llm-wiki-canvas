@@ -84,7 +84,7 @@ This project does not claim an invented percentage or time saving. The compariso
 | Understand a new wiki | Open pages and follow links one by one | See the whole relationship graph, then inspect a node and its neighbors |
 | Find structural problems | Manually inspect links and filenames | Run `lwc lint`; each diagnostic includes a code and source path |
 | Draw an Obsidian Canvas | Create and reconnect nodes manually | Generate it from the wiki while preserving later manual positions |
-| Let an Agent contribute | Give broad access and review scattered edits | Keep repo instructions and the Agent Skill next to the Markdown |
+| Let an Agent contribute | Give broad access and review scattered edits | Stage drafts, review a hash-bound proposal, then explicitly apply it |
 | Review generated changes | Compare unstable or opaque output | Diff deterministic JSON with stable node and edge IDs |
 | Leave the tool | Export or migrate from a database | Keep the original Markdown and delete generated views at any time |
 
@@ -133,6 +133,19 @@ The repository now includes one shared Agent contract plus native entry points w
 
 See [Using AI agents](docs/ai-agents.md) for exact setup, compatibility limits, permissions, and copy-ready tasks. Local file access plus `lwc` is sufficient; no MCP server is required for this workflow.
 
+## Review Agent knowledge changes
+
+Formal Markdown changes can now stay outside the Vault until a person accepts their exact content:
+
+```bash
+lwc proposal create /path/to/vault --from /path/to/draft --summary "Add reviewed notes"
+lwc proposal show /path/to/proposal.json
+lwc proposal review /path/to/proposal.json --approve <proposal-id> --reviewer "Alice"
+lwc proposal apply /path/to/proposal.json /path/to/vault --confirm <proposal-id>
+```
+
+Apply verifies the reviewed payload, review record, target paths, and original SHA-256 hashes before writing. A concurrent source edit or any post-review proposal change blocks the apply. See [Reviewed knowledge changes](docs/proposals.md) for rejection, security boundaries, and the runnable example.
+
 ## Supported knowledge conventions
 
 - Markdown files and headings
@@ -151,7 +164,8 @@ flowchart LR
   C --> G["graph.json"]
   C --> J["Obsidian JSON Canvas"]
   G --> V["Local relationship Viewer"]
-  S["Codex / Claude / Qoder / TRAE / WorkBuddy"] --> M
+  S["Codex / Claude / Qoder / TRAE / WorkBuddy"] --> P["Proposal review gate"]
+  P --> M
   S --> C
 ```
 
@@ -163,6 +177,7 @@ Markdown is durable knowledge. The graph, Canvas, and Viewer data are disposable
 - Generate stable node and edge IDs.
 - Report broken and ambiguous links, missing titles, and orphan pages.
 - Produce Markdown or JSON health reports from observed structure without inventing a score.
+- Stage, diff, review, reject, and hash-check Markdown proposals before applying Agent changes.
 - Generate an Obsidian-compatible `.canvas` file.
 - Preserve manual Canvas positions on regeneration.
 - Browse, search, filter, and inspect relationships in the local Viewer.
@@ -180,7 +195,7 @@ It performs secret scanning, dependency auditing, unit tests, a reproducible dem
 
 ## Direction
 
-The next product layer is a multi-format visual compiler: a shared visual intermediate representation with JSON Canvas, Excalidraw, Markmap, and Mermaid projections. Agent changes will follow a `propose → diff → review → apply` workflow rather than silently editing the wiki.
+The next product layer is a multi-format visual compiler: a shared visual intermediate representation with JSON Canvas, Excalidraw, Markmap, and Mermaid projections. The shipped proposal lifecycle will next gain delete/rename operations and stronger multi-file recovery while keeping human review mandatory.
 
 See [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), and the [Changelog](CHANGELOG.md).
 
