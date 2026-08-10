@@ -60,6 +60,20 @@ public/graph.json            # 确定性的 Viewer 输入
 
 更完整的操作步骤见 [Examples](examples/README.md)。
 
+## 与其他工具怎么选
+
+LLM Wiki Canvas 有意只做很小的一层：编译并检查已经存在的 Markdown Wiki；它不负责导入所有文档格式，不用 LLM 自动生成整个 Wiki，也不提供 RAG 问答。
+
+| 工具 | 核心职责 | 适合选择它的情况 | 与 LLM Wiki Canvas 的关系 |
+| --- | --- | --- | --- |
+| **LLM Wiki Canvas** | 确定性关系图、结构检查、可编辑 Canvas | 已经有 Markdown，希望 Agent 共享可测试的视觉契约 | 本项目 |
+| **Obsidian** | 人工编辑 Markdown 与个人知识管理 | 需要优秀的日常写作和浏览体验 | 组合使用：Obsidian 编辑 Vault，`lwc` 生成 Canvas |
+| **QMD** | 本地 BM25、向量与重排检索 | Agent 需要高质量本地搜索 | 组合使用：QMD 检索，`lwc` 可视化并检查结构 |
+| **LLM Wiki** | LLM 自动摄取并维护桌面 Wiki | 希望把文档自动综合成 Wiki 页面 | 自动生成和聊天选它；需要 JSON Canvas 时可再用 `lwc` 处理 Markdown |
+| **WeKnora** | 完整 RAG、Agent、Wiki、文档解析和团队平台 | 需要多格式、检索基础设施、集成或 RBAC | 需要平台时选它；它与本项目不是同一轻量层 |
+
+完整能力矩阵、选择建议和组合方式见[对比与决策指南](docs/comparison.zh-CN.md)。能力快照于 2026-08-10 根据各项目官方资料核对。
+
 ## 收益对比
 
 这里不编造“提升百分比”或“节省多少小时”。下表只比较能在示例中真实验证的操作差异。
@@ -97,6 +111,8 @@ lwc build /path/to/vault \
 ```
 
 如果要把生成结果提交到 Git，请给 `lwc build` 传入 `--generated-at <ISO 时间>`，固定该次输出中的生成时间和节点修改时间。
+
+Obsidian、QMD、Agent Skill 和 CI 的具体用法见[使用指南](docs/usage.zh-CN.md)。
 
 ## 支持的知识库约定
 

@@ -60,6 +60,20 @@ public/graph.json            # Deterministic Viewer input
 
 See [Examples](examples/README.md) for a guided walkthrough and commands you can copy.
 
+## How it compares
+
+LLM Wiki Canvas occupies a deliberately small layer. It compiles and checks an existing Markdown wiki; it does not ingest every document format, generate the wiki with an LLM, or answer questions with RAG.
+
+| Tool | Primary job | Choose it when | Relationship to LLM Wiki Canvas |
+| --- | --- | --- | --- |
+| **LLM Wiki Canvas** | Deterministic graph, lint, and editable Canvas generation | Markdown already exists and Agents need a testable visual contract | This project |
+| **Obsidian** | Human Markdown authoring and personal knowledge management | You want the best day-to-day editing experience | Use together: edit the Vault in Obsidian and generate its Canvas with `lwc` |
+| **QMD** | Local BM25, vector, and reranked document retrieval | Agents need high-quality local search | Use together: QMD retrieves; `lwc` visualizes and checks structure |
+| **LLM Wiki** | LLM-driven ingest into a maintained desktop wiki | You want documents automatically synthesized into wiki pages | Use instead for generation/chat, or run `lwc` over its Markdown when JSON Canvas matters |
+| **WeKnora** | Full RAG, Agent, Wiki, ingestion, and team knowledge platform | You need broad formats, retrieval infrastructure, integrations, or RBAC | Use instead when a platform is required; it is not the same lightweight layer |
+
+Read [the complete comparison and decision guide](docs/comparison.md). The feature snapshot was verified against official project documentation on 2026-08-10.
+
 ## Benefit comparison
 
 This project does not claim an invented percentage or time saving. The comparison below describes concrete operations you can verify with the example.
@@ -97,6 +111,8 @@ lwc build /path/to/vault \
 ```
 
 For reproducible checked-in fixtures, pass `--generated-at <ISO timestamp>` to `lwc build`. It fixes graph generation and node modification timestamps for that output.
+
+For Obsidian, QMD, Agent Skill, and CI workflows, see the [usage guide](docs/usage.md).
 
 ## Supported knowledge conventions
 
