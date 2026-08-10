@@ -3,12 +3,18 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { Command } from "commander";
-import { buildGraph, graphToCanvas, type JsonCanvas } from "../core/index.js";
+import { buildGraph, buildWikiReport, graphToCanvas, reportToMarkdown, type JsonCanvas } from "../core/index.js";
 
 async function writeJson(target: string, value: unknown): Promise<void> {
   const absolute = path.resolve(target);
   await mkdir(path.dirname(absolute), { recursive: true });
   await writeFile(absolute, `${JSON.stringify(value, null, 2)}\n`, "utf8");
+}
+
+async function writeText(target: string, value: string): Promise<void> {
+  const absolute = path.resolve(target);
+  await mkdir(path.dirname(absolute), { recursive: true });
+  await writeFile(absolute, value.endsWith("\n") ? value : `${value}\n`, "utf8");
 }
 
 async function readCanvas(target?: string): Promise<JsonCanvas | undefined> {
@@ -57,6 +63,28 @@ program.command("lint")
     console.log(`${graph.stats.files} files · ${graph.stats.links} links · ${graph.diagnostics.length} diagnostic(s)`);
     const failed = graph.diagnostics.some((item) => item.level === "error" || options.strict);
     if (failed) process.exitCode = 1;
+  });
+
+program.command("report")
+  .argument("[root]", "wiki root", ".")
+  .option("-o, --output <file>", "write the report to a file instead of stdout")
+  .option("--format <format>", "report format: markdown or json", "markdown")
+  .option("--top <count>", "number of most-connected pages to include", "5")
+  .option("--generated-at <iso>", "fixed ISO timestamp for reproducible report output")
+  .description("Summarize measurable wiki structure, provenance, and diagnostics")
+  .action(async (root, options) => {
+    if (!["markdown", "json"].includes(options.format)) throw new Error(`Invalid --format value: ${options.format}`);
+    const top = Number.parseInt(options.top, 10);
+    if (!Number.isInteger(top) || top < 0) throw new Error(`Invalid --top value: ${options.top}`);
+    const fixedTime = options.generatedAt ? generatedAt(options.generatedAt) : undefined;
+    const report = buildWikiReport(await buildGraph(root, fixedTime ?? new Date(), fixedTime), top);
+    const output = options.format === "json" ? `${JSON.stringify(report, null, 2)}\n` : reportToMarkdown(report);
+    if (options.output) {
+      await writeText(options.output, output);
+      console.log(`Report → ${options.output}`);
+    } else {
+      process.stdout.write(output);
+    }
   });
 
 program.command("canvas")

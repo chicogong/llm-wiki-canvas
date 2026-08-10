@@ -43,21 +43,29 @@ try {
   writeFileSync(path.join(consumer, "Wiki.canvas"), `${JSON.stringify(editableCanvas)}\n`);
   run(lwc, ["canvas", wiki, "-o", path.join(consumer, "Wiki.canvas")], { cwd: consumer });
   run(lwc, ["build", wiki, "--graph", path.join(consumer, "built-graph.json"), "--canvas", path.join(consumer, "Built.canvas")], { cwd: consumer });
+  run(lwc, ["report", wiki, "--format", "json", "--generated-at", "2026-08-10T00:00:00.000Z", "-o", path.join(consumer, "report.json")], { cwd: consumer });
+  const markdownReport = run(lwc, ["report", wiki, "--top", "1"], { cwd: consumer }).stdout;
+  run(lwc, ["report", wiki, "--format", "xml"], { cwd: consumer, expectFailure: true });
+  run(lwc, ["report", wiki, "--top", "many"], { cwd: consumer, expectFailure: true });
   run(lwc, ["build", wiki, "--generated-at", "not-a-date"], { cwd: consumer, expectFailure: true });
   const graph = JSON.parse(readFileSync(path.join(consumer, "graph.json"), "utf8"));
   const canvas = JSON.parse(readFileSync(path.join(consumer, "Wiki.canvas"), "utf8"));
   const builtGraph = JSON.parse(readFileSync(path.join(consumer, "built-graph.json"), "utf8"));
+  const report = JSON.parse(readFileSync(path.join(consumer, "report.json"), "utf8"));
   const nodeIds = new Set(canvas.nodes.map((node) => node.id));
   const edgeIds = new Set(canvas.edges.map((edge) => edge.id));
   const validEndpoints = canvas.edges.every((edge) => nodeIds.has(edge.fromNode) && nodeIds.has(edge.toNode));
   if (graph.stats.brokenLinks !== 1 || builtGraph.stats.brokenLinks !== 0 || canvas.nodes.length !== 3 || canvas.edges.length !== 2) {
     throw new Error("packaged CLI artifacts did not match the expected smoke fixture");
   }
+  if (report.summary.pages !== 3 || report.summary.connectedPages !== 2 || report.summary.warnings !== 1 || !markdownReport.includes("Wiki health report")) {
+    throw new Error("packaged CLI report did not match the expected smoke fixture");
+  }
   if (canvas.nodes[0].x !== 4321 || canvas.nodes[0].y !== -1234 || nodeIds.size !== canvas.nodes.length || edgeIds.size !== canvas.edges.length || !validEndpoints) {
     throw new Error("canvas preservation or JSON Canvas integrity check failed");
   }
   run(lwc, ["scan", path.join(scratch, "missing-root")], { cwd: consumer, expectFailure: true });
-  console.log("Packaged CLI smoke passed: bin, scan, lint/strict, build, canvas preservation, invalid root");
+  console.log("Packaged CLI smoke passed: bin, scan, lint/strict, report, build, canvas preservation, invalid root");
 } finally {
   rmSync(scratch, { recursive: true, force: true });
 }

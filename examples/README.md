@@ -23,6 +23,7 @@ Build and check it from the repository root:
 ```bash
 pnpm demo:build
 pnpm lint:demo
+pnpm report:demo
 pnpm dev
 ```
 
@@ -32,6 +33,8 @@ Expected compiler output:
 Built 8 files · 16 links · 0 broken
 8 files · 16 links · 0 diagnostic(s)
 ```
+
+The report additionally verifies **8 / 8 connected pages**, **2 / 8 pages with source metadata**, and the most-connected pages. It uses observed counts and intentionally does not invent a health score.
 
 Try these three checks in the Viewer:
 
@@ -89,6 +92,7 @@ lwc lint /path/to/wiki
 ```bash
 pnpm demo:build
 pnpm lint:demo
+pnpm report:demo
 pnpm dev
 ```
 
@@ -98,6 +102,8 @@ pnpm dev
 Built 8 files · 16 links · 0 broken
 8 files · 16 links · 0 diagnostic(s)
 ```
+
+报告还会验证 **8 / 8 个页面已连接**、**2 / 8 个页面声明来源元数据**，并列出高连接页面。它只使用实际观测值，不虚构综合健康分。
 
 在 Viewer 中可以做三个验证：
 

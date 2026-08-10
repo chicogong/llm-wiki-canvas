@@ -12,6 +12,7 @@ cd llm-wiki-canvas
 pnpm install
 pnpm demo:build
 pnpm lint:demo
+pnpm report:demo
 pnpm dev
 ```
 
@@ -40,7 +41,26 @@ This produces two different views:
 
 Move nodes in Obsidian and run the same build again. Existing node coordinates and sizes are preserved when stable IDs still match.
 
-## 3. Scan, lint, or generate only one artifact
+## 3. Measure the current wiki
+
+Generate a human-readable report to stdout:
+
+```bash
+pnpm lwc report /path/to/vault
+```
+
+For Agent comparisons or CI fixtures, write deterministic JSON:
+
+```bash
+pnpm lwc report /path/to/vault \
+  --format json \
+  --generated-at 2026-08-10T00:00:00.000Z \
+  --output /path/to/report.json
+```
+
+The report contains observed page, relationship, connectivity, provenance, diagnostic, and degree counts. It does not assign an arbitrary health score. See [Benefits and workflows](value-and-workflows.md) for how to interpret and compare it.
+
+## 4. Scan, lint, or generate only one artifact
 
 Use the source CLI during development:
 
@@ -56,7 +76,7 @@ pnpm exec tsx src/cli/index.ts canvas /path/to/vault \
 
 `lint` exits non-zero for broken links. Add `--strict` to treat warnings such as ambiguous links, missing titles, and orphan pages as failures.
 
-## 4. Use it with Obsidian
+## 5. Use it with Obsidian
 
 Recommended ownership:
 
@@ -69,7 +89,7 @@ Git owns review and history.
 
 Keep `Wiki.canvas` in the Vault when it is a curated shared view. Keep `.lwc/` ignored when it contains disposable local scans.
 
-## 5. Use it with QMD
+## 6. Use it with QMD
 
 Both tools can point to the same Markdown root without sharing an index:
 
@@ -86,7 +106,7 @@ pnpm exec tsx src/cli/index.ts build /path/to/vault \
 
 Use QMD for keyword, semantic, and reranked retrieval. Use LLM Wiki Canvas for explicit link topology, structural diagnostics, and JSON Canvas generation.
 
-## 6. Use it with AI agents
+## 7. Use it with AI agents
 
 Copy the public Skill into the target repository when that Agent supports repository Skills:
 
@@ -109,7 +129,7 @@ No MCP server is required. The Agent reads files and invokes the CLI using its e
 
 Codex and TRAE use the shared `.agents/skills` entry directly. Qoder and Claude Code use the included `.qoder/skills` and `.claude/skills` adapters. Tencent WorkBuddy should use the repository as its working directory and `@`-reference the rule and Skill files. See [Using AI agents](ai-agents.md) for the exact matrix, tool-specific setup, permissions, and copy-ready prompts.
 
-## 7. Use it in CI
+## 8. Use it in CI
 
 For a repository that vendors or installs the CLI, the essential quality gate is:
 
@@ -124,7 +144,7 @@ git diff --exit-code -- ./fixtures/graph.json ./wiki/Wiki.canvas
 
 Use a deliberate fixed timestamp only for checked-in fixtures. Do not hide real source changes by automatically committing generated output from CI.
 
-## 8. What the current Viewer does and does not do
+## 9. What the current Viewer does and does not do
 
 The Viewer supports graph browsing, metadata search, page-kind filters, node evidence cards, and direct-neighbor navigation. It does not currently render Markdown bodies, perform semantic search, edit source files, or call an LLM.
 
