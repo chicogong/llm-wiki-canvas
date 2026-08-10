@@ -1,5 +1,6 @@
 export { buildGraph } from "./graph.js";
 export { graphToCanvas } from "./canvas.js";
+export { graphToExcalidraw } from "./excalidraw.js";
 export { buildWikiReport, reportToMarkdown } from "./report.js";
 export type { WikiReport } from "./report.js";
 export { readProposalInbox } from "./inbox.js";

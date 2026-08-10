@@ -48,16 +48,20 @@ To create persistent graph and Canvas artifacts instead:
 ```bash
 pnpm exec tsx src/cli/index.ts build /path/to/vault \
   --graph public/graph.json \
-  --canvas /path/to/vault/Wiki.canvas
+  --canvas /path/to/vault/Wiki.canvas \
+  --excalidraw /path/to/vault/Wiki.excalidraw
 pnpm dev
 ```
 
-This produces two persistent views:
+This produces three persistent views:
 
 - `public/graph.json` drives the local relationship Viewer.
 - `/path/to/vault/Wiki.canvas` opens directly in Obsidian.
+- `/path/to/vault/Wiki.excalidraw` opens as an editable Excalidraw scene with page titles, relative paths, and typed relationships.
 
 Move nodes in Obsidian and run the same build again. Existing node coordinates and sizes are preserved when stable IDs still match.
+
+To generate only the Excalidraw handoff, run `lwc excalidraw /path/to/vault -o Wiki.excalidraw`. The scene is deterministic and does not contain the Vault's absolute path.
 
 ## 3. Measure the current wiki
 

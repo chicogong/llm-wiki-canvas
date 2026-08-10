@@ -64,3 +64,28 @@ export interface JsonCanvas {
     label?: string;
   }>;
 }
+
+export interface ExcalidrawElement {
+  id: string;
+  type: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  [key: string]: unknown;
+}
+
+export interface ExcalidrawDocument {
+  type: "excalidraw";
+  version: 2;
+  source: string;
+  elements: ExcalidrawElement[];
+  appState: {
+    gridSize: number;
+    viewBackgroundColor: string;
+    scrollX: number;
+    scrollY: number;
+    zoom: { value: number };
+  };
+  files: Record<string, never>;
+}

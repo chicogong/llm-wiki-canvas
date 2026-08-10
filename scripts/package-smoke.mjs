@@ -62,12 +62,13 @@ try {
   run(lwc, ["lint", wiki], { cwd: consumer });
   run(lwc, ["lint", wiki, "--strict"], { cwd: consumer, expectFailure: true });
   run(lwc, ["canvas", wiki, "-o", path.join(consumer, "Wiki.canvas")], { cwd: consumer });
+  run(lwc, ["excalidraw", wiki, "-o", path.join(consumer, "Wiki.excalidraw")], { cwd: consumer });
   const editableCanvas = JSON.parse(readFileSync(path.join(consumer, "Wiki.canvas"), "utf8"));
   editableCanvas.nodes[0].x = 4321;
   editableCanvas.nodes[0].y = -1234;
   writeFileSync(path.join(consumer, "Wiki.canvas"), `${JSON.stringify(editableCanvas)}\n`);
   run(lwc, ["canvas", wiki, "-o", path.join(consumer, "Wiki.canvas")], { cwd: consumer });
-  run(lwc, ["build", wiki, "--graph", path.join(consumer, "built-graph.json"), "--canvas", path.join(consumer, "Built.canvas")], { cwd: consumer });
+  run(lwc, ["build", wiki, "--graph", path.join(consumer, "built-graph.json"), "--canvas", path.join(consumer, "Built.canvas"), "--excalidraw", path.join(consumer, "Built.excalidraw")], { cwd: consumer });
   run(lwc, ["report", wiki, "--format", "json", "--generated-at", "2026-08-10T00:00:00.000Z", "-o", path.join(consumer, "report.json")], { cwd: consumer });
   const markdownReport = run(lwc, ["report", wiki, "--top", "1"], { cwd: consumer }).stdout;
   run(lwc, ["report", wiki, "--format", "xml"], { cwd: consumer, expectFailure: true });
@@ -75,6 +76,8 @@ try {
   run(lwc, ["build", wiki, "--generated-at", "not-a-date"], { cwd: consumer, expectFailure: true });
   const graph = JSON.parse(readFileSync(path.join(consumer, "graph.json"), "utf8"));
   const canvas = JSON.parse(readFileSync(path.join(consumer, "Wiki.canvas"), "utf8"));
+  const excalidraw = JSON.parse(readFileSync(path.join(consumer, "Wiki.excalidraw"), "utf8"));
+  const builtExcalidraw = JSON.parse(readFileSync(path.join(consumer, "Built.excalidraw"), "utf8"));
   const builtGraph = JSON.parse(readFileSync(path.join(consumer, "built-graph.json"), "utf8"));
   const report = JSON.parse(readFileSync(path.join(consumer, "report.json"), "utf8"));
   const nodeIds = new Set(canvas.nodes.map((node) => node.id));
@@ -88,6 +91,9 @@ try {
   }
   if (canvas.nodes[0].x !== 4321 || canvas.nodes[0].y !== -1234 || nodeIds.size !== canvas.nodes.length || edgeIds.size !== canvas.edges.length || !validEndpoints) {
     throw new Error("canvas preservation or JSON Canvas integrity check failed");
+  }
+  if (excalidraw.type !== "excalidraw" || excalidraw.version !== 2 || excalidraw.elements.filter((element) => element.type === "rectangle").length !== 3 || builtExcalidraw.elements.length !== excalidraw.elements.length || JSON.stringify(excalidraw).includes(wiki)) {
+    throw new Error("Excalidraw scene integrity or path portability check failed");
   }
   const draft = path.join(consumer, "draft");
   const proposalFile = path.join(wiki, ".lwc", "proposals", "package.json");
@@ -126,7 +132,7 @@ try {
     throw new Error("packaged CLI did not apply the reviewed proposal");
   }
   run(lwc, ["scan", path.join(scratch, "missing-root")], { cwd: consumer, expectFailure: true });
-  console.log("Packaged CLI smoke passed: bin, scan, lint/strict, report, build, local serve, proposal lifecycle, canvas preservation, invalid root");
+  console.log("Packaged CLI smoke passed: bin, scan, lint/strict, report, build, local serve, proposal lifecycle, Canvas/Excalidraw exports, invalid root");
 } finally {
   rmSync(scratch, { recursive: true, force: true });
 }

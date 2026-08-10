@@ -48,16 +48,20 @@ lwc serve /path/to/vault --no-watch
 ```bash
 pnpm exec tsx src/cli/index.ts build /path/to/vault \
   --graph public/graph.json \
-  --canvas /path/to/vault/Wiki.canvas
+  --canvas /path/to/vault/Wiki.canvas \
+  --excalidraw /path/to/vault/Wiki.excalidraw
 pnpm dev
 ```
 
-这会生成两种持久化视图：
+这会生成三种持久化视图：
 
 - `public/graph.json` 驱动本地关系 Viewer。
 - `/path/to/vault/Wiki.canvas` 可以直接用 Obsidian 打开。
+- `/path/to/vault/Wiki.excalidraw` 是包含页面标题、相对路径和分类关系的可编辑 Excalidraw 场景。
 
 在 Obsidian 中移动节点，再执行同一条构建命令。只要稳定 ID 仍然匹配，已有节点坐标和大小就会保留。
+
+如果只需要 Excalidraw 交接文件，执行 `lwc excalidraw /path/to/vault -o Wiki.excalidraw`。场景输出是确定性的，不包含 Vault 绝对路径。
 
 ## 3. 衡量当前知识库
 

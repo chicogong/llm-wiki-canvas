@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { buildGraph, buildWikiReport, graphToCanvas, reportToMarkdown, type JsonCanvas } from "../src/core/index.js";
+import { buildGraph, buildWikiReport, graphToCanvas, graphToExcalidraw, reportToMarkdown, type JsonCanvas } from "../src/core/index.js";
 
 async function fixture(): Promise<string> {
   const root = await mkdtemp(path.join(tmpdir(), "lwc-test-"));
@@ -31,6 +31,23 @@ describe("wiki graph compiler", () => {
     const previous: JsonCanvas = { ...generated, nodes: generated.nodes.map((node, index) => index === 0 ? { ...node, x: 1234, y: -456, width: 777 } : node) };
     const rebuilt = graphToCanvas(second, previous);
     expect(rebuilt.nodes.find((node) => node.id === previous.nodes[0].id)).toMatchObject({ x: 1234, y: -456, width: 777 });
+  });
+
+  it("exports a deterministic editable Excalidraw scene without machine paths", async () => {
+    const root = await fixture();
+    const graph = await buildGraph(root, new Date("2026-08-10T00:00:00Z"));
+    const first = graphToExcalidraw(graph);
+    const second = graphToExcalidraw(graph);
+    expect(first).toEqual(second);
+    expect(first).toMatchObject({ type: "excalidraw", version: 2, files: {} });
+    expect(first.elements.filter((element) => element.type === "rectangle")).toHaveLength(graph.nodes.length);
+    expect(first.elements.filter((element) => element.type === "arrow")).toHaveLength(graph.edges.length);
+    expect(first.elements.find((element) => element.type === "arrow")).toMatchObject({ startBinding: { elementId: expect.stringMatching(/^x-node-/) }, endBinding: { elementId: expect.stringMatching(/^x-node-/) } });
+    expect(first.elements.find((element) => element.type === "rectangle")?.boundElements).toEqual(expect.any(Array));
+    expect(new Set(first.elements.map((element) => element.id)).size).toBe(first.elements.length);
+    expect(first.elements.every((element) => element.width >= 0 && element.height >= 0)).toBe(true);
+    expect(JSON.stringify(first)).toContain("concepts/Graph.md");
+    expect(JSON.stringify(first)).not.toContain(root);
   });
 
   it("can fix generated and modified timestamps for reproducible fixtures", async () => {

@@ -12,8 +12,10 @@
 
 - `graph.json` uses schema version 1 and contains nodes, edges, diagnostics, and aggregate stats.
 - `.canvas` follows the JSON Canvas 1.0 shape with file nodes and directed edges.
+- `.excalidraw` follows Excalidraw's plaintext scene format with editable shapes, text, and arrows.
 - Node IDs derive from normalized relative paths and stay stable across builds.
 - Existing Canvas coordinates, dimensions, and colors are retained by node ID.
+- Generated visual files contain relative knowledge paths, never machine-specific absolute Vault paths.
 
 ## Recommended wiki files
 

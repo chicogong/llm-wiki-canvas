@@ -9,6 +9,7 @@ import {
   buildWikiReport,
   createKnowledgeProposal,
   graphToCanvas,
+  graphToExcalidraw,
   parseKnowledgeProposal,
   proposalToMarkdown,
   rejectKnowledgeProposal,
@@ -191,23 +192,37 @@ program.command("canvas")
     console.log(`Canvas ${graph.stats.files} nodes, ${graph.stats.links} edges → ${options.output}`);
   });
 
+program.command("excalidraw")
+  .argument("[root]", "wiki root", ".")
+  .option("-o, --output <file>", "Excalidraw scene output", "Wiki.excalidraw")
+  .description("Generate an editable Excalidraw relationship scene")
+  .action(async (root, options) => {
+    const graph = await buildGraph(root);
+    await writeJson(options.output, graphToExcalidraw(graph));
+    console.log(`Excalidraw ${graph.stats.files} nodes, ${graph.stats.links} edges → ${options.output}`);
+  });
+
 program.command("build")
   .argument("[root]", "wiki root", ".")
   .option("--graph <file>", "graph JSON output", ".lwc/graph.json")
   .option("--canvas <file>", "JSON Canvas output", "Wiki.canvas")
+  .option("--excalidraw <file>", "optional Excalidraw scene output")
   .option("--generated-at <iso>", "fixed ISO timestamp for reproducible graph output")
-  .description("Generate both graph JSON and JSON Canvas")
+  .description("Generate graph JSON, JSON Canvas, and optional Excalidraw scene")
   .action(async (root, options) => {
     const fixedTime = options.generatedAt ? generatedAt(options.generatedAt) : undefined;
     const graph = await buildGraph(root, fixedTime ?? new Date(), fixedTime);
     const previous = await readCanvas(options.canvas);
-    await Promise.all([
+    const writes = [
       writeJson(options.graph, graph),
       writeJson(options.canvas, graphToCanvas(graph, previous)),
-    ]);
+    ];
+    if (options.excalidraw) writes.push(writeJson(options.excalidraw, graphToExcalidraw(graph)));
+    await Promise.all(writes);
     console.log(`Built ${graph.stats.files} files · ${graph.stats.links} links · ${graph.stats.brokenLinks} broken`);
     console.log(`Graph → ${options.graph}`);
     console.log(`Canvas → ${options.canvas}`);
+    if (options.excalidraw) console.log(`Excalidraw → ${options.excalidraw}`);
   });
 
 program.command("serve")

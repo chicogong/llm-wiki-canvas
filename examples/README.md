@@ -16,6 +16,7 @@ It demonstrates:
 - deterministic graph compilation;
 - a clean `lwc lint` result;
 - an editable Obsidian JSON Canvas;
+- an editable Excalidraw relationship scene;
 - a searchable local relationship Viewer.
 
 Build and check it from the repository root:
@@ -47,6 +48,8 @@ Try these three checks in the Viewer:
 
 Then open [`atlas-wiki/Atlas.canvas`](atlas-wiki/Atlas.canvas) in Obsidian. Move a node and rebuild with the same output path: the compiler reuses that node's position.
 
+Open [`atlas-wiki/Atlas.excalidraw`](atlas-wiki/Atlas.excalidraw) in Excalidraw to annotate the same relationship evidence with ordinary editable shapes and arrows.
+
 ### Copy the pattern
 
 A minimal page looks like this:
@@ -70,7 +73,8 @@ Start a new wiki with an `index.md`, add WikiLinks between ordinary Markdown fil
 ```bash
 lwc build /path/to/wiki \
   --graph /path/to/graph.json \
-  --canvas /path/to/wiki/Wiki.canvas
+  --canvas /path/to/wiki/Wiki.canvas \
+  --excalidraw /path/to/wiki/Wiki.excalidraw
 lwc lint /path/to/wiki
 ```
 
@@ -88,6 +92,7 @@ lwc lint /path/to/wiki
 - 确定性关系图编译；
 - 无诊断问题的 `lwc lint`；
 - 可继续编辑的 Obsidian JSON Canvas；
+- 可继续编辑的 Excalidraw 关系场景；
 - 可搜索的本地关系 Viewer。
 
 在仓库根目录构建并检查：
@@ -119,6 +124,8 @@ Built 8 files · 16 links · 0 broken
 
 然后在 Obsidian 中打开 [`atlas-wiki/Atlas.canvas`](atlas-wiki/Atlas.canvas)，移动任意节点，再使用同一个输出路径重新构建；编译器会复用该节点的位置。
 
+还可以在 Excalidraw 中打开 [`atlas-wiki/Atlas.excalidraw`](atlas-wiki/Atlas.excalidraw)，继续用普通可编辑图形和箭头标注同一份关系证据。
+
 ### 复制这种模式
 
 一个最小页面如下：
@@ -142,6 +149,7 @@ summary: Agent changes保持提案状态，直到人明确接受。
 ```bash
 lwc build /path/to/wiki \
   --graph /path/to/graph.json \
-  --canvas /path/to/wiki/Wiki.canvas
+  --canvas /path/to/wiki/Wiki.canvas \
+  --excalidraw /path/to/wiki/Wiki.excalidraw
 lwc lint /path/to/wiki
 ```

@@ -63,7 +63,7 @@ The daily loop is deliberately small:
 | **0.2.1 Local serve** | `lwc serve <vault>` provides one-command local viewing | Loopback-only by default; watches Markdown; rebuilds atomically; clear port/error output; no cloud account | Shipped in current iteration |
 | **0.2.2 Changes inbox** | Review Agent proposals inside the Workbench | List proposal status; show file diff and evidence; CLI remains the only apply path initially; no invented reviewer identity | Shipped in current iteration |
 | **0.2.3 Proposal topology** | See the structural effect before accepting a proposal | Added edges green, changed pages amber, conflicts red; base/proposal hashes visible; empty and conflict states tested | Shipped in current iteration |
-| **0.3 Spatial views** | Generate useful diagrams without locking users in | JSON Canvas remains canonical output; optional Excalidraw export uses its open file format; Mermaid/Markmap are derived views; rebuild never overwrites hand-edited positions silently | Planned |
+| **0.3 Spatial views** | Generate useful diagrams without locking users in | JSON Canvas remains canonical output; optional Excalidraw export uses its open file format; Mermaid/Markmap are derived views; rebuild never overwrites hand-edited positions silently | In progress — 0.3.1 shipped |
 | **0.4 Source intake** | Turn selected local material into reviewable wiki drafts | Start with Markdown/text; preserve source path/hash; generated pages stay in `.lwc/drafts`; human-approved proposal required | Planned |
 
 ## Execution plan / 执行计划
@@ -72,11 +72,11 @@ The daily loop is deliberately small:
 
 The next release should make the product useful for explaining a knowledge system, not merely inspecting it.
 
-| Increment | User outcome | In scope | Acceptance gate |
-| --- | --- | --- | --- |
-| **0.3.1 Excalidraw export** | Open a generated relationship view in Excalidraw and continue drawing | `lwc build --excalidraw`; page nodes, typed edges, titles, source paths, deterministic IDs | Valid `.excalidraw` file; repeat build is deterministic; exported content contains no absolute path |
-| **0.3.2 Focused diagrams** | Turn a selected page and its neighborhood into a small explainable diagram | Depth 1–2 selection; direction and page-kind filters; Mermaid and Excalidraw output | Same selection produces equivalent nodes/edges in both formats; empty and broken-link states tested |
-| **0.3.3 Position ownership** | Rebuild without destroying a person's layout work | Preserve known coordinates; place only new nodes; surface removed nodes before deletion | Existing coordinates survive byte-for-byte where schema permits; regression fixture covers add/remove/rebuild |
+| Increment | User outcome | In scope | Acceptance gate | Status |
+| --- | --- | --- | --- | --- |
+| **0.3.1 Excalidraw export** | Open a generated relationship view in Excalidraw and continue drawing | `lwc build --excalidraw`; page nodes, typed edges, titles, source paths, deterministic IDs | Valid `.excalidraw` file; repeat build is deterministic; exported content contains no absolute path | **Shipped** |
+| **0.3.2 Focused diagrams** | Turn a selected page and its neighborhood into a small explainable diagram | Depth 1–2 selection; direction and page-kind filters; Mermaid and Excalidraw output | Same selection produces equivalent nodes/edges in both formats; empty and broken-link states tested | Next |
+| **0.3.3 Position ownership** | Rebuild without destroying a person's layout work | Preserve known coordinates; place only new nodes; surface removed nodes before deletion | Existing coordinates survive byte-for-byte where schema permits; regression fixture covers add/remove/rebuild | Planned |
 
 This phase does **not** add collaborative whiteboards, an Excalidraw editor clone, or AI-generated decorative diagrams.
 

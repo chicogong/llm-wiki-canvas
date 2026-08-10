@@ -45,10 +45,11 @@ Run:
 ```bash
 lwc build <root> \
   --graph <viewer-public>/graph.json \
-  --canvas <root>/Wiki.canvas
+  --canvas <root>/Wiki.canvas \
+  --excalidraw <root>/Wiki.excalidraw
 ```
 
-Open `Wiki.canvas` in Obsidian for manual spatial editing. Future builds preserve positions when the same output canvas is used. Use the local Viewer for filtering and relationship inspection.
+Open `Wiki.canvas` in Obsidian for position-preserving spatial editing. Open `Wiki.excalidraw` in Excalidraw for an editable visual handoff; it contains stable generated IDs and relative knowledge paths, not an absolute Vault path. Use the local Viewer for filtering and relationship inspection.
 
 For a live local Workbench, run `lwc serve <root>`. Use Map for relationships, Health for compiler facts, and Changes to inspect proposal lifecycle, hashes, and diffs. Changes is evidence only: never claim that viewing a proposal reviewed, rejected, or applied it, and run those state transitions only after the person gives explicit direction.
 

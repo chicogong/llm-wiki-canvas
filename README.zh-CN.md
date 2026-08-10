@@ -7,7 +7,7 @@
 
 **面向 Agent 管理的 Markdown 知识库的本地优先可视化编译器。**
 
-LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性的关系图和可继续编辑的 Obsidian JSON Canvas。Codex、Claude Code、Qoder、TRAE 和腾讯 WorkBuddy 仍然操作普通文件；人可以查看全局关系、定位知识库问题并审查生成产物。
+LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性的关系图，以及可继续编辑的 Obsidian Canvas 和 Excalidraw 文件。Codex、Claude Code、Qoder、TRAE 和腾讯 WorkBuddy 仍然操作普通文件；人可以查看全局关系、定位知识库问题并审查生成产物。
 
 项目不内置 LLM、向量数据库、聊天界面、云服务或 MCP Server。
 
@@ -19,6 +19,7 @@ LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性�
 - **关系可以直接看见。** 搜索、筛选页面，并查看一个页面周围的证据与相邻关系。
 - **知识库质量可以测试。** 断链、歧义链接、缺少标题和孤立页面都有准确路径。
 - **Canvas 仍然可编辑。** 重新生成时保留用户手工调整过的节点位置。
+- **Excalidraw 仍是开放交接文件。** 导出带稳定 ID、相对来源路径的可编辑图形、文字和分类关系箭头。
 - **Agent 遵循同一套仓库契约。** 内置 Skill 指导 Agent 以文件为中心、经人工审查地工作，不依赖 MCP。
 - **Proposal 生命周期可以直接检查。** Changes 展示状态、文件动作、完整哈希、精确 diff 和安全 CLI 下一步，但 UI 本身不执行 apply。
 - **审核前即可看到关系影响。** Change blueprint 会标出受影响页面、新增或删除的链接，以及目标哈希冲突，且不会写入正式知识。
@@ -56,7 +57,8 @@ examples/atlas-wiki/
 ├── sources/                 # 可检查的来源笔记
 ├── Agent Workflow.md        # Agent 工作方式
 ├── log.md                   # 维护记录
-└── Atlas.canvas             # 可编辑的生成 Canvas
+├── Atlas.canvas             # 可编辑的生成 Canvas
+└── Atlas.excalidraw         # 可编辑的 Excalidraw 场景
 
 public/graph.json            # 确定性的 Viewer 输入
 ```
@@ -106,7 +108,8 @@ pnpm lwc serve /path/to/vault
 pnpm lwc report /path/to/vault
 pnpm lwc build /path/to/vault \
   --graph public/graph.json \
-  --canvas /path/to/vault/Wiki.canvas
+  --canvas /path/to/vault/Wiki.canvas \
+  --excalidraw /path/to/vault/Wiki.excalidraw
 ```
 
 执行 `pnpm build` 后，包会暴露 `llm-wiki-canvas` 和 `lwc` 两个命令：
@@ -117,9 +120,11 @@ lwc scan /path/to/vault -o .lwc/graph.json
 lwc lint /path/to/vault
 lwc report /path/to/vault
 lwc canvas /path/to/vault -o /path/to/vault/Wiki.canvas
+lwc excalidraw /path/to/vault -o /path/to/vault/Wiki.excalidraw
 lwc build /path/to/vault \
   --graph .lwc/graph.json \
-  --canvas /path/to/vault/Wiki.canvas
+  --canvas /path/to/vault/Wiki.canvas \
+  --excalidraw /path/to/vault/Wiki.excalidraw
 ```
 
 `lwc serve` 会在 <http://127.0.0.1:4173> 打开包含 Map、Health 和 Changes 的完整 Workbench，并在 Markdown 或 proposal 变化后刷新。默认只监听本机回环地址；重建失败时保留上一份有效图，也不会向 Vault 写入临时生成状态。可用 `--port <端口>` 修改端口，或用 `--no-watch` 查看固定快照。
@@ -172,6 +177,7 @@ flowchart LR
   M["Markdown + 来源"] --> C["确定性编译器"]
   C --> G["graph.json"]
   C --> J["Obsidian JSON Canvas"]
+  C --> E["Excalidraw 场景"]
   G --> V["本地关系 Viewer"]
   S["Codex / Claude / Qoder / TRAE / WorkBuddy"] --> P["Proposal 人工审查门"]
   P --> M
@@ -188,6 +194,7 @@ Markdown 是长期保存的知识；关系图、Canvas 和 Viewer 数据都是�
 - 基于实际结构生成 Markdown 或 JSON 健康报告，不虚构综合评分。
 - 在应用 Agent 修改前完成 Markdown 草稿隔离、diff、review、reject 和哈希校验。
 - 生成 Obsidian 兼容 `.canvas` 文件。
+- 生成带稳定 ID 和分类关系样式的可编辑 `.excalidraw` 场景。
 - 重新生成时保留 Canvas 手工位置。
 - 在本地 Viewer 中浏览、搜索、筛选并检查关系。
 - 通过内置 `llm-wiki-canvas` Skill 指导仓库级 Agent。
@@ -204,7 +211,7 @@ pnpm verify
 
 ## 后续方向
 
-下一层会是多格式 Visual Compiler：建立统一视觉中间层，并生成 JSON Canvas、Excalidraw、Markmap 和 Mermaid。已经交付的 proposal 生命周期下一步会支持删除、重命名和更强的多文件恢复，同时继续强制人工审查。
+下一项是局部关系图：选择一个页面的邻域，把同一份关系证据导出到 Mermaid 或 Excalidraw。已经交付的 proposal 生命周期后续会支持删除、重命名和更强的多文件恢复，同时继续强制人工审查。
 
 另见 [贡献指南](CONTRIBUTING.md)、[安全策略](SECURITY.md)和[变更记录](CHANGELOG.md)。
 

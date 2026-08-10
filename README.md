@@ -7,7 +7,7 @@
 
 **A local-first visual compiler for Agent-managed Markdown knowledge bases.**
 
-LLM Wiki Canvas turns Markdown, frontmatter, and WikiLinks into a deterministic relationship graph and an editable Obsidian JSON Canvas. Codex, Claude Code, Qoder, TRAE, and Tencent WorkBuddy keep working with ordinary files; people get a visual map, diagnostics, and reviewable generated artifacts.
+LLM Wiki Canvas turns Markdown, frontmatter, and WikiLinks into a deterministic relationship graph plus editable Obsidian Canvas and Excalidraw files. Codex, Claude Code, Qoder, TRAE, and Tencent WorkBuddy keep working with ordinary files; people get a visual map, diagnostics, and reviewable generated artifacts.
 
 It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
 
@@ -19,6 +19,7 @@ It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
 - **Relationships become visible.** Search, filter, and inspect the evidence around a page.
 - **Wiki quality becomes testable.** Broken links, ambiguous links, missing titles, and orphan pages have exact paths.
 - **The Canvas stays editable.** Rebuilds preserve manually adjusted node positions.
+- **Excalidraw stays an open handoff.** Export editable shapes, labels, and typed arrows with stable IDs and relative source paths.
 - **Agents use the same repository contract.** The included Skill guides file-first, human-reviewed changes without requiring MCP.
 - **Proposals have a visible lifecycle.** Changes shows status, file actions, full hashes, exact diff lines, and safe CLI next steps without applying anything from the UI.
 - **Relationship impact is visible before review.** The Change blueprint marks affected pages, added or removed links, and target-hash conflicts before anything is applied.
@@ -56,7 +57,8 @@ examples/atlas-wiki/
 ├── sources/                 # Inspectable source notes
 ├── Agent Workflow.md        # Agent operating model
 ├── log.md                   # Maintenance record
-└── Atlas.canvas             # Editable generated Canvas
+├── Atlas.canvas             # Editable generated Canvas
+└── Atlas.excalidraw         # Editable generated Excalidraw scene
 
 public/graph.json            # Deterministic Viewer input
 ```
@@ -106,7 +108,8 @@ pnpm lwc serve /path/to/vault
 pnpm lwc report /path/to/vault
 pnpm lwc build /path/to/vault \
   --graph public/graph.json \
-  --canvas /path/to/vault/Wiki.canvas
+  --canvas /path/to/vault/Wiki.canvas \
+  --excalidraw /path/to/vault/Wiki.excalidraw
 ```
 
 After `pnpm build`, the package exposes both `llm-wiki-canvas` and `lwc`:
@@ -117,9 +120,11 @@ lwc scan /path/to/vault -o .lwc/graph.json
 lwc lint /path/to/vault
 lwc report /path/to/vault
 lwc canvas /path/to/vault -o /path/to/vault/Wiki.canvas
+lwc excalidraw /path/to/vault -o /path/to/vault/Wiki.excalidraw
 lwc build /path/to/vault \
   --graph .lwc/graph.json \
-  --canvas /path/to/vault/Wiki.canvas
+  --canvas /path/to/vault/Wiki.canvas \
+  --excalidraw /path/to/vault/Wiki.excalidraw
 ```
 
 `lwc serve` opens the complete Map, Health, and Changes Workbench at <http://127.0.0.1:4173>. It refreshes after Markdown or proposal changes, binds to loopback by default, keeps the last valid graph if a rebuild fails, and does not write generated state into the Vault. Use `--port <number>` to change the port or `--no-watch` for a fixed snapshot.
@@ -172,6 +177,7 @@ flowchart LR
   M["Markdown + sources"] --> C["Deterministic compiler"]
   C --> G["graph.json"]
   C --> J["Obsidian JSON Canvas"]
+  C --> E["Excalidraw scene"]
   G --> V["Local relationship Viewer"]
   S["Codex / Claude / Qoder / TRAE / WorkBuddy"] --> P["Proposal review gate"]
   P --> M
@@ -188,6 +194,7 @@ Markdown is durable knowledge. The graph, Canvas, and Viewer data are disposable
 - Produce Markdown or JSON health reports from observed structure without inventing a score.
 - Stage, diff, review, reject, and hash-check Markdown proposals before applying Agent changes.
 - Generate an Obsidian-compatible `.canvas` file.
+- Generate an editable `.excalidraw` scene with stable IDs and typed relationship styles.
 - Preserve manual Canvas positions on regeneration.
 - Browse, search, filter, and inspect relationships in the local Viewer.
 - Guide repository-scoped Agents through the included `llm-wiki-canvas` Skill.
@@ -204,7 +211,7 @@ It performs secret scanning, dependency auditing, unit tests, a reproducible dem
 
 ## Direction
 
-The next product layer is a multi-format visual compiler: a shared visual intermediate representation with JSON Canvas, Excalidraw, Markmap, and Mermaid projections. The shipped proposal lifecycle will next gain delete/rename operations and stronger multi-file recovery while keeping human review mandatory.
+The next product increment is focused diagrams: select a page neighborhood and export the same evidence to Mermaid or Excalidraw. The shipped proposal lifecycle will later gain delete/rename operations and stronger multi-file recovery while keeping human review mandatory.
 
 See [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), and the [Changelog](CHANGELOG.md).
 
