@@ -25,7 +25,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: 11.10.0
+          version: 10.34.5
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
@@ -45,19 +45,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            node: 20
-            pnpm: 10.34.5
-          - os: macos-latest
-            node: 20
-            pnpm: 10.34.5
-          - os: ubuntu-latest
-            node: 22
-            pnpm: 11.10.0
-          - os: macos-latest
-            node: 22
-            pnpm: 11.10.0
+        os: [ubuntu-latest, macos-latest]
+        node: [20, 22]
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -66,7 +55,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: ${{ matrix.pnpm }}
+          version: 10.34.5
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:

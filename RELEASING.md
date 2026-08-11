@@ -19,5 +19,3 @@ Publishing is an explicit maintainer action. CI proves that a commit is a releas
 After the candidate commit and CI are accepted, a maintainer may create an annotated version tag, publish with the configured public access, and create matching GitHub release notes. Verify the installed package in a clean temporary directory after publication. Never publish from a dirty working tree, reuse an npm one-time password in logs, or describe an unpublished local pack as a released package.
 
 候选提交与 CI 通过后，维护者可以创建带注释的版本标签、按公开访问配置发布 npm 包，并创建对应 GitHub Release。发布后应在干净临时目录重新安装验证。不要从脏工作树发布，不要把 npm 一次性密码写入日志，也不要把本地 pack 误称为已经发布。
-
-The Node.js 20 consumer jobs intentionally use pnpm 10; pnpm 11 requires Node.js 22.13. This tests the package's declared runtime without pretending the repository's development package manager supports Node.js 20.
