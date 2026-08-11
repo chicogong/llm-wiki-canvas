@@ -63,6 +63,22 @@ Move nodes in Obsidian and run the same build again. Existing node coordinates a
 
 To generate only the Excalidraw handoff, run `lwc excalidraw /path/to/vault -o Wiki.excalidraw`. The scene is deterministic and does not contain the Vault's absolute path.
 
+### Export a focused explanation
+
+Use one page and its immediate neighborhood when a full Vault graph is too dense for documentation or a design discussion:
+
+```bash
+lwc diagram /path/to/vault \
+  --focus "Human Review" \
+  --depth 1 \
+  --direction both \
+  --kind concept note \
+  --format mermaid \
+  --output Human-Review.mmd
+```
+
+`--focus` accepts an exact title, stable node ID, or relative Markdown path. Depth is deliberately limited to 1 or 2. Direction can be `incoming`, `outgoing`, or `both`; format can be `mermaid` or `excalidraw`. An ambiguous title fails with the matching paths instead of choosing silently. Mermaid output includes comments for broken links originating from selected pages.
+
 ## 3. Measure the current wiki
 
 Generate a human-readable report to stdout:

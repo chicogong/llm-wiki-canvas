@@ -16,6 +16,7 @@
 - Node IDs derive from normalized relative paths and stay stable across builds.
 - Existing Canvas coordinates, dimensions, and colors are retained by node ID.
 - Generated visual files contain relative knowledge paths, never machine-specific absolute Vault paths.
+- Focused diagrams resolve an exact page title, ID, or relative path and select one or two relationship layers before rendering Mermaid or Excalidraw.
 
 ## Recommended wiki files
 

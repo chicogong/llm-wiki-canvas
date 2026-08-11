@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { buildGraph, buildWikiReport, graphToCanvas, graphToExcalidraw, reportToMarkdown, type JsonCanvas } from "../src/core/index.js";
+import { buildGraph, buildWikiReport, graphToCanvas, graphToExcalidraw, graphToMermaid, reportToMarkdown, resolveFocusNode, selectFocusedGraph, type JsonCanvas } from "../src/core/index.js";
 
 async function fixture(): Promise<string> {
   const root = await mkdtemp(path.join(tmpdir(), "lwc-test-"));
@@ -48,6 +48,41 @@ describe("wiki graph compiler", () => {
     expect(first.elements.every((element) => element.width >= 0 && element.height >= 0)).toBe(true);
     expect(JSON.stringify(first)).toContain("concepts/Graph.md");
     expect(JSON.stringify(first)).not.toContain(root);
+  });
+
+  it("selects one shared focused graph for Mermaid and Excalidraw", async () => {
+    const root = await fixture();
+    const graph = await buildGraph(root, new Date("2026-08-10T00:00:00Z"));
+    const focused = selectFocusedGraph(graph, "Home", { depth: 1, direction: "both", kinds: ["concept"] });
+    expect(focused.focus.path).toBe("index.md");
+    expect(focused.graph.nodes.map((node) => node.path)).toEqual(["concepts/Graph.md", "index.md"]);
+    expect(focused.graph.edges).toHaveLength(2);
+    expect(focused.graph.stats.brokenLinks).toBe(1);
+    const mermaid = graphToMermaid(focused.graph, focused.focus);
+    const excalidraw = graphToExcalidraw(focused.graph, { focusId: focused.focus.id });
+    expect(mermaid).toContain("flowchart LR");
+    expect(mermaid).toContain("%% BROKEN_LINK index.md -> Missing");
+    expect(mermaid).toContain("classDef focus");
+    expect(excalidraw.elements.filter((element) => element.type === "rectangle")).toHaveLength(focused.graph.nodes.length);
+    expect(excalidraw.elements.filter((element) => element.type === "arrow")).toHaveLength(focused.graph.edges.length);
+    expect(excalidraw.elements.find((element) => element.id === `x-${focused.focus.id}`)).toMatchObject({ strokeColor: "#173fc5", strokeWidth: 4 });
+    expect(JSON.stringify(excalidraw)).not.toContain(root);
+  });
+
+  it("applies depth and direction without silently resolving ambiguous focus pages", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "lwc-focus-"));
+    await mkdir(path.join(root, "a"));
+    await mkdir(path.join(root, "b"));
+    await writeFile(path.join(root, "a/Start.md"), "# Start\n[[Middle]]\n");
+    await writeFile(path.join(root, "Middle.md"), "# Middle\n[[End]]\n");
+    await writeFile(path.join(root, "End.md"), "# End\n");
+    await writeFile(path.join(root, "b/Start.md"), "# Other Start\n[[Middle]]\n");
+    const graph = await buildGraph(root);
+    expect(selectFocusedGraph(graph, "Middle", { depth: 1, direction: "outgoing" }).graph.nodes.map((node) => node.path)).toEqual(["End.md", "Middle.md"]);
+    expect(selectFocusedGraph(graph, "Middle", { depth: 1, direction: "incoming" }).graph.nodes.map((node) => node.path)).toEqual(["Middle.md", "a/Start.md", "b/Start.md"]);
+    expect(selectFocusedGraph(graph, "Middle", { depth: 2, direction: "both" }).graph.nodes).toHaveLength(4);
+    expect(() => resolveFocusNode(graph, "Start")).toThrow("ambiguous");
+    expect(() => resolveFocusNode(graph, "Missing page")).toThrow("not found");
   });
 
   it("can fix generated and modified timestamps for reproducible fixtures", async () => {

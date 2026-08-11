@@ -1,6 +1,9 @@
 export { buildGraph } from "./graph.js";
 export { graphToCanvas } from "./canvas.js";
 export { graphToExcalidraw } from "./excalidraw.js";
+export { resolveFocusNode, selectFocusedGraph } from "./focus.js";
+export type { FocusDirection, FocusOptions, FocusedGraph } from "./focus.js";
+export { graphToMermaid } from "./mermaid.js";
 export { buildWikiReport, reportToMarkdown } from "./report.js";
 export type { WikiReport } from "./report.js";
 export { readProposalInbox } from "./inbox.js";

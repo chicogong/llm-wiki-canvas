@@ -19,3 +19,4 @@ All notable changes will be documented here. This project follows Semantic Versi
 - A tested `lwc report` command for Markdown or JSON structure snapshots, a source-checkout `pnpm lwc` entry point, and bilingual benefit and workflow guides grounded in reproducible counts.
 - A guarded `lwc proposal` lifecycle with isolated drafts, rendered diffs, review/reject states, exact-ID confirmation, SHA-256 integrity and target-drift checks, rollback attempts, and bilingual security documentation.
 - Deterministic editable Excalidraw scene export through `lwc excalidraw` and `lwc build --excalidraw`, with stable IDs, typed relationship styles, relative source paths, and packaged CLI coverage.
+- Focused Mermaid and Excalidraw diagrams through `lwc diagram`, with exact focus resolution, one- or two-layer traversal, direction and page-kind filters, broken-link evidence, and shared-subgraph parity tests.

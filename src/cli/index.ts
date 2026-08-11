@@ -10,13 +10,16 @@ import {
   createKnowledgeProposal,
   graphToCanvas,
   graphToExcalidraw,
+  graphToMermaid,
   parseKnowledgeProposal,
   proposalToMarkdown,
   rejectKnowledgeProposal,
   reportToMarkdown,
   reviewKnowledgeProposal,
+  selectFocusedGraph,
   type JsonCanvas,
   type KnowledgeProposal,
+  type NodeKind,
 } from "../core/index.js";
 import { startWikiServer } from "./serve.js";
 
@@ -56,6 +59,11 @@ function generatedAt(value?: string): Date {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) throw new Error(`Invalid --generated-at value: ${value}`);
   return date;
+}
+
+function focusedOutput(title: string, format: "mermaid" | "excalidraw"): string {
+  const slug = title.normalize("NFKD").replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "").toLocaleLowerCase() || "focused";
+  return `${slug}.${format === "mermaid" ? "mmd" : "excalidraw"}`;
 }
 
 const program = new Command()
@@ -200,6 +208,33 @@ program.command("excalidraw")
     const graph = await buildGraph(root);
     await writeJson(options.output, graphToExcalidraw(graph));
     console.log(`Excalidraw ${graph.stats.files} nodes, ${graph.stats.links} edges → ${options.output}`);
+  });
+
+program.command("diagram")
+  .argument("[root]", "wiki root", ".")
+  .requiredOption("--focus <page>", "focus page title, ID, or relative Markdown path")
+  .option("--depth <number>", "relationship depth: 1 or 2", "1")
+  .option("--direction <direction>", "both, incoming, or outgoing", "both")
+  .option("--kind <kind...>", "neighbor page kinds: index, concept, source, note")
+  .option("--format <format>", "mermaid or excalidraw", "mermaid")
+  .option("-o, --output <file>", "focused diagram output")
+  .description("Export a focused page neighborhood to Mermaid or Excalidraw")
+  .action(async (root, options) => {
+    const depth = Number.parseInt(options.depth, 10);
+    if (![1, 2].includes(depth) || String(depth) !== String(options.depth)) throw new Error(`Focused diagram depth must be 1 or 2: ${options.depth}`);
+    if (!["both", "incoming", "outgoing"].includes(options.direction)) throw new Error(`Invalid focused diagram direction: ${options.direction}`);
+    if (!["mermaid", "excalidraw"].includes(options.format)) throw new Error(`Invalid focused diagram format: ${options.format}`);
+    const allowedKinds = new Set<NodeKind>(["index", "concept", "source", "note"]);
+    const kinds = options.kind?.map((kind: string) => kind.toLocaleLowerCase()) as NodeKind[] | undefined;
+    const invalidKinds = kinds?.filter((kind) => !allowedKinds.has(kind)) ?? [];
+    if (invalidKinds.length) throw new Error(`Invalid focused diagram page kind: ${invalidKinds.join(", ")}`);
+    const graph = await buildGraph(root);
+    const focused = selectFocusedGraph(graph, options.focus, { depth: depth as 1 | 2, direction: options.direction, kinds });
+    const output = options.output ?? focusedOutput(focused.focus.title, options.format);
+    if (options.format === "mermaid") await writeText(output, graphToMermaid(focused.graph, focused.focus));
+    else await writeJson(output, graphToExcalidraw(focused.graph, { focusId: focused.focus.id }));
+    console.log(`Focused ${focused.graph.stats.files} pages, ${focused.graph.stats.links} relationships around ${focused.focus.path} → ${output}`);
+    if (focused.graph.stats.brokenLinks) console.log(`${focused.graph.stats.brokenLinks} broken link(s) originate from selected pages`);
   });
 
 program.command("build")

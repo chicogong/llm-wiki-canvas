@@ -46,6 +46,15 @@ Try these three checks in the Viewer:
 2. Select **Human Review**; its evidence card should show its source path, tags, and neighboring pages.
 3. Filter by **Source**; only source notes should remain emphasized.
 
+Export the Human Review neighborhood in two equivalent formats:
+
+```bash
+pnpm lwc diagram examples/atlas-wiki --focus "Human Review" --depth 1 --format mermaid -o .lwc/examples/human-review.mmd
+pnpm lwc diagram examples/atlas-wiki --focus "Human Review" --depth 1 --format excalidraw -o .lwc/examples/human-review.excalidraw
+```
+
+Both outputs contain **4 pages and 6 resolved relationships** from the same focused subgraph.
+
 Then open [`atlas-wiki/Atlas.canvas`](atlas-wiki/Atlas.canvas) in Obsidian. Move a node and rebuild with the same output path: the compiler reuses that node's position.
 
 Open [`atlas-wiki/Atlas.excalidraw`](atlas-wiki/Atlas.excalidraw) in Excalidraw to annotate the same relationship evidence with ordinary editable shapes and arrows.
@@ -121,6 +130,15 @@ Built 8 files · 16 links · 0 broken
 1. 搜索 `review`，关系图应缩小到 **1 / 8** 个页面。
 2. 选择 **Human Review**，证据卡应显示源文件路径、标签和相邻页面。
 3. 按 **来源**筛选，只有来源笔记保持突出显示。
+
+把 Human Review 邻域导出为两种等价格式：
+
+```bash
+pnpm lwc diagram examples/atlas-wiki --focus "Human Review" --depth 1 --format mermaid -o .lwc/examples/human-review.mmd
+pnpm lwc diagram examples/atlas-wiki --focus "Human Review" --depth 1 --format excalidraw -o .lwc/examples/human-review.excalidraw
+```
+
+两份输出来自同一个局部子图，都包含 **4 个页面和 6 条有效关系**。
 
 然后在 Obsidian 中打开 [`atlas-wiki/Atlas.canvas`](atlas-wiki/Atlas.canvas)，移动任意节点，再使用同一个输出路径重新构建；编译器会复用该节点的位置。
 

@@ -20,6 +20,7 @@ LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性�
 - **知识库质量可以测试。** 断链、歧义链接、缺少标题和孤立页面都有准确路径。
 - **Canvas 仍然可编辑。** 重新生成时保留用户手工调整过的节点位置。
 - **Excalidraw 仍是开放交接文件。** 导出带稳定 ID、相对来源路径的可编辑图形、文字和分类关系箭头。
+- **把大图变成小型解释图。** 选择一个页面及一至两层关系，把同一份证据导出到 Mermaid 或 Excalidraw。
 - **Agent 遵循同一套仓库契约。** 内置 Skill 指导 Agent 以文件为中心、经人工审查地工作，不依赖 MCP。
 - **Proposal 生命周期可以直接检查。** Changes 展示状态、文件动作、完整哈希、精确 diff 和安全 CLI 下一步，但 UI 本身不执行 apply。
 - **审核前即可看到关系影响。** Change blueprint 会标出受影响页面、新增或删除的链接，以及目标哈希冲突，且不会写入正式知识。
@@ -121,6 +122,7 @@ lwc lint /path/to/vault
 lwc report /path/to/vault
 lwc canvas /path/to/vault -o /path/to/vault/Wiki.canvas
 lwc excalidraw /path/to/vault -o /path/to/vault/Wiki.excalidraw
+lwc diagram /path/to/vault --focus "Human Review" --depth 1 --format mermaid -o Human-Review.mmd
 lwc build /path/to/vault \
   --graph .lwc/graph.json \
   --canvas /path/to/vault/Wiki.canvas \
@@ -195,6 +197,7 @@ Markdown 是长期保存的知识；关系图、Canvas 和 Viewer 数据都是�
 - 在应用 Agent 修改前完成 Markdown 草稿隔离、diff、review、reject 和哈希校验。
 - 生成 Obsidian 兼容 `.canvas` 文件。
 - 生成带稳定 ID 和分类关系样式的可编辑 `.excalidraw` 场景。
+- 按方向和页面类型筛选，将一至两层局部关系导出为 Mermaid 或 Excalidraw。
 - 重新生成时保留 Canvas 手工位置。
 - 在本地 Viewer 中浏览、搜索、筛选并检查关系。
 - 通过内置 `llm-wiki-canvas` Skill 指导仓库级 Agent。
@@ -211,7 +214,7 @@ pnpm verify
 
 ## 后续方向
 
-下一项是局部关系图：选择一个页面的邻域，把同一份关系证据导出到 Mermaid 或 Excalidraw。已经交付的 proposal 生命周期后续会支持删除、重命名和更强的多文件恢复，同时继续强制人工审查。
+空间视图下一项是位置所有权：保留人工调整过的 Excalidraw 和 Canvas 布局，并可预测地放置新增节点。已经交付的 proposal 生命周期后续会支持删除、重命名和更强的多文件恢复，同时继续强制人工审查。
 
 另见 [贡献指南](CONTRIBUTING.md)、[安全策略](SECURITY.md)和[变更记录](CHANGELOG.md)。
 

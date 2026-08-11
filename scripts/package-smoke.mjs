@@ -63,6 +63,10 @@ try {
   run(lwc, ["lint", wiki, "--strict"], { cwd: consumer, expectFailure: true });
   run(lwc, ["canvas", wiki, "-o", path.join(consumer, "Wiki.canvas")], { cwd: consumer });
   run(lwc, ["excalidraw", wiki, "-o", path.join(consumer, "Wiki.excalidraw")], { cwd: consumer });
+  run(lwc, ["diagram", wiki, "--focus", "Missing", "--depth", "1", "--format", "mermaid", "-o", path.join(consumer, "Focused.mmd")], { cwd: consumer });
+  run(lwc, ["diagram", wiki, "--focus", "Missing", "--depth", "1", "--format", "excalidraw", "-o", path.join(consumer, "Focused.excalidraw")], { cwd: consumer });
+  run(lwc, ["diagram", wiki, "--focus", "Missing", "--depth", "3"], { cwd: consumer, expectFailure: true });
+  run(lwc, ["diagram", wiki, "--focus", "Missing", "--kind", "unknown"], { cwd: consumer, expectFailure: true });
   const editableCanvas = JSON.parse(readFileSync(path.join(consumer, "Wiki.canvas"), "utf8"));
   editableCanvas.nodes[0].x = 4321;
   editableCanvas.nodes[0].y = -1234;
@@ -78,6 +82,8 @@ try {
   const canvas = JSON.parse(readFileSync(path.join(consumer, "Wiki.canvas"), "utf8"));
   const excalidraw = JSON.parse(readFileSync(path.join(consumer, "Wiki.excalidraw"), "utf8"));
   const builtExcalidraw = JSON.parse(readFileSync(path.join(consumer, "Built.excalidraw"), "utf8"));
+  const focusedMermaid = readFileSync(path.join(consumer, "Focused.mmd"), "utf8");
+  const focusedExcalidraw = JSON.parse(readFileSync(path.join(consumer, "Focused.excalidraw"), "utf8"));
   const builtGraph = JSON.parse(readFileSync(path.join(consumer, "built-graph.json"), "utf8"));
   const report = JSON.parse(readFileSync(path.join(consumer, "report.json"), "utf8"));
   const nodeIds = new Set(canvas.nodes.map((node) => node.id));
@@ -94,6 +100,9 @@ try {
   }
   if (excalidraw.type !== "excalidraw" || excalidraw.version !== 2 || excalidraw.elements.filter((element) => element.type === "rectangle").length !== 3 || builtExcalidraw.elements.length !== excalidraw.elements.length || JSON.stringify(excalidraw).includes(wiki)) {
     throw new Error("Excalidraw scene integrity or path portability check failed");
+  }
+  if (!focusedMermaid.includes("%% Focus: Missing.md") || !focusedMermaid.includes("flowchart LR") || focusedExcalidraw.elements.filter((element) => element.type === "rectangle").length !== 2 || focusedExcalidraw.elements.filter((element) => element.type === "arrow").length !== 2) {
+    throw new Error("focused Mermaid and Excalidraw exports did not use the same neighborhood");
   }
   const draft = path.join(consumer, "draft");
   const proposalFile = path.join(wiki, ".lwc", "proposals", "package.json");
@@ -132,7 +141,7 @@ try {
     throw new Error("packaged CLI did not apply the reviewed proposal");
   }
   run(lwc, ["scan", path.join(scratch, "missing-root")], { cwd: consumer, expectFailure: true });
-  console.log("Packaged CLI smoke passed: bin, scan, lint/strict, report, build, local serve, proposal lifecycle, Canvas/Excalidraw exports, invalid root");
+  console.log("Packaged CLI smoke passed: bin, scan, lint/strict, report, build, local serve, proposal lifecycle, focused Mermaid/Excalidraw exports, invalid root");
 } finally {
   rmSync(scratch, { recursive: true, force: true });
 }

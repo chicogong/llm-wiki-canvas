@@ -81,7 +81,7 @@ function textElement(id: string, text: string, x: number, y: number, fontSize: n
   };
 }
 
-export function graphToExcalidraw(graph: WikiGraph): ExcalidrawDocument {
+export function graphToExcalidraw(graph: WikiGraph, options: { focusId?: string } = {}): ExcalidrawDocument {
   const layout = graphToCanvas(graph);
   const rawMinX = Math.min(...layout.nodes.map((node) => node.x), 0);
   const rawMinY = Math.min(...layout.nodes.map((node) => node.y), 0);
@@ -130,12 +130,14 @@ export function graphToExcalidraw(graph: WikiGraph): ExcalidrawDocument {
     if (!position) continue;
     const colors = COLORS[node.kind];
     const shapeId = `x-${node.id}`;
+    const focused = node.id === options.focusId;
     elements.push({
       ...base(shapeId, "rectangle", position.x, position.y, NODE_WIDTH, NODE_HEIGHT),
-      strokeColor: colors.stroke,
-      backgroundColor: colors.background,
+      strokeColor: focused ? "#173fc5" : colors.stroke,
+      backgroundColor: focused ? "#dfe6ff" : colors.background,
+      strokeWidth: focused ? 4 : 2,
       boundElements: graph.edges.filter((edge) => edge.source === node.id || edge.target === node.id).map((edge) => ({ id: `x-${edge.id}`, type: "arrow" })),
-      customData: { lwc: { nodeId: node.id, path: node.path, kind: node.kind } },
+      customData: { lwc: { nodeId: node.id, path: node.path, kind: node.kind, ...(focused ? { focus: true } : {}) } },
     });
     const title = wrap(node.title);
     elements.push(textElement(`xt-${node.id}`, title, position.x + 18, position.y + 18, 21, "#17201b"));

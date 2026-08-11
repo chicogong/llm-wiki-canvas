@@ -20,6 +20,7 @@ It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
 - **Wiki quality becomes testable.** Broken links, ambiguous links, missing titles, and orphan pages have exact paths.
 - **The Canvas stays editable.** Rebuilds preserve manually adjusted node positions.
 - **Excalidraw stays an open handoff.** Export editable shapes, labels, and typed arrows with stable IDs and relative source paths.
+- **Large maps become small explanations.** Select one page and one or two relationship layers, then export the same evidence to Mermaid or Excalidraw.
 - **Agents use the same repository contract.** The included Skill guides file-first, human-reviewed changes without requiring MCP.
 - **Proposals have a visible lifecycle.** Changes shows status, file actions, full hashes, exact diff lines, and safe CLI next steps without applying anything from the UI.
 - **Relationship impact is visible before review.** The Change blueprint marks affected pages, added or removed links, and target-hash conflicts before anything is applied.
@@ -121,6 +122,7 @@ lwc lint /path/to/vault
 lwc report /path/to/vault
 lwc canvas /path/to/vault -o /path/to/vault/Wiki.canvas
 lwc excalidraw /path/to/vault -o /path/to/vault/Wiki.excalidraw
+lwc diagram /path/to/vault --focus "Human Review" --depth 1 --format mermaid -o Human-Review.mmd
 lwc build /path/to/vault \
   --graph .lwc/graph.json \
   --canvas /path/to/vault/Wiki.canvas \
@@ -195,6 +197,7 @@ Markdown is durable knowledge. The graph, Canvas, and Viewer data are disposable
 - Stage, diff, review, reject, and hash-check Markdown proposals before applying Agent changes.
 - Generate an Obsidian-compatible `.canvas` file.
 - Generate an editable `.excalidraw` scene with stable IDs and typed relationship styles.
+- Export a focused one- or two-layer neighborhood to Mermaid or Excalidraw with direction and page-kind filters.
 - Preserve manual Canvas positions on regeneration.
 - Browse, search, filter, and inspect relationships in the local Viewer.
 - Guide repository-scoped Agents through the included `llm-wiki-canvas` Skill.
@@ -211,7 +214,7 @@ It performs secret scanning, dependency auditing, unit tests, a reproducible dem
 
 ## Direction
 
-The next product increment is focused diagrams: select a page neighborhood and export the same evidence to Mermaid or Excalidraw. The shipped proposal lifecycle will later gain delete/rename operations and stronger multi-file recovery while keeping human review mandatory.
+The next spatial increment is position ownership: preserve manually arranged Excalidraw and Canvas layouts while adding new graph nodes predictably. The shipped proposal lifecycle will later gain delete/rename operations and stronger multi-file recovery while keeping human review mandatory.
 
 See [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), and the [Changelog](CHANGELOG.md).
 

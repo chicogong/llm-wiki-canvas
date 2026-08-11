@@ -63,6 +63,22 @@ pnpm dev
 
 如果只需要 Excalidraw 交接文件，执行 `lwc excalidraw /path/to/vault -o Wiki.excalidraw`。场景输出是确定性的，不包含 Vault 绝对路径。
 
+### 导出局部解释图
+
+当整个 Vault 图谱不适合直接放进文档或方案讨论时，可以只选择一个页面和它的直接邻域：
+
+```bash
+lwc diagram /path/to/vault \
+  --focus "Human Review" \
+  --depth 1 \
+  --direction both \
+  --kind concept note \
+  --format mermaid \
+  --output Human-Review.mmd
+```
+
+`--focus` 接受准确标题、稳定节点 ID 或相对 Markdown 路径。深度有意限制为 1 或 2；方向可以是 `incoming`、`outgoing` 或 `both`；格式可以是 `mermaid` 或 `excalidraw`。标题存在歧义时，命令会列出匹配路径并失败，不会静默猜测。所选页面存在断链时，Mermaid 输出会保留对应注释。
+
 ## 3. 衡量当前知识库
 
 把便于人阅读的报告输出到终端：
