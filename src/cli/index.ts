@@ -5,6 +5,7 @@ import process from "node:process";
 import { Command } from "commander";
 import {
   applyKnowledgeProposal,
+  agentCompatibilityToMarkdown,
   buildGraph,
   buildWikiReport,
   createKnowledgeIntake,
@@ -12,6 +13,7 @@ import {
   graphToCanvas,
   graphToExcalidraw,
   graphToMermaid,
+  inspectAgentCompatibility,
   intakeToMarkdown,
   parseKnowledgeProposal,
   proposalToMarkdown,
@@ -143,6 +145,25 @@ program.command("report")
     } else {
       process.stdout.write(output);
     }
+  });
+
+program.command("agents")
+  .argument("[root]", "workspace root containing Agent integration files", ".")
+  .option("-o, --output <file>", "write the compatibility report to a file instead of stdout")
+  .option("--format <format>", "report format: markdown or json", "markdown")
+  .option("--strict", "exit non-zero when a required host integration is incomplete", false)
+  .description("Verify cross-Agent repository rules and Skill entry points")
+  .action(async (root, options) => {
+    if (!["markdown", "json"].includes(options.format)) throw new Error(`Invalid --format value: ${options.format}`);
+    const report = await inspectAgentCompatibility(root);
+    const output = options.format === "json" ? `${JSON.stringify(report, null, 2)}\n` : agentCompatibilityToMarkdown(report);
+    if (options.output) {
+      await writeText(options.output, output);
+      console.log(`Agent compatibility → ${options.output}`);
+    } else {
+      process.stdout.write(output);
+    }
+    if (options.strict && report.summary.incomplete > 0) process.exitCode = 1;
   });
 
 const intake = program.command("intake")

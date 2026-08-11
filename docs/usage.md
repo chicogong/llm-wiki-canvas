@@ -98,6 +98,17 @@ pnpm lwc report /path/to/vault \
 
 The report contains observed page, relationship, connectivity, provenance, diagnostic, and degree counts. It does not assign an arbitrary health score. See [Benefits and workflows](value-and-workflows.md) for how to interpret and compare it.
 
+### Verify Agent integration
+
+At the repository root that contains Agent guidance, verify that every host points to the same reviewed-write contract:
+
+```bash
+lwc agents . --strict
+lwc agents . --format json -o .lwc/agents.json
+```
+
+Strict mode fails when a required rule or Skill adapter is missing, unsafe, or stale. A `manual` result is deliberate rather than a failure: it means the host requires explicit context attachment. See [Agent compatibility](agent-compatibility.md).
+
 ## 4. Turn one selected source into an isolated draft
 
 Register one Markdown or UTF-8 text source and one intended wiki target:

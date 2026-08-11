@@ -23,7 +23,7 @@ Commit files that let another contributor understand, build, test, and reproduce
 
 - source code, tests, configuration, lockfiles, and CI workflows;
 - public documentation, example Markdown, and deliberately anonymized fixtures;
-- stable generated fixtures used by tests or documentation, such as `public/graph.json`, `examples/atlas-wiki/Atlas.canvas`, and curated screenshots;
+- stable generated fixtures used by tests or documentation, such as `public/graph.json`, `examples/atlas-wiki/Atlas.canvas`, `docs/agent-compatibility.md`, and curated screenshots;
 - Agent Skills and repository instructions that define the public workflow;
 - migrations or schema changes together with the code that consumes them.
 
@@ -40,4 +40,4 @@ Before staging, run `git status --short`, inspect `git diff`, and stage explicit
 
 ## Pull requests
 
-Keep changes focused, add regression tests, and explain any graph schema or Canvas compatibility impact. Viewer changes should include desktop and mobile evidence.
+Keep changes focused, add regression tests, and explain any graph schema, Canvas, or Agent-contract compatibility impact. Viewer changes should include desktop and mobile evidence. Rebuild the public Agent matrix with `pnpm agents:matrix` when rules or adapters change.

@@ -67,6 +67,7 @@ The daily loop is deliberately small:
 | **0.2.3 Proposal topology** | See the structural effect before accepting a proposal | Added edges green, changed pages amber, conflicts red; base/proposal hashes visible; empty and conflict states tested | Shipped in current iteration |
 | **0.3 Spatial views** | Generate useful diagrams without locking users in | JSON Canvas remains canonical output; optional Excalidraw export uses its open file format; Mermaid/Markmap are derived views; rebuild never overwrites hand-edited positions silently | Shipped — 0.3.1–0.3.3 |
 | **0.4 Source intake** | Turn selected local material into reviewable wiki drafts | Start with Markdown/text; preserve source path/hash; generated pages stay in `.lwc/drafts`; human-approved proposal required | Shipped — 0.4.1–0.4.3 |
+| **0.5 Agent compatibility** | Verify that multiple coding Agents share one knowledge contract | Deterministic repository checks; public matrix; static contract evidence separated from real host execution | In progress — 0.5.1 shipped |
 
 ## Execution plan / 执行计划
 
@@ -96,9 +97,17 @@ PDF, OCR, web crawling, office documents, and bulk folder ingestion stay out unt
 
 PDF、OCR、网页抓取、Office 文档和整目录批量导入暂不进入这一阶段。
 
-### Then — 0.5 Agent compatibility / 随后：Agent 兼容层
+### Now — 0.5 Agent compatibility / 当前：Agent 兼容层
 
 No MCP server is required. The canonical integration is a portable Skill plus the `lwc` CLI.
+
+| Increment | User outcome | In scope | Acceptance gate | Status |
+| --- | --- | --- | --- | --- |
+| **0.5.1 Contract checker** | Know whether each Agent sees the same rules and Skill | `lwc agents`; Markdown/JSON output; strict CI mode; regular-file checks; generated public matrix | Same files produce deterministic status; absolute workspace paths never leak; WorkBuddy manual setup is not mislabeled native | **Shipped** |
+| **0.5.2 Host execution fixtures** | Compare real host output on one public task | Opt-in runners for locally installed host CLIs; shared prompt and expected proposal semantics | Runtime evidence is labeled separately; no credentials or sessions enter fixtures | Planned |
+| **0.5.3 Safe scaffolding** | Add missing integration entry points without overwriting repository rules | Dry-run-first initializer; host selection; conflict report | Existing files are never silently replaced; generated adapters point to one canonical Skill | Planned |
+
+The current generated result is [Agent compatibility](docs/agent-compatibility.md); the Chinese interpretation is [Agent 兼容性验证](docs/agent-compatibility.zh-CN.md).
 
 | Host | Integration | Minimum verification |
 | --- | --- | --- |
@@ -157,12 +166,14 @@ Features that mainly increase ingestion breadth, chat capability, or infrastruct
 
 - **Map** answers: “What is connected, and why?” It shows page type, direction, edge kind, path, tags, and source summary.
 - **Health** answers: “Can I trust the current structure?” It only reports compiler facts: links, orphans, diagnostics, and connectivity.
-- **Changes** will answer: “What does the Agent want to change?” It separates summary, exact diff, topology impact, and the human decision.
+- **Drafts** answers: “What source did the Agent receive, and is its isolated output safe to propose?” It exposes provenance, hash state, scope, and blockers without writing.
+- **Changes** answers: “What does the Agent want to change?” It separates summary, exact diff, topology impact, and the human decision.
 - **Canvas** answers: “How do I arrange and explain this spatially?” It stays editable in Obsidian and later Excalidraw.
 
 - **Map** 回答“哪些知识有关，为什么有关”；展示页面类型、方向、关系类型、路径、标签和摘要。
 - **Health** 回答“当前结构是否可信”；只展示编译器事实，不生成神秘评分。
-- **Changes** 将回答“Agent 想改什么”；明确分开摘要、原始 diff、关系影响和人工决策。
+- **Drafts** 回答“Agent 收到了什么来源，隔离草稿是否可以安全进入 Proposal”；展示溯源、哈希状态、范围和阻塞原因，但不写入。
+- **Changes** 回答“Agent 想改什么”；明确分开摘要、原始 diff、关系影响和人工决策。
 - **Canvas** 回答“如何用空间结构解释”；继续允许在 Obsidian、后续 Excalidraw 中手工编辑。
 
 ## Deliberate non-goals / 暂不做

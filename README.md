@@ -24,6 +24,7 @@ It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
 - **Excalidraw stays an open handoff.** Rebuilds retain page positions, hand-drawn annotations, and embedded files while refreshing typed relationships.
 - **Large maps become small explanations.** Select one page and one or two relationship layers, then export the same evidence to Mermaid or Excalidraw.
 - **Agents use the same repository contract.** The included Skill guides file-first, human-reviewed changes without requiring MCP.
+- **Agent support is testable.** `lwc agents . --strict` verifies the actual Codex, Claude Code, Qoder, TRAE, and WorkBuddy entry files and emits a deterministic compatibility matrix for CI.
 - **Proposals have a visible lifecycle.** Changes shows status, file actions, full hashes, exact diff lines, and safe CLI next steps without applying anything from the UI.
 - **Relationship impact is visible before review.** The Change blueprint marks affected pages, added or removed links, and target-hash conflicts before anything is applied.
 - **Generated views are reproducible.** Stable node and edge IDs make graph fixtures and Git diffs meaningful.
@@ -122,6 +123,7 @@ lwc serve /path/to/vault
 lwc scan /path/to/vault -o .lwc/graph.json
 lwc lint /path/to/vault
 lwc report /path/to/vault
+lwc agents /path/to/workspace --strict
 lwc intake create /path/to/vault --source /path/to/meeting.txt --target concepts/Meeting.md --generator Codex
 lwc canvas /path/to/vault -o /path/to/vault/Wiki.canvas
 lwc excalidraw /path/to/vault -o /path/to/vault/Wiki.excalidraw
@@ -153,6 +155,8 @@ The repository now includes one shared Agent contract plus native entry points w
 | Tencent WorkBuddy | Select the repository as workspace and `@`-reference `AGENTS.md` and the shared Skill |
 
 See [Using AI agents](docs/ai-agents.md) for exact setup, compatibility limits, permissions, and copy-ready tasks. Local file access plus `lwc` is sufficient; no MCP server is required for this workflow.
+
+Run `lwc agents . --strict` at the integration repository root to verify shared rules and host-specific Skill entry points. `ready` means the repository contract is internally consistent, `manual` means explicit context attachment is required, and `incomplete` fails strict mode. See the generated [compatibility matrix](docs/agent-compatibility.md). This check does not pretend to execute proprietary host binaries.
 
 ## Review Agent knowledge changes
 
@@ -220,7 +224,7 @@ It performs secret scanning, dependency auditing, unit tests, a reproducible dem
 
 ## Direction
 
-Governed single-source intake now has a complete visible path: **Drafts** verifies `source → isolated draft → proposal`, and **Changes** carries the same provenance into human review. The next increment is the cross-Agent compatibility matrix and reproducible host fixtures described in the roadmap.
+Governed single-source intake now has a complete visible path, and the first 0.5 compatibility increment is shipped: one command verifies the shared Agent contract and publishes the same matrix used by CI. The next increment is opt-in host execution fixtures where a real host CLI is available; static file checks will remain clearly separated from runtime evidence.
 
 See [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), and the [Changelog](CHANGELOG.md).
 

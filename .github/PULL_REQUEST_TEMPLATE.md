@@ -10,6 +10,7 @@
 
 - [ ] `pnpm verify`
 - [ ] Generated graph and Canvas changes were reviewed
+- [ ] Agent compatibility matrix was rebuilt when rules or adapters changed
 - [ ] No source notes were silently rewritten
 
 ## Screenshots

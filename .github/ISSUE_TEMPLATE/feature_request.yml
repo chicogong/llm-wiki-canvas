@@ -18,6 +18,20 @@ body:
     validations:
       required: true
   - type: dropdown
+    id: surface
+    attributes:
+      label: Product surface
+      options:
+        - Map and relationships
+        - Health and diagnostics
+        - Drafts and source intake
+        - Changes and review
+        - Canvas, Excalidraw, or Mermaid
+        - Agent compatibility and Skills
+        - CLI and automation
+    validations:
+      required: true
+  - type: dropdown
     id: truth
     attributes:
       label: Source-of-truth impact

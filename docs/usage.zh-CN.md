@@ -98,6 +98,17 @@ pnpm lwc report /path/to/vault \
 
 报告包含实际观测到的页面、关系、连接情况、来源元数据、诊断和连接度，不提供任意定义的综合健康分。各指标解释和对比方法见[收益与使用场景](value-and-workflows.zh-CN.md)。
 
+### 校验 Agent 集成
+
+在包含 Agent 指引的仓库根目录，检查所有宿主是否指向同一份经审查写入契约：
+
+```bash
+lwc agents . --strict
+lwc agents . --format json -o .lwc/agents.json
+```
+
+所需规则或 Skill 适配器缺失、不安全或过期时，strict 模式会失败。`manual` 是明确的产品状态而非失败：它表示该宿主需要显式附加上下文。详见[Agent 兼容性验证](agent-compatibility.zh-CN.md)。
+
 ## 4. 把一份明确选择的资料变成隔离草稿
 
 登记一份 Markdown 或 UTF-8 文本来源，以及一个预期 Wiki 目标：

@@ -24,6 +24,7 @@ LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性�
 - **Excalidraw 仍是开放交接文件。** 重建时保留页面位置、手绘批注和嵌入文件，同时刷新分类关系。
 - **把大图变成小型解释图。** 选择一个页面及一至两层关系，把同一份证据导出到 Mermaid 或 Excalidraw。
 - **Agent 遵循同一套仓库契约。** 内置 Skill 指导 Agent 以文件为中心、经人工审查地工作，不依赖 MCP。
+- **Agent 支持情况可以测试。** `lwc agents . --strict` 会校验 Codex、Claude Code、Qoder、TRAE、WorkBuddy 的实际入口文件，并生成可由 CI 复现的兼容矩阵。
 - **Proposal 生命周期可以直接检查。** Changes 展示状态、文件动作、完整哈希、精确 diff 和安全 CLI 下一步，但 UI 本身不执行 apply。
 - **审核前即可看到关系影响。** Change blueprint 会标出受影响页面、新增或删除的链接，以及目标哈希冲突，且不会写入正式知识。
 - **生成视图可复现。** 稳定的节点和边 ID，让图谱 fixture 与 Git diff 有实际意义。
@@ -122,6 +123,7 @@ lwc serve /path/to/vault
 lwc scan /path/to/vault -o .lwc/graph.json
 lwc lint /path/to/vault
 lwc report /path/to/vault
+lwc agents /path/to/workspace --strict
 lwc intake create /path/to/vault --source /path/to/meeting.txt --target concepts/Meeting.md --generator Codex
 lwc canvas /path/to/vault -o /path/to/vault/Wiki.canvas
 lwc excalidraw /path/to/vault -o /path/to/vault/Wiki.excalidraw
@@ -153,6 +155,8 @@ Obsidian、QMD、Agent Skill 和 CI 的具体用法见[使用指南](docs/usage.
 | 腾讯 WorkBuddy | 选择仓库为工作区，并用 `@` 引用 `AGENTS.md` 和共享 Skill |
 
 准确设置、兼容边界、权限建议和可直接复制的任务见[与 AI Agent 配合](docs/ai-agents.zh-CN.md)。本地文件权限加 `lwc` 已经足够，这条工作流不需要 MCP Server。
+
+在集成仓库根目录运行 `lwc agents . --strict`，即可校验共享规则与各宿主的 Skill 入口。`ready` 表示仓库契约内部一致，`manual` 表示需要显式附加上下文，`incomplete` 会让 strict 模式失败。结果见自动生成的[英文兼容矩阵](docs/agent-compatibility.md)和[中文说明](docs/agent-compatibility.zh-CN.md)。该检查不会假装执行过闭源宿主程序。
 
 ## 审查 Agent 的知识修改
 
@@ -220,7 +224,7 @@ pnpm verify
 
 ## 后续方向
 
-单来源受控 Intake 已形成完整可见闭环：**Drafts** 校验“来源 → 隔离草稿 → Proposal”，**Changes** 把同一份溯源带入人工审查。下一项是路线图中的跨 Agent 兼容矩阵与可复现宿主 fixture。
+单来源受控 Intake 已形成完整可见闭环，0.5 的第一个兼容性增量也已经交付：一个命令校验共享 Agent 契约，并发布 CI 使用的同一份矩阵。下一项是在真实宿主 CLI 可用时增加可选运行 fixture；静态文件校验与运行时证据仍会严格分开。
 
 另见 [贡献指南](CONTRIBUTING.md)、[安全策略](SECURITY.md)和[变更记录](CHANGELOG.md)。
 

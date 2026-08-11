@@ -53,6 +53,24 @@ try {
   const lwc = path.join(consumer, "node_modules", ".bin", "lwc");
   writeFileSync(path.join(wiki, "index.md"), "# Package Smoke\n[[Missing]]\n");
   run(lwc, ["--version"], { cwd: consumer });
+  const agentWorkspace = path.join(consumer, "agent-workspace");
+  mkdirSync(path.join(agentWorkspace, ".agents", "skills", "llm-wiki-canvas"), { recursive: true });
+  mkdirSync(path.join(agentWorkspace, ".claude", "skills", "llm-wiki-canvas"), { recursive: true });
+  mkdirSync(path.join(agentWorkspace, ".qoder", "skills", "llm-wiki-canvas"), { recursive: true });
+  writeFileSync(path.join(agentWorkspace, "AGENTS.md"), "Use proposal review before writes. Never commit private credentials.\n");
+  writeFileSync(path.join(agentWorkspace, "CLAUDE.md"), "@AGENTS.md\n");
+  writeFileSync(path.join(agentWorkspace, ".agents", "skills", "llm-wiki-canvas", "SKILL.md"), "---\nname: llm-wiki-canvas\n---\nRun lwc intake create and lwc proposal apply only after review.\n");
+  writeFileSync(path.join(agentWorkspace, ".claude", "skills", "llm-wiki-canvas", "SKILL.md"), "Read ../../../.agents/skills/llm-wiki-canvas/SKILL.md\n");
+  writeFileSync(path.join(agentWorkspace, ".qoder", "skills", "llm-wiki-canvas", "SKILL.md"), "Read ../../../.agents/skills/llm-wiki-canvas/SKILL.md\n");
+  const agentReportFile = path.join(consumer, "agents.json");
+  run(lwc, ["agents", agentWorkspace, "--strict", "--format", "json", "-o", agentReportFile], { cwd: consumer });
+  const agentReport = JSON.parse(readFileSync(agentReportFile, "utf8"));
+  if (agentReport.summary.ready !== 4 || agentReport.summary.manual !== 1 || agentReport.summary.incomplete !== 0 || JSON.stringify(agentReport).includes(agentWorkspace)) {
+    throw new Error("packaged CLI Agent compatibility report is incomplete or leaks an absolute workspace path");
+  }
+  writeFileSync(path.join(agentWorkspace, ".qoder", "skills", "llm-wiki-canvas", "SKILL.md"), "Stale copied workflow.\n");
+  run(lwc, ["agents", agentWorkspace, "--strict"], { cwd: consumer, expectFailure: true });
+  run(lwc, ["agents", agentWorkspace, "--format", "xml"], { cwd: consumer, expectFailure: true });
   run(lwc, ["serve", "--help"], { cwd: consumer });
   run(lwc, ["scan", wiki, "-o", path.join(consumer, "graph.json")], { cwd: consumer });
   run(lwc, ["lint", wiki], { cwd: consumer, expectFailure: true });
@@ -159,7 +177,7 @@ try {
   run(lwc, ["proposal", "apply", intakeProposalFile, wiki, "--confirm", intakeProposal.id, "--applied-at", "2026-08-10T06:00:00.000Z"], { cwd: consumer });
   if (!readFileSync(path.join(wiki, "Intake.md"), "utf8").includes("Source-grounded")) throw new Error("packaged CLI intake proposal did not pass the human review gate");
   run(lwc, ["scan", path.join(scratch, "missing-root")], { cwd: consumer, expectFailure: true });
-  console.log("Packaged CLI smoke passed: bin, scan, lint/strict, report, build, local serve, intake and proposal lifecycles, focused Mermaid/Excalidraw exports, invalid root");
+  console.log("Packaged CLI smoke passed: bin, Agent compatibility, scan, lint/strict, report, build, local serve, intake and proposal lifecycles, focused Mermaid/Excalidraw exports, invalid root");
 } finally {
   rmSync(scratch, { recursive: true, force: true });
 }
