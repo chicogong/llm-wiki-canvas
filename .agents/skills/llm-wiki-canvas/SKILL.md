@@ -18,6 +18,8 @@ Treat Markdown, source files, and review records as truth. Treat generated graph
 
 For a new cross-Agent repository, run `lwc init <workspace>` and inspect the dry-run before adding `--write`. It may create missing shared rules, this canonical Skill package, and thin host adapters; it must preserve valid files and stop the entire write when any path conflicts. Then run `lwc agents <workspace> --strict` to verify the result. Treat `ready` as repository-contract evidence, `manual` as an explicit-context requirement, and `incomplete` as a setup failure. Do not claim that these static checks executed a proprietary host binary.
 
+For maintainers working in the upstream LLM Wiki Canvas source repository, use its synthetic `examples/host-fixture` and opt-in host commands. Keep deterministic reference results, successful host-runtime evidence, blocked authentication, unavailable commands, and semantic failures distinct. Never commit `.lwc/host-runtime`, host transcripts, credentials, or sessions, and never describe blocked or unavailable hosts as passing.
+
 If the repository package is not installed globally, run `pnpm exec tsx <repo>/src/cli/index.ts` in place of `lwc`.
 
 ## Query and Explain

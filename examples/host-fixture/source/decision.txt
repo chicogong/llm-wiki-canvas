@@ -1,0 +1,2 @@
+Decision: Markdown remains the source of truth for the local knowledge workspace.
+Boundary: Agent-generated knowledge must enter a Proposal and cannot be applied before human review.

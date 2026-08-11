@@ -67,7 +67,8 @@ The daily loop is deliberately small:
 | **0.2.3 Proposal topology** | See the structural effect before accepting a proposal | Added edges green, changed pages amber, conflicts red; base/proposal hashes visible; empty and conflict states tested | Shipped in current iteration |
 | **0.3 Spatial views** | Generate useful diagrams without locking users in | JSON Canvas remains canonical output; optional Excalidraw export uses its open file format; Mermaid/Markmap are derived views; rebuild never overwrites hand-edited positions silently | Shipped — 0.3.1–0.3.3 |
 | **0.4 Source intake** | Turn selected local material into reviewable wiki drafts | Start with Markdown/text; preserve source path/hash; generated pages stay in `.lwc/drafts`; human-approved proposal required | Shipped — 0.4.1–0.4.3 |
-| **0.5 Agent compatibility** | Verify that multiple coding Agents share one knowledge contract | Deterministic repository checks; safe scaffolding; public matrix; static contract evidence separated from real host execution | In progress — 0.5.1 and 0.5.3 shipped |
+| **0.5 Agent compatibility** | Verify that multiple coding Agents share one knowledge contract | Deterministic repository checks; safe scaffolding; public matrix; static contract evidence separated from real host execution | Shipped — 0.5.1–0.5.3 |
+| **0.6 Open-source readiness** | Make cloning, testing, packaging, and contributing reproducible | Bilingual quick starts; synthetic fixtures; release and schema policy; Linux/macOS Node 20/22 package CI | Shipped |
 
 ## Execution plan / 执行计划
 
@@ -97,17 +98,17 @@ PDF, OCR, web crawling, office documents, and bulk folder ingestion stay out unt
 
 PDF、OCR、网页抓取、Office 文档和整目录批量导入暂不进入这一阶段。
 
-### Now — 0.5 Agent compatibility / 当前：Agent 兼容层
+### Completed — 0.5 Agent compatibility / 已完成：Agent 兼容层
 
 No MCP server is required. The canonical integration is a portable Skill plus the `lwc` CLI.
 
 | Increment | User outcome | In scope | Acceptance gate | Status |
 | --- | --- | --- | --- | --- |
 | **0.5.1 Contract checker** | Know whether each Agent sees the same rules and Skill | `lwc agents`; Markdown/JSON output; strict CI mode; regular-file checks; generated public matrix | Same files produce deterministic status; absolute workspace paths never leak; WorkBuddy manual setup is not mislabeled native | **Shipped** |
-| **0.5.2 Host execution fixtures** | Compare real host output on one public task | Opt-in runners for locally installed host CLIs; shared prompt and expected proposal semantics | Runtime evidence is labeled separately; no credentials or sessions enter fixtures | Planned |
+| **0.5.2 Host execution fixtures** | Compare real host output on one public task | Opt-in runners for locally installed host CLIs; shared prompt and expected proposal semantics | Runtime evidence is labeled separately; no credentials or sessions enter fixtures | **Shipped** |
 | **0.5.3 Safe scaffolding** | Add missing integration entry points without overwriting repository rules | `lwc init`; dry-run-first behavior; host selection; conflict report; packaged Skill resources | Existing files are never silently replaced; one conflict blocks the write set; generated adapters point to one canonical Skill | **Shipped** |
 
-The current generated result is [Agent compatibility](docs/agent-compatibility.md); the Chinese interpretation is [Agent 兼容性验证](docs/agent-compatibility.zh-CN.md).
+The generated static result is [Agent compatibility](docs/agent-compatibility.md); the Chinese interpretation is [Agent 兼容性验证](docs/agent-compatibility.zh-CN.md). The separate opt-in execution protocol is documented in [Host runtime fixtures](docs/host-runtime.md).
 
 | Host | Integration | Minimum verification |
 | --- | --- | --- |
@@ -120,7 +121,7 @@ Acceptance requires a public compatibility matrix with reproducible commands. A 
 
 验收必须提供可复现的兼容矩阵；“能读取 Markdown”不等于已经兼容完整提案闭环。
 
-### Release — 0.6 Open-source readiness / 发布：开源可用性
+### Completed — 0.6 Open-source readiness / 已完成：开源可用性
 
 - One command starts the example and one command verifies the repository.
 - npm package smoke tests run on supported Node versions and macOS/Linux CI.
@@ -128,6 +129,8 @@ Acceptance requires a public compatibility matrix with reproducible commands. A 
 - Example data is synthetic, useful, and covered by secret scanning.
 - Contribution templates route feature requests into Map, Health, Changes, Canvas, or Intake.
 - A changelog documents graph, proposal, Canvas, and export schema compatibility.
+
+These gates are implemented by `pnpm verify`, the Linux/macOS Node 20/22 package matrix, [release instructions](RELEASING.md), and the [schema compatibility policy](docs/schema-compatibility.md). Publishing a version remains an explicit maintainer action.
 
 ## Release gates / 发布门槛
 

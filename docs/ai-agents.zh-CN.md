@@ -115,6 +115,10 @@ Claude Code 官方支持 `CLAUDE.md` 的 `@path` 导入，也会从 `.claude/ski
 
 WorkBuddy 的自定义 Skill 通常是 `skill.yml + 实现文件 + README`，与 Agent Skills 的 `SKILL.md` 发现协议不同，因此本仓库不宣称它能自动加载共享 Skill。腾讯的 CodeBuddy Code/CLI 是更偏代码开发的相关产品，可以在仓库目录直接执行相同 CLI 工作流，但不要与 WorkBuddy 工作台混为一谈。[创建 WorkBuddy 任务](https://www.workbuddy.ai/docs/workbuddy/Create-Task) · [WorkBuddy 权限模式](https://www.workbuddy.ai/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Permission-Modes) · [WorkBuddy 自定义 Skills](https://www.workbuddy.ai/docs/workbuddy/From-Beginner-to-Expert-Guide/Practice-Cases/Create-Skills)
 
+## 真实运行证据
+
+静态适配检查不会执行模型。维护者可以使用独立的合成 fixture，显式启用已安装的 Codex 与 Claude Code CLI；验证器要求它们满足相同来源、Proposal 生命周期和正式知识零写入边界。认证阻塞以及 Qoder、TRAE、WorkBuddy 命令未安装都必须保留为非通过状态。详见 [Host 运行 fixture](host-runtime.md)。
+
 ## 权限与开源边界
 
 - 第一次分析使用只读或计划模式；日常不要默认开启 Full Access 或跳过权限确认。

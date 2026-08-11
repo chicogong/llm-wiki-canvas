@@ -70,6 +70,8 @@ pnpm lwc intake create examples/atlas-wiki \
 
 The command creates ignored local state under `examples/atlas-wiki/.lwc/drafts/`. It copies the source, records its SHA-256, and prints one placeholder draft. Edit that draft, then use the printed manifest with `lwc intake show` and `lwc intake propose`. Proposal conversion still does not apply the page.
 
+The separate [`host-fixture`](host-fixture/) is the public cross-Agent execution case. `pnpm test:hosts` runs its deterministic reference implementation; explicitly enabled Codex or Claude Code runs must produce the same one-draft, one-proposal, zero-formal-write semantics. See [Host runtime fixtures](../docs/host-runtime.md).
+
 ### Copy the pattern
 
 A minimal page looks like this:
@@ -165,6 +167,8 @@ pnpm lwc intake create examples/atlas-wiki \
 ```
 
 命令会在 `examples/atlas-wiki/.lwc/drafts/` 下创建被忽略的本地状态：复制来源、记录 SHA-256，并打印唯一的占位草稿。编辑草稿后，使用打印的 manifest 执行 `lwc intake show` 和 `lwc intake propose`；转换 Proposal 仍然不会直接应用页面。
+
+独立的 [`host-fixture`](host-fixture/) 是公开的跨 Agent 运行案例。`pnpm test:hosts` 执行确定性基准；显式启用的 Codex 或 Claude Code 必须产生相同的“一份草稿、一份 Proposal、正式知识零写入”语义。详见 [Host 运行 fixture](../docs/host-runtime.md)。
 
 ### 复制这种模式
 

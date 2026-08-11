@@ -115,6 +115,10 @@ Use the current repository as the working directory. Read @AGENTS.md and
 
 A WorkBuddy custom Skill normally contains `skill.yml`, implementation files, and a README, which is not the Agent Skills `SKILL.md` discovery protocol. The repository therefore does not claim automatic shared-Skill discovery in WorkBuddy. Tencent's related CodeBuddy Code/CLI is more development-oriented and can run the same CLI workflow from the repository, but it should not be conflated with the WorkBuddy workbench. [Create a WorkBuddy task](https://www.workbuddy.ai/docs/workbuddy/Create-Task) · [WorkBuddy permission modes](https://www.workbuddy.ai/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Permission-Modes) · [WorkBuddy custom Skills](https://www.workbuddy.ai/docs/workbuddy/From-Beginner-to-Expert-Guide/Practice-Cases/Create-Skills)
 
+## Runtime evidence
+
+Static adapter checks do not execute a model. Maintainers can run the separate synthetic, opt-in fixture for installed Codex and Claude Code CLIs; its validator requires the same provenance, Proposal lifecycle, and zero-formal-write boundary. Blocked authentication and missing Qoder, TRAE, or WorkBuddy executables remain explicit non-pass states. See [Host runtime fixtures](host-runtime.md).
+
 ## Permissions and open-source boundaries
 
 - Use read-only or plan mode for first inspection. Do not enable Full Access or skip permission checks by default.

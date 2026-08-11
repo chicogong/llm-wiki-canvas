@@ -223,11 +223,11 @@ Markdown 是长期保存的知识；关系图、Canvas 和 Viewer 数据都是�
 pnpm verify
 ```
 
-它包括敏感信息扫描、依赖审计、单元测试、可复现示例构建、TypeScript 与生产构建、Skill 校验、真实 npm 打包安装冒烟测试，以及桌面端和移动端的生产 Viewer 测试。
+它包括敏感信息扫描、依赖审计、单元测试、可复现示例构建、TypeScript 与生产构建、Skill 校验、确定性 Host fixture、真实 npm 打包安装冒烟测试，以及桌面端和移动端的生产 Viewer 测试。CI 还会在 Linux/macOS 与 Node.js 20/22 上重复包验证。
 
 ## 后续方向
 
-单来源受控 Intake 已形成完整可见闭环，Agent 安全初始化和兼容性校验也已交付：一个 dry-run-first 命令只补缺失入口，另一个命令校验共享契约并发布 CI 使用的同一份矩阵。0.5 剩余工作是在真实宿主 CLI 可用时增加可选运行 fixture；静态文件校验与运行时证据仍会严格分开。
+受控 Intake、Agent 安全初始化、静态兼容校验和可选真实宿主 fixture 已形成一个经过测试的闭环。真实宿主证据与确定性 CI 严格分开，登录阻塞或命令未安装绝不会被算作通过。详见 [Host 运行 fixture](docs/host-runtime.md)、[Schema 兼容策略](docs/schema-compatibility.md)和[发布流程](RELEASING.md)。
 
 另见 [贡献指南](CONTRIBUTING.md)、[安全策略](SECURITY.md)和[变更记录](CHANGELOG.md)。
 

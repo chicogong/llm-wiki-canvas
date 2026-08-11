@@ -22,6 +22,10 @@
     "test:e2e": "playwright test --reporter=list",
     "test:e2e:prod": "playwright test --config playwright.prod.config.ts --reporter=list",
     "test:package": "node scripts/package-smoke.mjs",
+    "test:hosts": "node scripts/host-runtime-fixture.mjs --host fixture",
+    "test:host:codex": "node scripts/host-runtime-fixture.mjs --host codex --output .lwc/host-runtime/codex.json",
+    "test:host:claude": "node scripts/host-runtime-fixture.mjs --host claude-code --output .lwc/host-runtime/claude-code.json",
+    "test:release-matrix": "pnpm audit:secrets && pnpm test && pnpm build && pnpm validate:skill && pnpm test:hosts && pnpm test:package",
     "audit:secrets": "node scripts/scan-secrets.mjs",
     "audit:deps": "pnpm audit --audit-level low",
     "demo:build": "tsx src/cli/index.ts build examples/atlas-wiki --graph public/graph.json --canvas examples/atlas-wiki/Atlas.canvas --excalidraw examples/atlas-wiki/Atlas.excalidraw --generated-at 2026-08-10T00:00:00.000Z",
@@ -31,8 +35,10 @@
     "agents:matrix": "tsx src/cli/index.ts agents . --strict -o docs/agent-compatibility.md",
     "proposal:demo": "tsx src/cli/index.ts proposal create examples/atlas-wiki --from examples/proposal-draft --summary 'Demonstrate reviewed knowledge changes' --created-at 2026-08-10T00:00:00.000Z -o .lwc/atlas-demo-proposal.json && tsx src/cli/index.ts proposal show .lwc/atlas-demo-proposal.json",
     "validate:skill": "node scripts/validate-skill.mjs",
-    "check": "pnpm test && pnpm demo:build && pnpm report:demo && pnpm agents:matrix && pnpm proposal:demo && pnpm generated:check && pnpm build && pnpm validate:skill",
-    "verify": "pnpm audit:secrets && pnpm audit:deps && pnpm check && pnpm test:package && pnpm test:e2e:prod"
+    "check": "pnpm test && pnpm demo:build && pnpm report:demo && pnpm agents:matrix && pnpm proposal:demo && pnpm generated:check && pnpm build && pnpm validate:skill && pnpm test:hosts",
+    "verify": "pnpm audit:secrets && pnpm audit:deps && pnpm check && pnpm test:package && pnpm test:e2e:prod",
+    "release:check": "pnpm verify && pnpm pack --dry-run",
+    "prepack": "pnpm build && pnpm validate:skill"
   },
   "dependencies": {
     "commander": "^14.0.0",

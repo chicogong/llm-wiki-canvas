@@ -223,11 +223,11 @@ Run the complete release-style verification:
 pnpm verify
 ```
 
-It performs secret scanning, dependency auditing, unit tests, a reproducible demo build, TypeScript and production builds, Skill validation, a packed npm install smoke test, and production Viewer tests on desktop and mobile.
+It performs secret scanning, dependency auditing, unit tests, a reproducible demo build, TypeScript and production builds, Skill validation, a deterministic host fixture, a packed npm install smoke test, and production Viewer tests on desktop and mobile. CI also repeats package smoke on Linux/macOS with Node.js 20/22.
 
 ## Direction
 
-Governed single-source intake now has a complete visible path. Agent setup and verification are also shipped: one dry-run-first command creates missing entry points, while another verifies the shared contract and publishes the same matrix used by CI. The remaining 0.5 increment is opt-in host execution fixtures where a real host CLI is available; static file checks will remain clearly separated from runtime evidence.
+Governed source intake, Agent scaffolding, static compatibility, and opt-in host execution fixtures now form one tested loop. Real host evidence remains separate from deterministic CI and never turns a blocked login or missing binary into a pass. See [Host runtime fixtures](docs/host-runtime.md), [Schema compatibility](docs/schema-compatibility.md), and [Releasing](RELEASING.md).
 
 See [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), and the [Changelog](CHANGELOG.md).
 

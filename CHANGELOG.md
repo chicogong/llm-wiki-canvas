@@ -25,3 +25,11 @@ All notable changes will be documented here. This project follows Semantic Versi
 - A live, read-only Drafts Workbench with source/draft comparison, evidence-chain states, scope and hash validation, generator provenance, safe CLI handoff, filesystem refresh events, and desktop/mobile coverage; Changes now carries intake provenance into review.
 - Deterministic cross-Agent contract verification through `lwc agents`, including Markdown/JSON output, strict CI failure, safe regular-file checks, Codex/Claude Code/Qoder/TRAE adapters, an honest manual WorkBuddy state, and a generated public compatibility matrix.
 - Dry-run-first cross-Agent scaffolding through `lwc init`, with host selection, packaged canonical Skill resources, preservation of valid workspace-owned rules, all-or-nothing conflict blocking, exclusive file creation, and packaged CLI regression coverage.
+- An opt-in synthetic host runtime fixture that distinguishes deterministic reference evidence, real host execution, authentication blocks, unavailable binaries, and semantic failures without touching formal Markdown or storing sessions.
+- Linux and macOS package CI across Node.js 20 and 22, plus repeatable release checks and a documented schema compatibility policy.
+
+### Compatibility
+
+- Graph/report, intake, proposal, Agent compatibility, scaffolding, and host-runtime JSON remain at `schemaVersion: 1`; readers must reject unsupported future versions instead of guessing.
+- Obsidian Canvas output follows JSON Canvas `1.0`; generated Excalidraw scenes use Excalidraw file format version `2`.
+- Stable IDs and preserved positions remain compatibility promises within schema version 1. See [Schema compatibility](docs/schema-compatibility.md) for the change policy.
