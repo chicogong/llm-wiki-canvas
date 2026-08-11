@@ -4,7 +4,7 @@ Thanks for helping improve LLM Wiki Canvas.
 
 ## Development
 
-1. Use Node.js 20 or newer and pnpm 11.10.0.
+1. For source development, use Node.js 22.13 or newer and pnpm 11.10.0. The published CLI still supports Node.js 20; CI tests that consumer boundary with pnpm 10 because pnpm 11 itself requires Node.js 22.13.
 2. Run `pnpm install`.
 3. Run `pnpm demo:build` and `pnpm dev` for local development.
 4. Run `pnpm verify` before opening a pull request.
