@@ -127,6 +127,7 @@ test("@smoke filters the map and opens a relationship", async ({ page }, testInf
   await expect(page.getByRole("heading", { name: "Human Review" })).toBeVisible();
   await expect(page.getByLabel("Agent context command")).toContainText("lwc context <vault>");
   await expect(page.getByLabel("Agent context command")).toContainText("--max-words 2000");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByLabel("Agent context command").getByRole("button", { name: "Copy" }).click();
   await expect(page.getByLabel("Agent context command").getByRole("button", { name: "Copied" })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("map-context.png"), fullPage: true });

@@ -340,7 +340,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(49, 89, 232,
 @media (max-width: 760px) {
   .workbench-shell { display: block; }
   .sidebar { display: none; }
-  .workbench { grid-template-rows: 50px auto minmax(0, 1fr); }
+  .workbench { grid-template-columns: minmax(0, 1fr); grid-template-rows: 50px auto minmax(0, 1fr); }
   .topbar { height: 50px; padding: 0 13px; }
   .breadcrumb { display: none; }
   .mobile-brand { min-width: 0; display: flex; align-items: center; gap: 8px; }
@@ -355,7 +355,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(49, 89, 232,
   .map-panel { min-height: 500px; border-right: 0; border-bottom: 1px solid var(--line); }
   .map-toolbar { padding: 9px 10px; }
   .canvas-frame, .graph-canvas { min-height: 440px; }
-  .inspector { padding: 0 16px 26px; }
+  .inspector { padding: 0 16px 26px; overflow: visible; }
   .panel-heading { min-height: 50px; }
   .health-view { min-height: auto; padding: 24px 14px; }
   .health-intro { display: block; }
