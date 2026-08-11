@@ -1,8 +1,8 @@
-import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { buildGraph, buildWikiReport, graphToCanvas, graphToExcalidraw, graphToMermaid, reportToMarkdown, resolveFocusNode, selectFocusedGraph, type JsonCanvas } from "../src/core/index.js";
+import { buildGraph, buildWikiReport, graphToCanvas, graphToExcalidraw, graphToMermaid, reportToMarkdown, resolveFocusNode, selectFocusedGraph, summarizeCanvasLayout, summarizeExcalidrawLayout, type JsonCanvas } from "../src/core/index.js";
 
 async function fixture(): Promise<string> {
   const root = await mkdtemp(path.join(tmpdir(), "lwc-test-"));
@@ -33,6 +33,29 @@ describe("wiki graph compiler", () => {
     expect(rebuilt.nodes.find((node) => node.id === previous.nodes[0].id)).toMatchObject({ x: 1234, y: -456, width: 777 });
   });
 
+  it("retains JSON Canvas annotations while adding and removing generated pages", async () => {
+    const root = await fixture();
+    const first = await buildGraph(root);
+    const previous = graphToCanvas(first);
+    const home = previous.nodes.find((node) => node.type === "file" && node.file === "index.md");
+    if (!home) throw new Error("missing generated home node");
+    home.x = 1400;
+    home.y = -300;
+    previous.nodes.push({ id: "manual-note", type: "text", text: "Keep this decision", x: 40, y: 40, width: 280, height: 120, color: "3" });
+    previous.edges.push({ id: "manual-edge", fromNode: "manual-note", toNode: home.id, fromSide: "right", toSide: "left", label: "context" });
+    await unlink(path.join(root, "concepts/Graph.md"));
+    await writeFile(path.join(root, "New.md"), "# New\nFresh page.\n");
+    const second = await buildGraph(root);
+    const summary = summarizeCanvasLayout(second, previous);
+    const rebuilt = graphToCanvas(second, previous);
+    expect(summary).toMatchObject({ preserved: 1, added: 1, removed: ["concepts/Graph.md"], annotations: 1 });
+    expect(rebuilt.nodes.find((node) => node.id === home.id)).toMatchObject({ x: 1400, y: -300 });
+    expect(rebuilt.nodes).toContainEqual(expect.objectContaining({ id: "manual-note", text: "Keep this decision" }));
+    expect(rebuilt.edges).toContainEqual(expect.objectContaining({ id: "manual-edge", label: "context" }));
+    expect(rebuilt.nodes.some((node) => node.type === "file" && node.file === "concepts/Graph.md")).toBe(false);
+    expect(rebuilt.nodes.find((node) => node.type === "file" && node.file === "New.md")?.x).toBeGreaterThan(1760);
+  });
+
   it("exports a deterministic editable Excalidraw scene without machine paths", async () => {
     const root = await fixture();
     const graph = await buildGraph(root, new Date("2026-08-10T00:00:00Z"));
@@ -48,6 +71,38 @@ describe("wiki graph compiler", () => {
     expect(first.elements.every((element) => element.width >= 0 && element.height >= 0)).toBe(true);
     expect(JSON.stringify(first)).toContain("concepts/Graph.md");
     expect(JSON.stringify(first)).not.toContain(root);
+  });
+
+  it("retains Excalidraw positions, files, and manual annotations across rebuilds", async () => {
+    const root = await fixture();
+    const firstGraph = await buildGraph(root);
+    const previous = graphToExcalidraw(firstGraph);
+    const home = firstGraph.nodes.find((node) => node.path === "index.md");
+    const removed = firstGraph.nodes.find((node) => node.path === "concepts/Graph.md");
+    if (!home || !removed) throw new Error("missing fixture nodes");
+    const homeShape = previous.elements.find((element) => element.id === `x-${home.id}`);
+    const homeTitle = previous.elements.find((element) => element.id === `xt-${home.id}`);
+    if (!homeShape || !homeTitle) throw new Error("missing generated elements");
+    homeShape.x = 1500;
+    homeShape.y = 320;
+    homeTitle.x = 1518;
+    homeTitle.y = 338;
+    const annotation = { id: "manual-diamond", type: "diamond", x: 20, y: 30, width: 90, height: 90, strokeColor: "#e03131" };
+    previous.elements.push(annotation);
+    previous.files = { "asset-1": { mimeType: "image/png", dataURL: "data:image/png;base64,AA==" } };
+    await unlink(path.join(root, "concepts/Graph.md"));
+    await writeFile(path.join(root, "New.md"), "# New\nFresh page.\n");
+    const secondGraph = await buildGraph(root);
+    const summary = summarizeExcalidrawLayout(secondGraph, previous);
+    const rebuilt = graphToExcalidraw(secondGraph, { previous });
+    expect(summary).toMatchObject({ preserved: 1, added: 1, removed: ["concepts/Graph.md"], annotations: 1 });
+    expect(rebuilt.elements.find((element) => element.id === `x-${home.id}`)).toMatchObject({ x: 1500, y: 320 });
+    expect(rebuilt.elements.find((element) => element.id === `xt-${home.id}`)).toMatchObject({ x: 1518, y: 338 });
+    expect(rebuilt.elements.find((element) => element.id === annotation.id)).toEqual(annotation);
+    expect(rebuilt.files).toEqual(previous.files);
+    expect(rebuilt.elements.some((element) => ["x-", "xt-", "xp-"].some((prefix) => element.id === `${prefix}${removed.id}`))).toBe(false);
+    const fresh = secondGraph.nodes.find((node) => node.path === "New.md");
+    expect(rebuilt.elements.find((element) => element.id === `x-${fresh?.id}`)?.x).toBeGreaterThan(1800);
   });
 
   it("selects one shared focused graph for Mermaid and Excalidraw", async () => {
@@ -96,7 +151,7 @@ describe("wiki graph compiler", () => {
   it("emits valid file nodes that point to real Markdown", async () => {
     const root = await fixture();
     const canvas = graphToCanvas(await buildGraph(root));
-    for (const node of canvas.nodes) await expect(readFile(path.join(root, node.file), "utf8")).resolves.toContain("#");
+    for (const node of canvas.nodes) if (node.type === "file") await expect(readFile(path.join(root, node.file), "utf8")).resolves.toContain("#");
   });
 
   it("builds a factual wiki report without an arbitrary score", async () => {

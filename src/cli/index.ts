@@ -17,7 +17,11 @@ import {
   reportToMarkdown,
   reviewKnowledgeProposal,
   selectFocusedGraph,
+  summarizeCanvasLayout,
+  summarizeExcalidrawLayout,
+  type ExcalidrawDocument,
   type JsonCanvas,
+  type LayoutSummary,
   type KnowledgeProposal,
   type NodeKind,
 } from "../core/index.js";
@@ -43,6 +47,24 @@ async function readCanvas(target?: string): Promise<JsonCanvas | undefined> {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
     throw error;
   }
+}
+
+async function readExcalidraw(target?: string): Promise<ExcalidrawDocument | undefined> {
+  if (!target) return undefined;
+  try {
+    return JSON.parse(await readFile(path.resolve(target), "utf8")) as ExcalidrawDocument;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
+    throw error;
+  }
+}
+
+function printLayoutSummary(summary: LayoutSummary): void {
+  console.log(`Layout ${summary.preserved} preserved · ${summary.added} new · ${summary.annotations} annotation(s)`);
+}
+
+function printRemovedPages(summary: LayoutSummary): void {
+  if (summary.removed.length) console.log(`Removing from generated view: ${summary.removed.join(", ")}`);
 }
 
 async function readProposal(target: string): Promise<KnowledgeProposal> {
@@ -196,18 +218,26 @@ program.command("canvas")
   .action(async (root, options) => {
     const graph = await buildGraph(root);
     const previous = await readCanvas(options.previous ?? options.output);
+    const summary = summarizeCanvasLayout(graph, previous);
+    printRemovedPages(summary);
     await writeJson(options.output, graphToCanvas(graph, previous));
     console.log(`Canvas ${graph.stats.files} nodes, ${graph.stats.links} edges → ${options.output}`);
+    printLayoutSummary(summary);
   });
 
 program.command("excalidraw")
   .argument("[root]", "wiki root", ".")
   .option("-o, --output <file>", "Excalidraw scene output", "Wiki.excalidraw")
+  .option("--previous <file>", "existing scene whose positions and annotations should be retained")
   .description("Generate an editable Excalidraw relationship scene")
   .action(async (root, options) => {
     const graph = await buildGraph(root);
-    await writeJson(options.output, graphToExcalidraw(graph));
+    const previous = await readExcalidraw(options.previous ?? options.output);
+    const summary = summarizeExcalidrawLayout(graph, previous);
+    printRemovedPages(summary);
+    await writeJson(options.output, graphToExcalidraw(graph, { previous }));
     console.log(`Excalidraw ${graph.stats.files} nodes, ${graph.stats.links} edges → ${options.output}`);
+    printLayoutSummary(summary);
   });
 
 program.command("diagram")
@@ -232,7 +262,12 @@ program.command("diagram")
     const focused = selectFocusedGraph(graph, options.focus, { depth: depth as 1 | 2, direction: options.direction, kinds });
     const output = options.output ?? focusedOutput(focused.focus.title, options.format);
     if (options.format === "mermaid") await writeText(output, graphToMermaid(focused.graph, focused.focus));
-    else await writeJson(output, graphToExcalidraw(focused.graph, { focusId: focused.focus.id }));
+    else {
+      const previous = await readExcalidraw(output);
+      printRemovedPages(summarizeExcalidrawLayout(focused.graph, previous));
+      await writeJson(output, graphToExcalidraw(focused.graph, { focusId: focused.focus.id, previous }));
+      printLayoutSummary(summarizeExcalidrawLayout(focused.graph, previous));
+    }
     console.log(`Focused ${focused.graph.stats.files} pages, ${focused.graph.stats.links} relationships around ${focused.focus.path} → ${output}`);
     if (focused.graph.stats.brokenLinks) console.log(`${focused.graph.stats.brokenLinks} broken link(s) originate from selected pages`);
   });
@@ -248,16 +283,25 @@ program.command("build")
     const fixedTime = options.generatedAt ? generatedAt(options.generatedAt) : undefined;
     const graph = await buildGraph(root, fixedTime ?? new Date(), fixedTime);
     const previous = await readCanvas(options.canvas);
+    const previousExcalidraw = await readExcalidraw(options.excalidraw);
+    const canvasSummary = summarizeCanvasLayout(graph, previous);
+    const excalidrawSummary = summarizeExcalidrawLayout(graph, previousExcalidraw);
+    printRemovedPages(canvasSummary);
+    if (options.excalidraw) printRemovedPages(excalidrawSummary);
     const writes = [
       writeJson(options.graph, graph),
       writeJson(options.canvas, graphToCanvas(graph, previous)),
     ];
-    if (options.excalidraw) writes.push(writeJson(options.excalidraw, graphToExcalidraw(graph)));
+    if (options.excalidraw) writes.push(writeJson(options.excalidraw, graphToExcalidraw(graph, { previous: previousExcalidraw })));
     await Promise.all(writes);
     console.log(`Built ${graph.stats.files} files · ${graph.stats.links} links · ${graph.stats.brokenLinks} broken`);
     console.log(`Graph → ${options.graph}`);
     console.log(`Canvas → ${options.canvas}`);
-    if (options.excalidraw) console.log(`Excalidraw → ${options.excalidraw}`);
+    printLayoutSummary(canvasSummary);
+    if (options.excalidraw) {
+      console.log(`Excalidraw → ${options.excalidraw}`);
+      printLayoutSummary(excalidrawSummary);
+    }
   });
 
 program.command("serve")

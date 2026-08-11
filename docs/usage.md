@@ -59,9 +59,9 @@ This produces three persistent views:
 - `/path/to/vault/Wiki.canvas` opens directly in Obsidian.
 - `/path/to/vault/Wiki.excalidraw` opens as an editable Excalidraw scene with page titles, relative paths, and typed relationships.
 
-Move nodes in Obsidian and run the same build again. Existing node coordinates and sizes are preserved when stable IDs still match.
+Move nodes or add text, link, and group annotations in Obsidian, then run the same build again. Existing generated coordinates and sizes stay in place, manual annotations and their edges survive, and only new pages are placed to the right of the occupied layout. The CLI lists Markdown pages removed from the generated view.
 
-To generate only the Excalidraw handoff, run `lwc excalidraw /path/to/vault -o Wiki.excalidraw`. The scene is deterministic and does not contain the Vault's absolute path.
+The same ownership rule applies to Excalidraw: generated page positions, user-created shapes, and embedded files survive a rebuild, while generated arrows are refreshed from current Markdown relationships. Run `lwc excalidraw /path/to/vault -o Wiki.excalidraw`; use `--previous another.excalidraw` to take layout ownership from a different scene. A first build is deterministic and does not contain the Vault's absolute path.
 
 ### Export a focused explanation
 

@@ -44,25 +44,45 @@ export interface WikiGraph {
   };
 }
 
+interface JsonCanvasNodeBase {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color?: string;
+}
+
+export type JsonCanvasFileNode = JsonCanvasNodeBase & { type: "file"; file: string; subpath?: string };
+
+export type JsonCanvasNode =
+  | JsonCanvasFileNode
+  | (JsonCanvasNodeBase & (
+    | { type: "text"; text: string }
+  | { type: "link"; url: string }
+  | { type: "group"; label?: string; background?: string; backgroundStyle?: "cover" | "ratio" | "repeat" }
+  ));
+
 export interface JsonCanvas {
-  nodes: Array<{
-    id: string;
-    type: "file";
-    file: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    color?: string;
-  }>;
+  nodes: JsonCanvasNode[];
   edges: Array<{
     id: string;
     fromNode: string;
     toNode: string;
+    fromSide?: "top" | "right" | "bottom" | "left";
     fromEnd?: "arrow" | "none";
+    toSide?: "top" | "right" | "bottom" | "left";
     toEnd?: "arrow" | "none";
+    color?: string;
     label?: string;
   }>;
+}
+
+export interface LayoutSummary {
+  preserved: number;
+  added: number;
+  removed: string[];
+  annotations: number;
 }
 
 export interface ExcalidrawElement {
@@ -86,6 +106,7 @@ export interface ExcalidrawDocument {
     scrollX: number;
     scrollY: number;
     zoom: { value: number };
+    [key: string]: unknown;
   };
-  files: Record<string, never>;
+  files: Record<string, unknown>;
 }

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { graphToCanvas } from "./canvas.js";
-import type { ExcalidrawDocument, ExcalidrawElement, WikiGraph } from "./types.js";
+import type { ExcalidrawDocument, ExcalidrawElement, LayoutSummary, WikiGraph } from "./types.js";
 
 const SOURCE = "https://github.com/chicogong/llm-wiki-canvas";
 const NODE_WIDTH = 300;
@@ -81,15 +81,60 @@ function textElement(id: string, text: string, x: number, y: number, fontSize: n
   };
 }
 
-export function graphToExcalidraw(graph: WikiGraph, options: { focusId?: string } = {}): ExcalidrawDocument {
+function lwcData(element: ExcalidrawElement): Record<string, unknown> | undefined {
+  const customData = element.customData;
+  if (!customData || typeof customData !== "object") return undefined;
+  const lwc = (customData as Record<string, unknown>).lwc;
+  return lwc && typeof lwc === "object" ? lwc as Record<string, unknown> : undefined;
+}
+
+function generatedElement(element: ExcalidrawElement): boolean {
+  return Boolean(lwcData(element)) || element.id.startsWith("xt-node-") || element.id.startsWith("xp-node-");
+}
+
+export function summarizeExcalidrawLayout(graph: WikiGraph, previous?: ExcalidrawDocument): LayoutSummary {
+  const current = new Set(graph.nodes.map((node) => node.id));
+  const oldNodes = (previous?.elements ?? []).flatMap((element) => {
+    const data = lwcData(element);
+    return typeof data?.nodeId === "string" ? [{ id: data.nodeId, path: typeof data.path === "string" ? data.path : data.nodeId }] : [];
+  });
+  const oldIds = new Set(oldNodes.map((node) => node.id));
+  return {
+    preserved: oldNodes.filter((node) => current.has(node.id)).length,
+    added: graph.nodes.filter((node) => !oldIds.has(node.id)).length,
+    removed: oldNodes.filter((node) => !current.has(node.id)).map((node) => node.path).sort(),
+    annotations: (previous?.elements ?? []).filter((element) => !generatedElement(element)).length,
+  };
+}
+
+function preservePosition(element: ExcalidrawElement, previous: Map<string, ExcalidrawElement>): ExcalidrawElement {
+  const old = previous.get(element.id);
+  return old ? { ...element, x: old.x, y: old.y } : element;
+}
+
+export function graphToExcalidraw(graph: WikiGraph, options: { focusId?: string; previous?: ExcalidrawDocument } = {}): ExcalidrawDocument {
   const layout = graphToCanvas(graph);
   const rawMinX = Math.min(...layout.nodes.map((node) => node.x), 0);
   const rawMinY = Math.min(...layout.nodes.map((node) => node.y), 0);
   const layoutScale = 0.72;
-  const positions = new Map(layout.nodes.map((node) => [node.id, {
+  const defaultPositions = new Map(layout.nodes.map((node) => [node.id, {
     x: Math.round((node.x - rawMinX) * layoutScale + 80),
     y: Math.round((node.y - rawMinY) * layoutScale + 90),
   }]));
+  const previousElements = new Map((options.previous?.elements ?? []).map((element) => [element.id, element]));
+  const previousBounds = options.previous?.elements.length ? {
+    maxX: Math.max(...options.previous.elements.filter((element) => !element.isDeleted).map((element) => element.x + element.width), 0),
+    minY: Math.min(...options.previous.elements.filter((element) => !element.isDeleted).map((element) => element.y), 0),
+  } : undefined;
+  let added = 0;
+  const positions = new Map(graph.nodes.map((node) => {
+    const old = previousElements.get(`x-${node.id}`);
+    const fallback = defaultPositions.get(node.id) ?? { x: 80, y: 90 };
+    if (old) return [node.id, { x: old.x, y: old.y }];
+    if (!previousBounds) return [node.id, fallback];
+    const index = added++;
+    return [node.id, { x: previousBounds.maxX + 120 + Math.floor(index / 6) * 420, y: previousBounds.minY + (index % 6) * 190 }];
+  }));
   const elements: ExcalidrawElement[] = [];
   const sceneBounds = [...positions.values()].reduce((bounds, position) => ({
     minX: Math.min(bounds.minX, position.x),
@@ -131,18 +176,20 @@ export function graphToExcalidraw(graph: WikiGraph, options: { focusId?: string 
     const colors = COLORS[node.kind];
     const shapeId = `x-${node.id}`;
     const focused = node.id === options.focusId;
-    elements.push({
+    elements.push(preservePosition({
       ...base(shapeId, "rectangle", position.x, position.y, NODE_WIDTH, NODE_HEIGHT),
       strokeColor: focused ? "#173fc5" : colors.stroke,
       backgroundColor: focused ? "#dfe6ff" : colors.background,
       strokeWidth: focused ? 4 : 2,
       boundElements: graph.edges.filter((edge) => edge.source === node.id || edge.target === node.id).map((edge) => ({ id: `x-${edge.id}`, type: "arrow" })),
       customData: { lwc: { nodeId: node.id, path: node.path, kind: node.kind, ...(focused ? { focus: true } : {}) } },
-    });
+    }, previousElements));
     const title = wrap(node.title);
-    elements.push(textElement(`xt-${node.id}`, title, position.x + 18, position.y + 18, 21, "#17201b"));
-    elements.push(textElement(`xp-${node.id}`, node.path, position.x + 18, position.y + 88, 11, colors.stroke));
+    elements.push(preservePosition(textElement(`xt-${node.id}`, title, position.x + 18, position.y + 18, 21, "#17201b"), previousElements));
+    elements.push(preservePosition(textElement(`xp-${node.id}`, node.path, position.x + 18, position.y + 88, 11, colors.stroke), previousElements));
   }
+
+  elements.push(...(options.previous?.elements ?? []).filter((element) => !generatedElement(element)));
 
   return {
     type: "excalidraw",
@@ -150,12 +197,13 @@ export function graphToExcalidraw(graph: WikiGraph, options: { focusId?: string 
     source: SOURCE,
     elements,
     appState: {
-      gridSize: 20,
-      viewBackgroundColor: "#f8faf7",
-      scrollX: Math.round(720 / initialZoom - centerX),
-      scrollY: Math.round(450 / initialZoom - centerY),
-      zoom: { value: initialZoom },
+      ...options.previous?.appState,
+      gridSize: options.previous?.appState.gridSize ?? 20,
+      viewBackgroundColor: options.previous?.appState.viewBackgroundColor ?? "#f8faf7",
+      scrollX: options.previous?.appState.scrollX ?? Math.round(720 / initialZoom - centerX),
+      scrollY: options.previous?.appState.scrollY ?? Math.round(450 / initialZoom - centerY),
+      zoom: options.previous?.appState.zoom ?? { value: initialZoom },
     },
-    files: {},
+    files: options.previous?.files ?? {},
   };
 }

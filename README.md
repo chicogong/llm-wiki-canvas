@@ -18,8 +18,8 @@ It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
 - **Markdown stays the source of truth.** No proprietary database or forced migration.
 - **Relationships become visible.** Search, filter, and inspect the evidence around a page.
 - **Wiki quality becomes testable.** Broken links, ambiguous links, missing titles, and orphan pages have exact paths.
-- **The Canvas stays editable.** Rebuilds preserve manually adjusted node positions.
-- **Excalidraw stays an open handoff.** Export editable shapes, labels, and typed arrows with stable IDs and relative source paths.
+- **The Canvas stays yours.** Rebuilds preserve adjusted positions, text/link/group annotations, and manual edges while placing only new pages.
+- **Excalidraw stays an open handoff.** Rebuilds retain page positions, hand-drawn annotations, and embedded files while refreshing typed relationships.
 - **Large maps become small explanations.** Select one page and one or two relationship layers, then export the same evidence to Mermaid or Excalidraw.
 - **Agents use the same repository contract.** The included Skill guides file-first, human-reviewed changes without requiring MCP.
 - **Proposals have a visible lifecycle.** Changes shows status, file actions, full hashes, exact diff lines, and safe CLI next steps without applying anything from the UI.
@@ -214,7 +214,7 @@ It performs secret scanning, dependency auditing, unit tests, a reproducible dem
 
 ## Direction
 
-The next spatial increment is position ownership: preserve manually arranged Excalidraw and Canvas layouts while adding new graph nodes predictably. The shipped proposal lifecycle will later gain delete/rename operations and stronger multi-file recovery while keeping human review mandatory.
+Spatial position ownership is now shipped for Canvas and Excalidraw. The next increment is governed text intake: selected local Markdown/text becomes provenance-bound drafts and must pass through the existing human-reviewed proposal lifecycle.
 
 See [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), and the [Changelog](CHANGELOG.md).
 

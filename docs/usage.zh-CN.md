@@ -59,9 +59,9 @@ pnpm dev
 - `/path/to/vault/Wiki.canvas` 可以直接用 Obsidian 打开。
 - `/path/to/vault/Wiki.excalidraw` 是包含页面标题、相对路径和分类关系的可编辑 Excalidraw 场景。
 
-在 Obsidian 中移动节点，再执行同一条构建命令。只要稳定 ID 仍然匹配，已有节点坐标和大小就会保留。
+在 Obsidian 中移动节点，或添加文字、链接、分组批注，再执行同一条构建命令。已有生成节点的坐标和大小会保留，手工批注及其连线不会丢失；只有新增页面会被放到当前画布右侧。CLI 会列出已经从生成视图移除的 Markdown 页面。
 
-如果只需要 Excalidraw 交接文件，执行 `lwc excalidraw /path/to/vault -o Wiki.excalidraw`。场景输出是确定性的，不包含 Vault 绝对路径。
+Excalidraw 使用相同的所有权规则：保留生成页面的位置、用户手绘元素和嵌入文件，同时按当前 Markdown 关系重建箭头。如果只需要 Excalidraw 交接文件，执行 `lwc excalidraw /path/to/vault -o Wiki.excalidraw`；也可以用 `--previous another.excalidraw` 从另一场景继承布局。首次生成是确定性的，且不包含 Vault 绝对路径。
 
 ### 导出局部解释图
 
