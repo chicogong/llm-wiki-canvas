@@ -67,7 +67,7 @@ The daily loop is deliberately small:
 | **0.2.3 Proposal topology** | See the structural effect before accepting a proposal | Added edges green, changed pages amber, conflicts red; base/proposal hashes visible; empty and conflict states tested | Shipped in current iteration |
 | **0.3 Spatial views** | Generate useful diagrams without locking users in | JSON Canvas remains canonical output; optional Excalidraw export uses its open file format; Mermaid/Markmap are derived views; rebuild never overwrites hand-edited positions silently | Shipped — 0.3.1–0.3.3 |
 | **0.4 Source intake** | Turn selected local material into reviewable wiki drafts | Start with Markdown/text; preserve source path/hash; generated pages stay in `.lwc/drafts`; human-approved proposal required | Shipped — 0.4.1–0.4.3 |
-| **0.5 Agent compatibility** | Verify that multiple coding Agents share one knowledge contract | Deterministic repository checks; public matrix; static contract evidence separated from real host execution | In progress — 0.5.1 shipped |
+| **0.5 Agent compatibility** | Verify that multiple coding Agents share one knowledge contract | Deterministic repository checks; safe scaffolding; public matrix; static contract evidence separated from real host execution | In progress — 0.5.1 and 0.5.3 shipped |
 
 ## Execution plan / 执行计划
 
@@ -105,7 +105,7 @@ No MCP server is required. The canonical integration is a portable Skill plus th
 | --- | --- | --- | --- | --- |
 | **0.5.1 Contract checker** | Know whether each Agent sees the same rules and Skill | `lwc agents`; Markdown/JSON output; strict CI mode; regular-file checks; generated public matrix | Same files produce deterministic status; absolute workspace paths never leak; WorkBuddy manual setup is not mislabeled native | **Shipped** |
 | **0.5.2 Host execution fixtures** | Compare real host output on one public task | Opt-in runners for locally installed host CLIs; shared prompt and expected proposal semantics | Runtime evidence is labeled separately; no credentials or sessions enter fixtures | Planned |
-| **0.5.3 Safe scaffolding** | Add missing integration entry points without overwriting repository rules | Dry-run-first initializer; host selection; conflict report | Existing files are never silently replaced; generated adapters point to one canonical Skill | Planned |
+| **0.5.3 Safe scaffolding** | Add missing integration entry points without overwriting repository rules | `lwc init`; dry-run-first behavior; host selection; conflict report; packaged Skill resources | Existing files are never silently replaced; one conflict blocks the write set; generated adapters point to one canonical Skill | **Shipped** |
 
 The current generated result is [Agent compatibility](docs/agent-compatibility.md); the Chinese interpretation is [Agent 兼容性验证](docs/agent-compatibility.zh-CN.md).
 

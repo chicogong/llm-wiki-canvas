@@ -24,6 +24,8 @@ flowchart LR
 
 运行 `lwc agents . --strict` 可以直接用仓库文件校验下表，而不是只相信文档。提交到仓库的[自动生成英文矩阵](agent-compatibility.md)会在 CI 中重建，并明确区分仓库契约证据与闭源宿主运行证据；中文解释见[Agent 兼容性验证](agent-compatibility.zh-CN.md)。
 
+新仓库先运行 `lwc init .`，预览共享规则、Canonical Skill 资源和选定宿主适配器；检查计划后再加 `--write`。初始化器只创建缺失文件，保留有效的自定义规则，只要一个计划路径发生冲突就不会写入任何文件。
+
 | 工具 | 仓库规则 | 项目 Skill | 本仓库状态 | 使用方式 |
 | --- | --- | --- | --- | --- |
 | **Codex** | `AGENTS.md` | `.agents/skills/<name>/SKILL.md` | 原生 | 打开仓库，要求使用 `llm-wiki-canvas` Skill |

@@ -4,6 +4,16 @@
 
 LLM Wiki Canvas 不用“能读 Markdown”冒充完整兼容。`lwc agents` 检查一个工作区中实际存在的共享规则、Canonical Skill 和宿主适配入口，并把结果输出为 Markdown 或 JSON。
 
+新工作区先运行安全初始化预览：
+
+```bash
+lwc init /path/to/workspace
+lwc init /path/to/workspace --agents codex,claude-code,qoder
+lwc init /path/to/workspace --write
+```
+
+默认只生成计划。`--write` 也只创建缺失文件；已有且有效的自定义规则会保留，一个过期文件、符号链接或目录冲突会阻止整批写入。Canonical Skill、Codex metadata 和 Wiki contract 来自当前安装包，不维护隐藏的第二份 Skill 模板。
+
 ```bash
 lwc agents /path/to/workspace
 lwc agents /path/to/workspace --strict

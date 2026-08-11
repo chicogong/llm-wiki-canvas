@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import path from "node:path";
 import process from "node:process";
 import { Command } from "commander";
 import {
   applyKnowledgeProposal,
+  applyAgentScaffold,
   agentCompatibilityToMarkdown,
+  agentScaffoldToMarkdown,
   buildGraph,
   buildWikiReport,
   createKnowledgeIntake,
@@ -16,6 +19,8 @@ import {
   inspectAgentCompatibility,
   intakeToMarkdown,
   parseKnowledgeProposal,
+  parseAgentHosts,
+  planAgentScaffold,
   proposalToMarkdown,
   proposeKnowledgeIntake,
   rejectKnowledgeProposal,
@@ -29,6 +34,7 @@ import {
   type JsonCanvas,
   type LayoutSummary,
   type KnowledgeProposal,
+  type AgentScaffoldTemplates,
   type NodeKind,
 } from "../core/index.js";
 import { startWikiServer } from "./serve.js";
@@ -80,6 +86,25 @@ async function readProposal(target: string): Promise<KnowledgeProposal> {
     if (error instanceof SyntaxError) throw new Error(`Proposal is not valid JSON: ${target}`);
     throw error;
   }
+}
+
+async function readScaffoldTemplates(): Promise<AgentScaffoldTemplates> {
+  const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
+  const candidates = [path.resolve(moduleDirectory, "../.."), path.resolve(moduleDirectory, "..")];
+  for (const root of candidates) {
+    const skillRoot = path.join(root, ".agents", "skills", "llm-wiki-canvas");
+    try {
+      const [skill, metadata, contract] = await Promise.all([
+        readFile(path.join(skillRoot, "SKILL.md"), "utf8"),
+        readFile(path.join(skillRoot, "agents", "openai.yaml"), "utf8"),
+        readFile(path.join(skillRoot, "references", "wiki-contract.md"), "utf8"),
+      ]);
+      return { skill, metadata, contract };
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    }
+  }
+  throw new Error("Packaged Agent Skill templates are missing; reinstall llm-wiki-canvas");
 }
 
 function generatedAt(value?: string): Date {
@@ -164,6 +189,25 @@ program.command("agents")
       process.stdout.write(output);
     }
     if (options.strict && report.summary.incomplete > 0) process.exitCode = 1;
+  });
+
+program.command("init")
+  .argument("[root]", "workspace root for Agent integration", ".")
+  .option("--agents <hosts>", "comma-separated hosts: codex, claude-code, qoder, trae, workbuddy", "codex,claude-code,qoder,trae,workbuddy")
+  .option("--write", "create missing files after a conflict-free dry-run", false)
+  .option("-o, --output <file>", "write the setup report to a file instead of stdout")
+  .option("--format <format>", "report format: markdown or json", "markdown")
+  .description("Preview or create safe cross-Agent repository entry points")
+  .action(async (root, options) => {
+    if (!["markdown", "json"].includes(options.format)) throw new Error(`Invalid --format value: ${options.format}`);
+    const hosts = parseAgentHosts(options.agents);
+    const templates = await readScaffoldTemplates();
+    const preview = await planAgentScaffold(root, hosts, templates);
+    const result = options.write && preview.summary.conflict === 0 ? await applyAgentScaffold(root, hosts, templates) : preview;
+    const output = options.format === "json" ? `${JSON.stringify(result, null, 2)}\n` : agentScaffoldToMarkdown(result);
+    if (options.output) await writeText(options.output, output);
+    else process.stdout.write(output);
+    if (options.write && preview.summary.conflict > 0) throw new Error(`Agent scaffold has ${preview.summary.conflict} conflict(s); no integration files were written`);
   });
 
 const intake = program.command("intake")

@@ -54,14 +54,19 @@ try {
   writeFileSync(path.join(wiki, "index.md"), "# Package Smoke\n[[Missing]]\n");
   run(lwc, ["--version"], { cwd: consumer });
   const agentWorkspace = path.join(consumer, "agent-workspace");
-  mkdirSync(path.join(agentWorkspace, ".agents", "skills", "llm-wiki-canvas"), { recursive: true });
-  mkdirSync(path.join(agentWorkspace, ".claude", "skills", "llm-wiki-canvas"), { recursive: true });
-  mkdirSync(path.join(agentWorkspace, ".qoder", "skills", "llm-wiki-canvas"), { recursive: true });
-  writeFileSync(path.join(agentWorkspace, "AGENTS.md"), "Use proposal review before writes. Never commit private credentials.\n");
-  writeFileSync(path.join(agentWorkspace, "CLAUDE.md"), "@AGENTS.md\n");
-  writeFileSync(path.join(agentWorkspace, ".agents", "skills", "llm-wiki-canvas", "SKILL.md"), "---\nname: llm-wiki-canvas\n---\nRun lwc intake create and lwc proposal apply only after review.\n");
-  writeFileSync(path.join(agentWorkspace, ".claude", "skills", "llm-wiki-canvas", "SKILL.md"), "Read ../../../.agents/skills/llm-wiki-canvas/SKILL.md\n");
-  writeFileSync(path.join(agentWorkspace, ".qoder", "skills", "llm-wiki-canvas", "SKILL.md"), "Read ../../../.agents/skills/llm-wiki-canvas/SKILL.md\n");
+  mkdirSync(agentWorkspace, { recursive: true });
+  const agentPreviewFile = path.join(consumer, "agents-preview.json");
+  run(lwc, ["init", agentWorkspace, "--format", "json", "-o", agentPreviewFile], { cwd: consumer });
+  const agentPreview = JSON.parse(readFileSync(agentPreviewFile, "utf8"));
+  if (agentPreview.mode !== "dry-run" || agentPreview.summary.create !== 7 || agentPreview.summary.manual !== 1 || readdirSync(agentWorkspace).length !== 0) {
+    throw new Error("packaged CLI Agent setup preview wrote files or returned the wrong plan");
+  }
+  const agentSetupFile = path.join(consumer, "agents-setup.json");
+  run(lwc, ["init", agentWorkspace, "--write", "--format", "json", "-o", agentSetupFile], { cwd: consumer });
+  const agentSetup = JSON.parse(readFileSync(agentSetupFile, "utf8"));
+  if (agentSetup.mode !== "written" || agentSetup.summary.create !== 7 || !readFileSync(path.join(agentWorkspace, "AGENTS.md"), "utf8").includes("human direction")) {
+    throw new Error("packaged CLI Agent setup did not create the safe shared contract");
+  }
   const agentReportFile = path.join(consumer, "agents.json");
   run(lwc, ["agents", agentWorkspace, "--strict", "--format", "json", "-o", agentReportFile], { cwd: consumer });
   const agentReport = JSON.parse(readFileSync(agentReportFile, "utf8"));
@@ -69,6 +74,7 @@ try {
     throw new Error("packaged CLI Agent compatibility report is incomplete or leaks an absolute workspace path");
   }
   writeFileSync(path.join(agentWorkspace, ".qoder", "skills", "llm-wiki-canvas", "SKILL.md"), "Stale copied workflow.\n");
+  run(lwc, ["init", agentWorkspace, "--write"], { cwd: consumer, expectFailure: true });
   run(lwc, ["agents", agentWorkspace, "--strict"], { cwd: consumer, expectFailure: true });
   run(lwc, ["agents", agentWorkspace, "--format", "xml"], { cwd: consumer, expectFailure: true });
   run(lwc, ["serve", "--help"], { cwd: consumer });
@@ -177,7 +183,7 @@ try {
   run(lwc, ["proposal", "apply", intakeProposalFile, wiki, "--confirm", intakeProposal.id, "--applied-at", "2026-08-10T06:00:00.000Z"], { cwd: consumer });
   if (!readFileSync(path.join(wiki, "Intake.md"), "utf8").includes("Source-grounded")) throw new Error("packaged CLI intake proposal did not pass the human review gate");
   run(lwc, ["scan", path.join(scratch, "missing-root")], { cwd: consumer, expectFailure: true });
-  console.log("Packaged CLI smoke passed: bin, Agent compatibility, scan, lint/strict, report, build, local serve, intake and proposal lifecycles, focused Mermaid/Excalidraw exports, invalid root");
+  console.log("Packaged CLI smoke passed: bin, safe Agent setup, Agent compatibility, scan, lint/strict, report, build, local serve, intake and proposal lifecycles, focused Mermaid/Excalidraw exports, invalid root");
 } finally {
   rmSync(scratch, { recursive: true, force: true });
 }

@@ -24,6 +24,8 @@ Local files and the CLI are already the common interface for these agents, so th
 
 Run `lwc agents . --strict` to verify this table against the repository instead of trusting documentation alone. The checked-in [generated matrix](agent-compatibility.md) is rebuilt in CI and separates repository-contract evidence from proprietary host execution.
 
+For a new repository, run `lwc init .` to preview the shared rules, canonical Skill resources, and selected host adapters. Add `--write` only after inspecting the plan. The initializer creates missing files exclusively, preserves valid custom rules, and writes nothing when any planned path conflicts.
+
 | Tool | Repository guidance | Project Skill | Repository status | How to use it |
 | --- | --- | --- | --- | --- |
 | **Codex** | `AGENTS.md` | `.agents/skills/<name>/SKILL.md` | Native | Open the repository and ask it to use the `llm-wiki-canvas` Skill |

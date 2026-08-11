@@ -103,11 +103,14 @@ pnpm lwc report /path/to/vault \
 在包含 Agent 指引的仓库根目录，检查所有宿主是否指向同一份经审查写入契约：
 
 ```bash
+lwc init .                                      # 仅预览
+lwc init . --agents codex,claude-code,qoder
+lwc init . --write                              # 仅创建缺失文件
 lwc agents . --strict
 lwc agents . --format json -o .lwc/agents.json
 ```
 
-所需规则或 Skill 适配器缺失、不安全或过期时，strict 模式会失败。`manual` 是明确的产品状态而非失败：它表示该宿主需要显式附加上下文。详见[Agent 兼容性验证](agent-compatibility.zh-CN.md)。
+初始化器从不覆盖文件；已有有效文件会保留，任何过期或不安全路径都会阻止整批写入。随后，所需规则或 Skill 适配器仍然缺失、不安全或过期时，strict 校验会失败。`manual` 是明确的产品状态而非失败：它表示该宿主需要显式附加上下文。详见[Agent 兼容性验证](agent-compatibility.zh-CN.md)。
 
 ## 4. 把一份明确选择的资料变成隔离草稿
 

@@ -16,7 +16,7 @@ Treat Markdown, source files, and review records as truth. Treat generated graph
 5. Run `lwc lint <root>` before proposing structural changes.
 6. Report exact file paths for broken, ambiguous, and orphaned pages.
 
-For cross-Agent repositories, run `lwc agents <workspace> --strict` to verify that shared rules and native adapters still point to this canonical Skill. Treat `ready` as repository-contract evidence, `manual` as an explicit-context requirement, and `incomplete` as a setup failure. Do not claim that this static check executed a proprietary host binary.
+For a new cross-Agent repository, run `lwc init <workspace>` and inspect the dry-run before adding `--write`. It may create missing shared rules, this canonical Skill package, and thin host adapters; it must preserve valid files and stop the entire write when any path conflicts. Then run `lwc agents <workspace> --strict` to verify the result. Treat `ready` as repository-contract evidence, `manual` as an explicit-context requirement, and `incomplete` as a setup failure. Do not claim that these static checks executed a proprietary host binary.
 
 If the repository package is not installed globally, run `pnpm exec tsx <repo>/src/cli/index.ts` in place of `lwc`.
 

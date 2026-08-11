@@ -8,6 +8,8 @@ export { buildWikiReport, reportToMarkdown } from "./report.js";
 export type { WikiReport } from "./report.js";
 export { agentCompatibilityToMarkdown, inspectAgentCompatibility } from "./compatibility.js";
 export type { AgentCompatibilityReport, AgentHostCompatibility, AgentHostId, AgentHostStatus, CompatibilityCheck, CompatibilityCheckStatus } from "./compatibility.js";
+export { agentScaffoldToMarkdown, applyAgentScaffold, parseAgentHosts, planAgentScaffold } from "./scaffold.js";
+export type { AgentScaffoldAction, AgentScaffoldActionStatus, AgentScaffoldPlan, AgentScaffoldTemplates } from "./scaffold.js";
 export { readProposalInbox } from "./inbox.js";
 export type { ProposalInbox, ProposalInboxChange, ProposalInboxIssue, ProposalInboxItem, ProposalTopology, ProposalTopologyLink } from "./inbox.js";
 export { readDraftInbox } from "./drafts.js";

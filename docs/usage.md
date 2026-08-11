@@ -103,11 +103,14 @@ The report contains observed page, relationship, connectivity, provenance, diagn
 At the repository root that contains Agent guidance, verify that every host points to the same reviewed-write contract:
 
 ```bash
+lwc init .                                      # preview only
+lwc init . --agents codex,claude-code,qoder
+lwc init . --write                              # missing files only
 lwc agents . --strict
 lwc agents . --format json -o .lwc/agents.json
 ```
 
-Strict mode fails when a required rule or Skill adapter is missing, unsafe, or stale. A `manual` result is deliberate rather than a failure: it means the host requires explicit context attachment. See [Agent compatibility](agent-compatibility.md).
+The initializer never overwrites. Existing valid files are preserved, and any stale or unsafe path blocks the complete write set. Strict verification then fails when a required rule or Skill adapter remains missing, unsafe, or stale. A `manual` result is deliberate rather than a failure: it means the host requires explicit context attachment. See [Agent compatibility](agent-compatibility.md).
 
 ## 4. Turn one selected source into an isolated draft
 
