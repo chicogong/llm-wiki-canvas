@@ -18,6 +18,7 @@ LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性�
 - **Markdown 始终是事实源。** 不引入专有数据库，也不强制迁移已有 Vault。
 - **关系可以直接看见。** 搜索、筛选页面，并查看一个页面周围的证据与相邻关系。
 - **知识库质量可以测试。** 断链、歧义链接、缺少标题和孤立页面都有准确路径。
+- **明确选择的资料会进入受控草稿。** 登记一份 Markdown/文本，保留来源快照和 SHA-256，让任意 Agent 只编辑隔离草稿，再进入现有 Proposal 审查门。
 - **Canvas 的所有权仍属于你。** 重建时保留节点位置、文字/链接/分组批注和手工连线，只安置新增页面。
 - **Excalidraw 仍是开放交接文件。** 重建时保留页面位置、手绘批注和嵌入文件，同时刷新分类关系。
 - **把大图变成小型解释图。** 选择一个页面及一至两层关系，把同一份证据导出到 Mermaid 或 Excalidraw。
@@ -120,6 +121,7 @@ lwc serve /path/to/vault
 lwc scan /path/to/vault -o .lwc/graph.json
 lwc lint /path/to/vault
 lwc report /path/to/vault
+lwc intake create /path/to/vault --source /path/to/meeting.txt --target concepts/Meeting.md --generator Codex
 lwc canvas /path/to/vault -o /path/to/vault/Wiki.canvas
 lwc excalidraw /path/to/vault -o /path/to/vault/Wiki.excalidraw
 lwc diagram /path/to/vault --focus "Human Review" --depth 1 --format mermaid -o Human-Review.mmd
@@ -134,6 +136,8 @@ lwc build /path/to/vault \
 如果要把生成结果提交到 Git，请给 `lwc build` 传入 `--generated-at <ISO 时间>`，固定该次输出中的生成时间和节点修改时间。
 
 Obsidian、QMD、Agent Skill 和 CI 的具体用法见[使用指南](docs/usage.zh-CN.md)。
+
+资料导入时，只编辑 `lwc intake create` 打印的草稿路径；用 `lwc intake show <manifest>` 检查证据，再运行 `lwc intake propose <manifest> /path/to/vault`。CLI 会重新校验原来源、复制的快照、声明目标和草稿状态，然后才创建 Proposal；它不会调用模型，也不会修改正式 Markdown。详见[受控资料进入知识库](docs/intake.zh-CN.md)。
 
 ## 与 AI 编码 Agent 配合
 
@@ -194,6 +198,7 @@ Markdown 是长期保存的知识；关系图、Canvas 和 Viewer 数据都是�
 - 生成稳定的节点和关系 ID。
 - 报告断链、歧义链接、缺少标题和孤立页面。
 - 基于实际结构生成 Markdown 或 JSON 健康报告，不虚构综合评分。
+- 为一份明确来源创建 Markdown/文本 Intake，复制来源快照，记录 SHA-256 与生成者，隔离唯一目标并检查漂移和篡改。
 - 在应用 Agent 修改前完成 Markdown 草稿隔离、diff、review、reject 和哈希校验。
 - 生成 Obsidian 兼容 `.canvas` 文件。
 - 生成带稳定 ID 和分类关系样式的可编辑 `.excalidraw` 场景。
@@ -214,7 +219,7 @@ pnpm verify
 
 ## 后续方向
 
-Canvas 与 Excalidraw 的位置所有权已经交付。下一项是受控文本导入：把明确选择的本地 Markdown/文本变成带来源证据的草稿，并继续强制经过现有的人工审查 proposal 生命周期。
+CLI 已经交付单来源受控文本 Intake。下一项是 Workbench 的只读 Drafts 页面，在转换 Proposal 前展示 Intake 证据和校验状态。
 
 另见 [贡献指南](CONTRIBUTING.md)、[安全策略](SECURITY.md)和[变更记录](CHANGELOG.md)。
 

@@ -40,7 +40,7 @@ flowchart LR
 4. **人工确认**：检查 Agent 的计划或 Changes / diff，再授权写入。
 5. **重建验证**：执行 `lwc build`，检查诊断、Markdown diff、`graph.json` 和 `.canvas` diff。
 
-正式知识修改使用已经交付的 `lwc proposal create → show → review/reject → apply` 生命周期。草稿留在正式 Wiki 外，review 用哈希绑定准确内容和审查记录，目标发生漂移时 apply 会拒绝写入。详见[审查式知识修改](proposals.zh-CN.md)。
+对于明确选择的 Markdown/文本来源，先执行 `lwc intake create → show → propose`，再进入已经交付的 `lwc proposal show → review/reject → apply` 生命周期。Intake 绑定来源、快照哈希和唯一目标；Proposal 绑定准确草稿、审查记录和当前目标状态。没有外部来源的维护任务可以直接使用 `proposal create`。详见[受控资料进入知识库](intake.zh-CN.md)和[审查式知识修改](proposals.zh-CN.md)。
 
 ## 可以直接复制的任务
 
@@ -51,11 +51,11 @@ flowchart LR
 运行 lwc report <vault> 和 lwc lint <vault>，说明范围、连接情况、来源元数据、核心页面、直接关系、断链、歧义链接和孤立页面；每个结论引用准确源文件路径。
 ```
 
-提出一次可审查的结构整理：
+把一份明确选择的来源变成可审查草稿：
 
 ```text
-使用 llm-wiki-canvas Skill 检查 <vault>。建议 Markdown 只写到 <vault>/.lwc/drafts/<name>，然后创建并展示 lwc proposal。
-不要修改正式 Wiki 文件。等待人执行 proposal review 或 reject；只有拿到准确 proposal ID 且状态为 reviewed 后才能 apply，再执行 report、lint 和 build 并总结 diff。
+使用 llm-wiki-canvas Skill 检查 <vault>。通过 lwc intake create 登记 <source-file>，只声明一个目标并记录当前 Agent 为 generator。只编辑命令打印的草稿，然后展示 Intake 并转换为 lwc proposal。
+不要 review、apply 或修改正式 Wiki。返回 intake ID、来源 SHA-256、proposal ID、准确 diff、诊断和未解决问题，然后停下来等待人工审查。
 ```
 
 从笔记生成可视关系图：

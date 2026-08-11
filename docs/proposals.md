@@ -52,6 +52,7 @@ The default output is `/path/to/vault/.lwc/proposals/<proposal-id>.json`. It con
 - target relative paths and create/update operations;
 - original and proposed content;
 - original-file and proposed-content SHA-256 hashes;
+- when created from `lwc intake propose`, the intake ID, source filename and SHA-256, declared target, and generator inside the proposal's hash-protected payload;
 - no absolute Vault path.
 
 Creation does not modify formal Markdown. Unchanged draft files are omitted.
@@ -62,7 +63,7 @@ Creation does not modify formal Markdown. Unchanged draft files are omitted.
 lwc proposal show /path/to/proposal.json
 ```
 
-The output contains status, paths, both hashes, and a Markdown diff. A reviewer must still inspect evidence and sources. Hashes prove that content did not change; they do not prove that it is true.
+The output contains status, paths, both hashes, and a Markdown diff. Source-bound proposals also show their Intake provenance. A reviewer must still inspect evidence and sources. Hashes prove that content did not change; they do not prove that it is true.
 
 To inspect every proposal in one read-only queue, run `lwc serve /path/to/vault` and open **Changes**. The Workbench reads the default `.lwc/proposals/` directory, separates open and closed lifecycle states, and shows the same hashes and diff evidence. It displays commands for the next valid transition but never runs review, reject, or apply.
 

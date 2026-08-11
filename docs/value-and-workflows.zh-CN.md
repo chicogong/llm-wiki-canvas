@@ -92,7 +92,7 @@ pnpm lwc build /path/to/vault \
 
 1. 把 `AGENTS.md` 和 `llm-wiki-canvas` Skill 放进仓库。
 2. 要求 Agent 先运行 `report` 和 `lint`，只读描述现状。
-3. Agent 只写 `.lwc/drafts/<name>`，再执行 `proposal create` 和 `proposal show`。
+3. 对明确选择的来源先执行 `intake create`；Agent 只编辑声明的 `.lwc/drafts/<intake-id>/<target>`，再执行 `intake show` 和 `intake propose`。只有没有外部来源的维护任务才直接使用 `proposal create`。
 4. 人执行 `proposal review` 或 `proposal reject`；只有 reviewed proposal 才能 apply。
 5. Apply 后重新执行 `report`、`lint` 和 `build`，检查源文件与生成产物 diff。
 
@@ -100,10 +100,10 @@ pnpm lwc build /path/to/vault \
 
 ```text
 使用 llm-wiki-canvas Skill。先运行 report 和 lint，只读说明当前页面规模、连接情况、来源元数据、结构诊断和高连接页面。
-建议 Markdown 只写到 .lwc/drafts/<name>，创建并展示 lwc proposal 后停止，不要修改正式 Wiki。人 review 或 reject 后，只用准确 ID apply reviewed proposal，再运行 report、lint 和 build 并对比结果。
+对于明确选择的 Markdown/文本来源，创建只声明一个目标的 Intake，只编辑打印出的草稿，展示来源哈希，再转换为 Proposal。没有外部来源的维护任务可以直接从隔离草稿创建 Proposal。停在 review/apply 之前；人作出决定后，只用准确 ID 应用 reviewed proposal，再运行 report、lint 和 build 并对比结果。
 ```
 
-准确命令与安全限制见[审查式知识修改](proposals.zh-CN.md)。
+准确命令与安全限制见[受控资料进入知识库](intake.zh-CN.md)和[审查式知识修改](proposals.zh-CN.md)。
 
 ### 团队 CI 门禁
 

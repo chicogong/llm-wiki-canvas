@@ -7,14 +7,18 @@ import {
   applyKnowledgeProposal,
   buildGraph,
   buildWikiReport,
+  createKnowledgeIntake,
   createKnowledgeProposal,
   graphToCanvas,
   graphToExcalidraw,
   graphToMermaid,
+  intakeToMarkdown,
   parseKnowledgeProposal,
   proposalToMarkdown,
+  proposeKnowledgeIntake,
   rejectKnowledgeProposal,
   reportToMarkdown,
+  readKnowledgeIntake,
   reviewKnowledgeProposal,
   selectFocusedGraph,
   summarizeCanvasLayout,
@@ -139,6 +143,49 @@ program.command("report")
     } else {
       process.stdout.write(output);
     }
+  });
+
+const intake = program.command("intake")
+  .description("Create source-bound drafts and convert them into reviewable proposals");
+
+intake.command("create")
+  .argument("[root]", "wiki root", ".")
+  .requiredOption("--source <file>", "explicit Markdown or text source file")
+  .requiredOption("--target <path>", "intended Markdown path inside the wiki")
+  .option("--generator <name>", "Agent, model, or author preparing the draft")
+  .option("--created-at <iso>", "fixed ISO timestamp for reproducible fixtures")
+  .description("Copy a source snapshot and create an isolated placeholder draft")
+  .action(async (root, options) => {
+    const createdAt = options.createdAt ? generatedAt(options.createdAt) : new Date();
+    const created = await createKnowledgeIntake(root, options.source, options.target, options.generator, createdAt);
+    console.log(`Intake ${created.intake.id} → ${created.manifestPath}`);
+    console.log(`Source snapshot → ${created.sourceSnapshotPath}`);
+    console.log(`Draft target → ${created.draftPath}`);
+    console.log(`Edit the draft, then run: lwc intake propose ${created.manifestPath} ${path.resolve(root)}`);
+  });
+
+intake.command("show")
+  .argument("<intake>", "intake manifest JSON file")
+  .description("Show source provenance, draft target, generator, and lifecycle state")
+  .action(async (intakeFile) => {
+    process.stdout.write(intakeToMarkdown(await readKnowledgeIntake(intakeFile)));
+  });
+
+intake.command("propose")
+  .argument("<intake>", "intake manifest JSON file")
+  .argument("[root]", "wiki root", ".")
+  .option("--summary <text>", "short reason for the generated knowledge", "Source-grounded knowledge intake")
+  .option("--proposed-at <iso>", "fixed ISO timestamp for reproducible fixtures")
+  .description("Validate source and draft integrity, then create a proposal without changing the wiki")
+  .action(async (intakeFile, root, options) => {
+    const proposedAt = options.proposedAt ? generatedAt(options.proposedAt) : new Date();
+    const value = await proposeKnowledgeIntake(root, intakeFile, options.summary, proposedAt);
+    const proposalFile = path.join(root, value.intake.proposal?.file ?? "");
+    await writeJson(proposalFile, value.proposal);
+    await writeJson(intakeFile, value.intake);
+    console.log(`Intake ${value.intake.id} → proposal ${value.proposal.id}`);
+    console.log(`Proposal → ${proposalFile}`);
+    console.log(`Formal Markdown is unchanged; review with: lwc proposal show ${proposalFile}`);
   });
 
 const proposal = program.command("proposal")

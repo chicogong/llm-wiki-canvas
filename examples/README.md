@@ -59,6 +59,17 @@ Then open [`atlas-wiki/Atlas.canvas`](atlas-wiki/Atlas.canvas) in Obsidian. Move
 
 Open [`atlas-wiki/Atlas.excalidraw`](atlas-wiki/Atlas.excalidraw) in Excalidraw to annotate the same relationship evidence with ordinary editable shapes and arrows.
 
+Try the governed source-intake boundary with the synthetic [`intake-source/meeting.txt`](intake-source/meeting.txt):
+
+```bash
+pnpm lwc intake create examples/atlas-wiki \
+  --source examples/intake-source/meeting.txt \
+  --target "concepts/Meeting Decision.md" \
+  --generator Codex
+```
+
+The command creates ignored local state under `examples/atlas-wiki/.lwc/drafts/`. It copies the source, records its SHA-256, and prints one placeholder draft. Edit that draft, then use the printed manifest with `lwc intake show` and `lwc intake propose`. Proposal conversion still does not apply the page.
+
 ### Copy the pattern
 
 A minimal page looks like this:
@@ -143,6 +154,17 @@ pnpm lwc diagram examples/atlas-wiki --focus "Human Review" --depth 1 --format e
 然后在 Obsidian 中打开 [`atlas-wiki/Atlas.canvas`](atlas-wiki/Atlas.canvas)，移动任意节点，再使用同一个输出路径重新构建；编译器会复用该节点的位置。
 
 还可以在 Excalidraw 中打开 [`atlas-wiki/Atlas.excalidraw`](atlas-wiki/Atlas.excalidraw)，继续用普通可编辑图形和箭头标注同一份关系证据。
+
+可以使用合成资料 [`intake-source/meeting.txt`](intake-source/meeting.txt) 验证受控资料边界：
+
+```bash
+pnpm lwc intake create examples/atlas-wiki \
+  --source examples/intake-source/meeting.txt \
+  --target "concepts/Meeting Decision.md" \
+  --generator Codex
+```
+
+命令会在 `examples/atlas-wiki/.lwc/drafts/` 下创建被忽略的本地状态：复制来源、记录 SHA-256，并打印唯一的占位草稿。编辑草稿后，使用打印的 manifest 执行 `lwc intake show` 和 `lwc intake propose`；转换 Proposal 仍然不会直接应用页面。
 
 ### 复制这种模式
 

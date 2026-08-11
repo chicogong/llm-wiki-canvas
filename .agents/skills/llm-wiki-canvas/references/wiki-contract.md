@@ -17,6 +17,8 @@
 - Existing Canvas coordinates, dimensions, and colors are retained by node ID.
 - Generated visual files contain relative knowledge paths, never machine-specific absolute Vault paths.
 - Focused diagrams resolve an exact page title, ID, or relative path and select one or two relationship layers before rendering Mermaid or Excalidraw.
+- `.lwc/drafts/<intake-id>/intake.json` records a selected `.md`/`.txt` source path, copied snapshot, SHA-256, byte count, generator, one declared Markdown target, and lifecycle state. It is local working state, not a public graph artifact.
+- Intake proposal conversion must revalidate the original source and snapshot hashes, reject an unchanged placeholder or undeclared Markdown targets, and still pass through Proposal review before formal writes.
 
 ## Recommended wiki files
 

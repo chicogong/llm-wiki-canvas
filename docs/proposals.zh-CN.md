@@ -52,6 +52,7 @@ lwc proposal create /path/to/vault \
 - 目标相对路径和 create/update 操作；
 - 原内容与建议内容；
 - 原文件 SHA-256 和建议内容 SHA-256；
+- 通过 `lwc intake propose` 创建时，Proposal 的哈希保护载荷还包含 Intake ID、来源文件名与 SHA-256、声明目标和生成者；
 - 不包含绝对 Vault 路径。
 
 创建时不会修改正式 Markdown。没有变化的草稿文件会被忽略。
@@ -62,7 +63,7 @@ lwc proposal create /path/to/vault \
 lwc proposal show /path/to/proposal.json
 ```
 
-输出包含状态、路径、两侧哈希和 Markdown diff。审查人还应检查草稿依据与来源；哈希只能证明内容没有变化，不能证明内容真实。
+输出包含状态、路径、两侧哈希和 Markdown diff；来源型 Proposal 还会显示 Intake provenance。审查人仍应检查草稿依据与来源；哈希只能证明内容没有变化，不能证明内容真实。
 
 要在一个只读队列里检查全部 proposal，运行 `lwc serve /path/to/vault` 并打开 **Changes**。Workbench 读取默认 `.lwc/proposals/` 目录，分开开放和已结束的生命周期状态，并展示相同的哈希与 diff 证据。它会给出下一次合法状态转换的命令，但绝不会直接执行 review、reject 或 apply。
 

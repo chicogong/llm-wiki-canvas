@@ -29,14 +29,16 @@ If the repository package is not installed globally, run `pnpm exec tsx <repo>/s
 ## Ingest or Maintain
 
 1. Preserve raw source files; do not rewrite them as generated prose.
-2. Put suggested Markdown under `<root>/.lwc/drafts/<name>/`, preserving its intended relative path. Never write the formal wiki before review.
-3. Run `lwc proposal create <root> --from <draft> --summary <reason>` and `lwc proposal show <proposal>`.
-4. Stop for human review. Only a person should run `proposal review --approve <id>` or `proposal reject --confirm <id>`.
-5. Apply only a `reviewed` proposal with `lwc proposal apply <proposal> <root> --confirm <id>`.
-6. Keep edits focused. Never regenerate a large `index.md` wholesale.
-7. Add a dated entry to `log.md` describing created, updated, and unresolved items through the same proposal.
-8. Re-run `lwc report`, `lwc lint`, and `lwc build` after apply.
-9. Compare the before and after report, then show the source diff and generated diagnostics for review.
+2. For one explicit Markdown/text source, run `lwc intake create <root> --source <file> --target <relative.md> --generator <host>`. Use the printed source snapshot and manifest as provenance; do not commit `.lwc/` state.
+3. Edit only the declared draft target. Run `lwc intake show <manifest>`, then `lwc intake propose <manifest> <root> --summary <reason>`. This rechecks the original source hash, copied snapshot, single-target scope, and draft change before creating a proposal.
+4. For maintenance that has no external source, put suggested Markdown under `<root>/.lwc/drafts/<name>/`, preserving intended relative paths, then use `lwc proposal create` directly.
+5. Run `lwc proposal show <proposal>` and cite the intake ID, source path, SHA-256, generator, and target path when intake was used.
+6. Stop for human review. Only a person should run `proposal review --approve <id>` or `proposal reject --confirm <id>`.
+7. Apply only a `reviewed` proposal with `lwc proposal apply <proposal> <root> --confirm <id>`.
+8. Keep edits focused. Never regenerate a large `index.md` wholesale.
+9. Add a dated entry to `log.md` describing created, updated, and unresolved items through the same proposal.
+10. Re-run `lwc report`, `lwc lint`, and `lwc build` after apply.
+11. Compare the before and after report, then show the source diff and generated diagnostics for review.
 
 ## Visualize
 

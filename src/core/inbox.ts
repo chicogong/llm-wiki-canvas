@@ -41,6 +41,7 @@ export interface ProposalInboxItem {
   createdAt: string;
   changes: ProposalInboxChange[];
   topology: ProposalTopology;
+  intake?: KnowledgeProposal["intake"];
   review?: KnowledgeProposal["review"];
   rejection?: KnowledgeProposal["rejection"];
   application?: KnowledgeProposal["application"];
@@ -117,6 +118,7 @@ async function toInboxItem(root: string, file: string, proposal: KnowledgePropos
       removedLinks: difference(beforeLinks, afterLinks),
       conflicts: changes.filter((change) => change.targetState === "conflict").map((change) => change.path),
     },
+    intake: proposal.intake,
     review: proposal.review,
     rejection: proposal.rejection,
     application: proposal.application,

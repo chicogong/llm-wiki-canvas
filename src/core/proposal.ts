@@ -14,6 +14,14 @@ export interface ProposalChange {
   content: string;
 }
 
+export interface ProposalIntakeProvenance {
+  id: string;
+  sourceName: string;
+  sourceHash: string;
+  target: string;
+  generator?: string;
+}
+
 export interface KnowledgeProposal {
   schemaVersion: 1;
   id: string;
@@ -22,6 +30,7 @@ export interface KnowledgeProposal {
   status: ProposalStatus;
   createdAt: string;
   changes: ProposalChange[];
+  intake?: ProposalIntakeProvenance;
   review?: {
     reviewer: string;
     reviewedAt: string;
@@ -41,6 +50,7 @@ export interface KnowledgeProposal {
 }
 
 const hash = (value: string) => createHash("sha256").update(value).digest("hex");
+const SHA256 = /^[a-f0-9]{64}$/;
 const unix = (value: string) => value.split(path.sep).join("/");
 
 function proposalPayload(proposal: KnowledgeProposal): string {
@@ -51,6 +61,7 @@ function proposalPayload(proposal: KnowledgeProposal): string {
     summary: proposal.summary,
     createdAt: proposal.createdAt,
     changes: proposal.changes,
+    intake: proposal.intake,
   });
 }
 
@@ -62,7 +73,7 @@ function reviewHash(proposalHashValue: string, reviewer: string, reviewedAt: str
   return hash(JSON.stringify({ proposalHash: proposalHashValue, reviewer, reviewedAt, note }));
 }
 
-function targetPath(root: string, relative: string): string {
+export function knowledgeTargetPath(root: string, relative: string): string {
   const clean = unix(relative).replace(/^\.\//, "");
   if (!clean || path.posix.isAbsolute(clean) || clean.split("/").some((part) => !part || part === "." || part === ".." || part.startsWith("."))) {
     throw new Error(`Unsafe proposal target path: ${relative}`);
@@ -87,7 +98,7 @@ async function assertNoSymlink(root: string, relative: string): Promise<void> {
     if (!info) break;
     if (info.isSymbolicLink()) throw new Error(`Proposal target crosses a symbolic link: ${relative}`);
   }
-  const targetInfo = await lstat(targetPath(root, relative)).catch((error: NodeJS.ErrnoException) => {
+  const targetInfo = await lstat(knowledgeTargetPath(root, relative)).catch((error: NodeJS.ErrnoException) => {
     if (error.code === "ENOENT") return undefined;
     throw error;
   });
@@ -105,7 +116,7 @@ async function optionalFile(target: string): Promise<string | null> {
   }
 }
 
-export async function createKnowledgeProposal(root: string, draftRoot: string, summary: string, createdAt = new Date()): Promise<KnowledgeProposal> {
+export async function createKnowledgeProposal(root: string, draftRoot: string, summary: string, createdAt = new Date(), intake?: ProposalIntakeProvenance): Promise<KnowledgeProposal> {
   const absoluteRoot = path.resolve(root);
   const rootInfo = await stat(absoluteRoot).catch(() => undefined);
   if (!rootInfo?.isDirectory()) throw new Error(`Wiki root is not a directory: ${absoluteRoot}`);
@@ -117,7 +128,7 @@ export async function createKnowledgeProposal(root: string, draftRoot: string, s
   const changes: ProposalChange[] = [];
   for (const relative of files.sort()) {
     const clean = unix(relative);
-    const target = targetPath(absoluteRoot, clean);
+    const target = knowledgeTargetPath(absoluteRoot, clean);
     await assertNoSymlink(absoluteRoot, clean);
     const [baseContent, content] = await Promise.all([optionalFile(target), readFile(path.join(absoluteDraft, relative), "utf8")]);
     if (baseContent === content) continue;
@@ -138,6 +149,7 @@ export async function createKnowledgeProposal(root: string, draftRoot: string, s
     status: "proposed" as const,
     createdAt: createdAt.toISOString(),
     changes,
+    intake,
   };
   const id = `proposal-${hash(JSON.stringify(proposalBase)).slice(0, 12)}`;
   return { ...proposalBase, id };
@@ -146,14 +158,14 @@ export async function createKnowledgeProposal(root: string, draftRoot: string, s
 export function parseKnowledgeProposal(value: unknown): KnowledgeProposal {
   if (!value || typeof value !== "object") throw new Error("Proposal must be a JSON object");
   const proposal = value as KnowledgeProposal;
-  if (proposal.schemaVersion !== 1 || !proposal.id?.startsWith("proposal-") || !["proposed", "reviewed", "applied", "rejected"].includes(proposal.status)) {
+  if (proposal.schemaVersion !== 1 || !/^proposal-[a-f0-9]{12}$/.test(proposal.id ?? "") || !["proposed", "reviewed", "applied", "rejected"].includes(proposal.status)) {
     throw new Error("Unsupported or invalid proposal schema");
   }
   if (!proposal.rootName || !proposal.summary || !proposal.createdAt || !Array.isArray(proposal.changes) || !proposal.changes.length) {
     throw new Error("Proposal metadata or changes are missing");
   }
   for (const change of proposal.changes) {
-    targetPath("/proposal-root", change.path);
+    knowledgeTargetPath("/proposal-root", change.path);
     if (!["create", "update"].includes(change.operation) || typeof change.content !== "string" || hash(change.content) !== change.contentHash) {
       throw new Error(`Proposal change integrity failed: ${change.path}`);
     }
@@ -161,6 +173,14 @@ export function parseKnowledgeProposal(value: unknown): KnowledgeProposal {
     if (change.operation === "update" && (typeof change.baseContent !== "string" || hash(change.baseContent) !== change.baseHash)) {
       throw new Error(`Invalid update proposal: ${change.path}`);
     }
+  }
+  if (proposal.intake) {
+    const provenance = proposal.intake;
+    knowledgeTargetPath("/proposal-root", provenance.target);
+    if (!/^intake-[a-f0-9]{12}$/.test(provenance.id ?? "") || !provenance.sourceName || path.basename(provenance.sourceName) !== provenance.sourceName || !SHA256.test(provenance.sourceHash) || (provenance.generator !== undefined && typeof provenance.generator !== "string")) {
+      throw new Error("Proposal intake provenance is invalid");
+    }
+    if (proposal.changes.length !== 1 || proposal.changes[0].path !== provenance.target) throw new Error("Proposal intake target does not match its only change");
   }
   if (["reviewed", "applied"].includes(proposal.status)) {
     if (!proposal.review) throw new Error(`Proposal in ${proposal.status} state is missing its review record`);
@@ -228,7 +248,7 @@ export async function applyKnowledgeProposal(root: string, proposalValue: unknow
   const originals = new Map<string, string | null>();
   for (const change of proposal.changes) {
     await assertNoSymlink(root, change.path);
-    const current = await optionalFile(targetPath(root, change.path));
+    const current = await optionalFile(knowledgeTargetPath(root, change.path));
     const currentHash = current === null ? null : hash(current);
     if (currentHash !== change.baseHash) throw new Error(`Target changed since proposal: ${change.path}`);
     originals.set(change.path, current);
@@ -237,7 +257,7 @@ export async function applyKnowledgeProposal(root: string, proposalValue: unknow
   const written: string[] = [];
   try {
     for (const change of proposal.changes) {
-      const target = targetPath(root, change.path);
+      const target = knowledgeTargetPath(root, change.path);
       await mkdir(path.dirname(target), { recursive: true });
       await writeFile(target, change.content, "utf8");
       written.push(change.path);
@@ -245,7 +265,7 @@ export async function applyKnowledgeProposal(root: string, proposalValue: unknow
   } catch (error) {
     for (const relative of written.reverse()) {
       const original = originals.get(relative);
-      const target = targetPath(root, relative);
+      const target = knowledgeTargetPath(root, relative);
       if (original === null) await rm(target, { force: true });
       else if (typeof original === "string") await writeFile(target, original, "utf8");
     }
@@ -294,6 +314,14 @@ export function proposalToMarkdown(proposalValue: unknown): string {
     `- Created: \`${proposal.createdAt}\``,
     `- Changes: ${proposal.changes.length}`,
   ];
+  if (proposal.intake) {
+    lines.push(
+      `- Intake: \`${proposal.intake.id}\``,
+      `- Intake source: \`${proposal.intake.sourceName}\``,
+      `- Intake source SHA-256: \`${proposal.intake.sourceHash}\``,
+      `- Intake generator: ${proposal.intake.generator ?? "not recorded"}`,
+    );
+  }
   if (proposal.review) lines.push(`- Reviewed by: ${proposal.review.reviewer} at \`${proposal.review.reviewedAt}\``);
   if (proposal.rejection) lines.push(`- Rejected: ${proposal.rejection.reason}`);
   if (proposal.application) lines.push(`- Applied: \`${proposal.application.appliedAt}\``);

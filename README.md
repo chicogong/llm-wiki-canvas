@@ -18,6 +18,7 @@ It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
 - **Markdown stays the source of truth.** No proprietary database or forced migration.
 - **Relationships become visible.** Search, filter, and inspect the evidence around a page.
 - **Wiki quality becomes testable.** Broken links, ambiguous links, missing titles, and orphan pages have exact paths.
+- **Selected sources become governed drafts.** Register one Markdown/text source, retain its snapshot and SHA-256, let any Agent edit an isolated draft, then convert it into the existing proposal gate.
 - **The Canvas stays yours.** Rebuilds preserve adjusted positions, text/link/group annotations, and manual edges while placing only new pages.
 - **Excalidraw stays an open handoff.** Rebuilds retain page positions, hand-drawn annotations, and embedded files while refreshing typed relationships.
 - **Large maps become small explanations.** Select one page and one or two relationship layers, then export the same evidence to Mermaid or Excalidraw.
@@ -120,6 +121,7 @@ lwc serve /path/to/vault
 lwc scan /path/to/vault -o .lwc/graph.json
 lwc lint /path/to/vault
 lwc report /path/to/vault
+lwc intake create /path/to/vault --source /path/to/meeting.txt --target concepts/Meeting.md --generator Codex
 lwc canvas /path/to/vault -o /path/to/vault/Wiki.canvas
 lwc excalidraw /path/to/vault -o /path/to/vault/Wiki.excalidraw
 lwc diagram /path/to/vault --focus "Human Review" --depth 1 --format mermaid -o Human-Review.mmd
@@ -134,6 +136,8 @@ lwc build /path/to/vault \
 For reproducible checked-in fixtures, pass `--generated-at <ISO timestamp>` to `lwc build`. It fixes graph generation and node modification timestamps for that output.
 
 For Obsidian, QMD, Agent Skill, and CI workflows, see the [usage guide](docs/usage.md).
+
+For source intake, edit only the draft path printed by `lwc intake create`, inspect it with `lwc intake show <manifest>`, then run `lwc intake propose <manifest> /path/to/vault`. The CLI rechecks the original source, copied snapshot, declared target, and draft state before creating a proposal. It does not call a model or change formal Markdown. See [Governed source intake](docs/intake.md).
 
 ## Use it with AI coding agents
 
@@ -194,6 +198,7 @@ Markdown is durable knowledge. The graph, Canvas, and Viewer data are disposable
 - Generate stable node and edge IDs.
 - Report broken and ambiguous links, missing titles, and orphan pages.
 - Produce Markdown or JSON health reports from observed structure without inventing a score.
+- Create one source-bound Markdown/text intake with a copied snapshot, SHA-256 provenance, generator record, isolated target, and drift/tamper checks.
 - Stage, diff, review, reject, and hash-check Markdown proposals before applying Agent changes.
 - Generate an Obsidian-compatible `.canvas` file.
 - Generate an editable `.excalidraw` scene with stable IDs and typed relationship styles.
@@ -214,7 +219,7 @@ It performs secret scanning, dependency auditing, unit tests, a reproducible dem
 
 ## Direction
 
-Spatial position ownership is now shipped for Canvas and Excalidraw. The next increment is governed text intake: selected local Markdown/text becomes provenance-bound drafts and must pass through the existing human-reviewed proposal lifecycle.
+Governed single-source text intake is now shipped in the CLI. The next increment is a read-only Drafts view that exposes intake evidence and validation state in the Workbench before proposal conversion.
 
 See [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), and the [Changelog](CHANGELOG.md).
 

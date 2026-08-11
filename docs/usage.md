@@ -98,7 +98,28 @@ pnpm lwc report /path/to/vault \
 
 The report contains observed page, relationship, connectivity, provenance, diagnostic, and degree counts. It does not assign an arbitrary health score. See [Benefits and workflows](value-and-workflows.md) for how to interpret and compare it.
 
-## 4. Review an Agent change before writing
+## 4. Turn one selected source into an isolated draft
+
+Register one Markdown or UTF-8 text source and one intended wiki target:
+
+```bash
+lwc intake create /path/to/vault \
+  --source /path/to/meeting.txt \
+  --target "concepts/Meeting Decision.md" \
+  --generator Codex
+```
+
+Edit only the printed draft path. Then inspect and convert it into the existing Proposal lifecycle:
+
+```bash
+lwc intake show /path/to/vault/.lwc/drafts/<intake-id>/intake.json
+lwc intake propose /path/to/vault/.lwc/drafts/<intake-id>/intake.json \
+  /path/to/vault --summary "Record meeting decision"
+```
+
+The source snapshot, source SHA-256, generator, and target stay attached to the local intake record. Original-source drift, snapshot tampering, unchanged placeholders, duplicate source-target pairs, and undeclared Markdown targets are blocked. No formal Markdown changes before the resulting Proposal is reviewed and applied. See [Governed source intake](intake.md).
+
+## 5. Review an Agent change before writing
 
 Keep proposed Markdown in a separate draft directory, then create and inspect a proposal:
 
@@ -124,7 +145,7 @@ When `lwc serve /path/to/vault` is running, open **Changes** to inspect proposal
 
 Changes is deliberately read-only. Review, reject, and apply remain explicit CLI operations so the Workbench cannot impersonate a reviewer or silently modify Markdown.
 
-## 5. Scan, lint, or generate only one artifact
+## 6. Scan, lint, or generate only one artifact
 
 Use the source CLI during development:
 
@@ -140,7 +161,7 @@ pnpm exec tsx src/cli/index.ts canvas /path/to/vault \
 
 `lint` exits non-zero for broken links. Add `--strict` to treat warnings such as ambiguous links, missing titles, and orphan pages as failures.
 
-## 6. Use it with Obsidian
+## 7. Use it with Obsidian
 
 Recommended ownership:
 
@@ -153,7 +174,7 @@ Git owns review and history.
 
 Keep `Wiki.canvas` in the Vault when it is a curated shared view. Keep `.lwc/` ignored when it contains disposable local scans.
 
-## 7. Use it with QMD
+## 8. Use it with QMD
 
 Both tools can point to the same Markdown root without sharing an index:
 
@@ -170,7 +191,7 @@ pnpm exec tsx src/cli/index.ts build /path/to/vault \
 
 Use QMD for keyword, semantic, and reranked retrieval. Use LLM Wiki Canvas for explicit link topology, structural diagnostics, and JSON Canvas generation.
 
-## 8. Use it with AI agents
+## 9. Use it with AI agents
 
 Copy the public Skill into the target repository when that Agent supports repository Skills:
 
@@ -193,7 +214,7 @@ No MCP server is required. The Agent reads files and invokes the CLI using its e
 
 Codex and TRAE use the shared `.agents/skills` entry directly. Qoder and Claude Code use the included `.qoder/skills` and `.claude/skills` adapters. Tencent WorkBuddy should use the repository as its working directory and `@`-reference the rule and Skill files. See [Using AI agents](ai-agents.md) for the exact matrix, tool-specific setup, permissions, and copy-ready prompts.
 
-## 9. Use it in CI
+## 10. Use it in CI
 
 For a repository that vendors or installs the CLI, the essential quality gate is:
 
@@ -208,7 +229,7 @@ git diff --exit-code -- ./fixtures/graph.json ./wiki/Wiki.canvas
 
 Use a deliberate fixed timestamp only for checked-in fixtures. Do not hide real source changes by automatically committing generated output from CI.
 
-## 10. What the current Viewer does and does not do
+## 11. What the current Viewer does and does not do
 
 The Workbench has three factual views. **Map** supports graph browsing, metadata search, page-kind filters, node evidence cards, relationship direction, and direct-neighbor navigation. **Health** reports compiled page/link totals, broken links, orphan pages, diagnostics, page-type distribution, and the most-connected pages. **Changes** renders the local proposal lifecycle, hashes, and exact diffs without making the review decision. It does not currently render full Markdown pages, perform semantic search, edit source files, or call an LLM.
 

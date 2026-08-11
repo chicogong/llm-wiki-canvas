@@ -1,5 +1,5 @@
 import { execFileSync, spawn, spawnSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -140,8 +140,26 @@ try {
   if (applied.status !== "applied" || !readFileSync(path.join(wiki, "Reviewed.md"), "utf8").includes("# Reviewed")) {
     throw new Error("packaged CLI did not apply the reviewed proposal");
   }
+  const intakeSource = path.join(consumer, "intake-source.txt");
+  writeFileSync(intakeSource, "Source-grounded package knowledge.\n");
+  run(lwc, ["intake", "create", wiki, "--source", intakeSource, "--target", "Intake.md", "--generator", "Package Smoke", "--created-at", "2026-08-10T03:00:00.000Z"], { cwd: consumer });
+  const intakeIds = readdirSync(path.join(wiki, ".lwc", "drafts"));
+  if (intakeIds.length !== 1) throw new Error("packaged CLI did not create exactly one intake draft");
+  const intakeManifest = path.join(wiki, ".lwc", "drafts", intakeIds[0], "intake.json");
+  const intakeDraft = path.join(wiki, ".lwc", "drafts", intakeIds[0], "Intake.md");
+  const intakeShown = run(lwc, ["intake", "show", intakeManifest], { cwd: consumer }).stdout;
+  if (!intakeShown.includes("Source SHA-256") || !intakeShown.includes("Draft target: `Intake.md`")) throw new Error("packaged CLI intake evidence is incomplete");
+  writeFileSync(intakeDraft, "# Intake\n\nSource-grounded package knowledge. [[index]]\n");
+  run(lwc, ["intake", "propose", intakeManifest, wiki, "--summary", "Package intake", "--proposed-at", "2026-08-10T04:00:00.000Z"], { cwd: consumer });
+  const intake = JSON.parse(readFileSync(intakeManifest, "utf8"));
+  const intakeProposalFile = path.join(wiki, intake.proposal.file);
+  const intakeProposal = JSON.parse(readFileSync(intakeProposalFile, "utf8"));
+  if (intake.status !== "proposed" || intakeProposal.changes[0]?.path !== "Intake.md" || intakeProposal.intake?.sourceHash !== intake.source.sha256 || intakeProposal.intake?.generator !== "Package Smoke") throw new Error("packaged CLI intake did not create the expected source-bound proposal");
+  run(lwc, ["proposal", "review", intakeProposalFile, "--approve", intakeProposal.id, "--reviewer", "Package Smoke", "--reviewed-at", "2026-08-10T05:00:00.000Z"], { cwd: consumer });
+  run(lwc, ["proposal", "apply", intakeProposalFile, wiki, "--confirm", intakeProposal.id, "--applied-at", "2026-08-10T06:00:00.000Z"], { cwd: consumer });
+  if (!readFileSync(path.join(wiki, "Intake.md"), "utf8").includes("Source-grounded")) throw new Error("packaged CLI intake proposal did not pass the human review gate");
   run(lwc, ["scan", path.join(scratch, "missing-root")], { cwd: consumer, expectFailure: true });
-  console.log("Packaged CLI smoke passed: bin, scan, lint/strict, report, build, local serve, proposal lifecycle, focused Mermaid/Excalidraw exports, invalid root");
+  console.log("Packaged CLI smoke passed: bin, scan, lint/strict, report, build, local serve, intake and proposal lifecycles, focused Mermaid/Excalidraw exports, invalid root");
 } finally {
   rmSync(scratch, { recursive: true, force: true });
 }

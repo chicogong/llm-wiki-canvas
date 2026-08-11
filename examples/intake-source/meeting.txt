@@ -1,0 +1,5 @@
+Synthetic meeting note
+
+Decision: Markdown remains the durable knowledge format.
+Constraint: Agent-generated summaries require a human-reviewed proposal.
+Follow-up: connect the decision to Human Review and Agent Workflow.

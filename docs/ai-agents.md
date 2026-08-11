@@ -40,7 +40,7 @@ Local files and the CLI are already the common interface for these agents, so th
 4. **Review:** inspect the plan or Changes / diff before authorizing writes.
 5. **Rebuild and verify:** run `lwc build`; inspect diagnostics and the Markdown, `graph.json`, and `.canvas` diffs.
 
-Use the shipped `lwc proposal create → show → review/reject → apply` lifecycle for formal knowledge changes. Draft content stays outside the source wiki, review binds the exact content and review record to hashes, and apply refuses target drift. See [Reviewed knowledge changes](proposals.md).
+For a selected Markdown/text source, use `lwc intake create → show → propose` before the shipped `lwc proposal show → review/reject → apply` lifecycle. Intake binds source and snapshot hashes plus one target; Proposal binds the exact draft, review record, and current target state. For maintenance without an external source, use `proposal create` directly. See [Governed source intake](intake.md) and [Reviewed knowledge changes](proposals.md).
 
 ## Copy-ready tasks
 
@@ -51,11 +51,11 @@ Use the llm-wiki-canvas Skill. Read AGENTS.md and <vault>/index.md first. Analyz
 Run lwc report <vault> and lwc lint <vault>, then explain the scope, connectivity, source metadata, core pages, direct relationships, broken links, ambiguous links, and orphans. Cite an exact source path for every material claim.
 ```
 
-Propose a reviewable cleanup:
+Turn one selected source into a reviewable draft:
 
 ```text
-Use the llm-wiki-canvas Skill to inspect <vault>. Write suggested Markdown only under <vault>/.lwc/drafts/<name>, then create and show an lwc proposal.
-Do not edit formal wiki files. Wait for a person to run proposal review or reject. Apply only a reviewed proposal with the exact printed ID, then run report, lint, and build and summarize the resulting diffs.
+Use the llm-wiki-canvas Skill to inspect <vault>. Register <source-file> with lwc intake create, declaring exactly one target and recording this Agent as generator. Edit only the printed draft, then show the intake and convert it into an lwc proposal.
+Do not review, apply, or edit formal wiki files. Return the intake ID, source SHA-256, proposal ID, exact diff, diagnostics, and unresolved questions, then stop for human review.
 ```
 
 Generate visual relationships from notes:
