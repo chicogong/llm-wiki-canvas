@@ -85,6 +85,12 @@ try {
   writeFileSync(path.join(wiki, "Orphan.md"), "# Orphan\n");
   run(lwc, ["lint", wiki], { cwd: consumer });
   run(lwc, ["lint", wiki, "--strict"], { cwd: consumer, expectFailure: true });
+  const contextFile = path.join(consumer, "context.json");
+  run(lwc, ["context", wiki, "--focus", "Missing", "--depth", "1", "--max-pages", "2", "--max-words", "20", "--format", "json", "-o", contextFile], { cwd: consumer });
+  run(lwc, ["context", wiki, "--focus", "Missing", "--depth", "3"], { cwd: consumer, expectFailure: true });
+  run(lwc, ["context", wiki, "--focus", "Missing", "--max-pages", "0"], { cwd: consumer, expectFailure: true });
+  run(lwc, ["context", wiki, "--focus", "Absent"], { cwd: consumer, expectFailure: true });
+  run(lwc, ["context", wiki, "--focus", "Missing", "--format", "xml"], { cwd: consumer, expectFailure: true });
   run(lwc, ["canvas", wiki, "-o", path.join(consumer, "Wiki.canvas")], { cwd: consumer });
   run(lwc, ["excalidraw", wiki, "-o", path.join(consumer, "Wiki.excalidraw")], { cwd: consumer });
   run(lwc, ["diagram", wiki, "--focus", "Missing", "--depth", "1", "--format", "mermaid", "-o", path.join(consumer, "Focused.mmd")], { cwd: consumer });
@@ -110,6 +116,7 @@ try {
   const focusedExcalidraw = JSON.parse(readFileSync(path.join(consumer, "Focused.excalidraw"), "utf8"));
   const builtGraph = JSON.parse(readFileSync(path.join(consumer, "built-graph.json"), "utf8"));
   const report = JSON.parse(readFileSync(path.join(consumer, "report.json"), "utf8"));
+  const context = JSON.parse(readFileSync(contextFile, "utf8"));
   const nodeIds = new Set(canvas.nodes.map((node) => node.id));
   const edgeIds = new Set(canvas.edges.map((edge) => edge.id));
   const validEndpoints = canvas.edges.every((edge) => nodeIds.has(edge.fromNode) && nodeIds.has(edge.toNode));
@@ -118,6 +125,9 @@ try {
   }
   if (report.summary.pages !== 3 || report.summary.connectedPages !== 2 || report.summary.warnings !== 1 || !markdownReport.includes("Wiki health report")) {
     throw new Error("packaged CLI report did not match the expected smoke fixture");
+  }
+  if (context.focus.path !== "Missing.md" || context.summary.selectedPages !== 2 || context.summary.includedWords > 20 || context.pages.some((page) => path.isAbsolute(page.path)) || JSON.stringify(context).includes(wiki)) {
+    throw new Error("packaged CLI context bundle did not enforce its portable evidence budget");
   }
   if (canvas.nodes[0].x !== 4321 || canvas.nodes[0].y !== -1234 || nodeIds.size !== canvas.nodes.length || edgeIds.size !== canvas.edges.length || !validEndpoints) {
     throw new Error("canvas preservation or JSON Canvas integrity check failed");
@@ -183,7 +193,7 @@ try {
   run(lwc, ["proposal", "apply", intakeProposalFile, wiki, "--confirm", intakeProposal.id, "--applied-at", "2026-08-10T06:00:00.000Z"], { cwd: consumer });
   if (!readFileSync(path.join(wiki, "Intake.md"), "utf8").includes("Source-grounded")) throw new Error("packaged CLI intake proposal did not pass the human review gate");
   run(lwc, ["scan", path.join(scratch, "missing-root")], { cwd: consumer, expectFailure: true });
-  console.log("Packaged CLI smoke passed: bin, safe Agent setup, Agent compatibility, scan, lint/strict, report, build, local serve, intake and proposal lifecycles, focused Mermaid/Excalidraw exports, invalid root");
+  console.log("Packaged CLI smoke passed: bin, safe Agent setup, Agent compatibility, scan, lint/strict, bounded context, report, build, local serve, intake and proposal lifecycles, focused Mermaid/Excalidraw exports, invalid root");
 } finally {
   rmSync(scratch, { recursive: true, force: true });
 }

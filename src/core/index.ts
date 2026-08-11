@@ -4,6 +4,8 @@ export { graphToExcalidraw, summarizeExcalidrawLayout } from "./excalidraw.js";
 export { resolveFocusNode, selectFocusedGraph } from "./focus.js";
 export type { FocusDirection, FocusOptions, FocusedGraph } from "./focus.js";
 export { graphToMermaid } from "./mermaid.js";
+export { buildKnowledgeContext, knowledgeContextToMarkdown } from "./context.js";
+export type { KnowledgeContextBundle, KnowledgeContextOptions, KnowledgeContextPage } from "./context.js";
 export { buildWikiReport, reportToMarkdown } from "./report.js";
 export type { WikiReport } from "./report.js";
 export { agentCompatibilityToMarkdown, inspectAgentCompatibility } from "./compatibility.js";

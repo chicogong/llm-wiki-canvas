@@ -29,6 +29,25 @@ const healthIcon = <Icon><path d="M4 12h4l2-6 4 12 2-6h4" /></Icon>;
 const draftsIcon = <Icon><path d="M7 3h8l3 3v15H7z" /><path d="M15 3v4h4M10 11h5M10 15h5" /><path d="M4 7v13" /></Icon>;
 const changesIcon = <Icon><path d="M7 4h10M7 12h10M7 20h10" /><circle cx="4" cy="4" r="1" fill="currentColor" stroke="none" /><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="4" cy="20" r="1" fill="currentColor" stroke="none" /></Icon>;
 
+async function copyText(value: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch {
+    // Fall back for local browsers that deny the async clipboard permission.
+  }
+  const field = document.createElement("textarea");
+  field.value = value;
+  field.setAttribute("readonly", "");
+  field.style.position = "fixed";
+  field.style.opacity = "0";
+  document.body.append(field);
+  field.select();
+  try { return document.execCommand("copy"); } finally { field.remove(); }
+}
+
 function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
   graph: WikiGraph;
   visibleIds: Set<string>;
@@ -121,6 +140,7 @@ function AppNavigation({ view, onView, drafts, changes }: { view: WorkbenchView;
 }
 
 function Inspector({ graph, selected, onSelect }: { graph: WikiGraph; selected?: WikiNode; onSelect: (id: string) => void }) {
+  const [contextCopied, setContextCopied] = useState(false);
   const relations = useMemo(() => {
     if (!selected) return [];
     return graph.edges.reduce<Array<{ node: WikiNode; direction: "in" | "out"; kind: "wikilink" | "markdown" | "embed" }>>((items, edge) => {
@@ -135,6 +155,8 @@ function Inspector({ graph, selected, onSelect }: { graph: WikiGraph; selected?:
       return items;
     }, []);
   }, [graph, selected]);
+  const contextCommand = selected ? `lwc context <vault> --focus ${shellQuote(selected.path)} --depth 1 --max-pages 8 --max-words 2000` : "";
+  useEffect(() => setContextCopied(false), [selected?.id]);
 
   return <aside className="inspector" aria-live="polite">
     <div className="panel-heading"><span>Page details</span>{selected && <span className={`kind-badge ${selected.kind}`}>{KIND_LABEL[selected.kind]}</span>}</div>
@@ -146,6 +168,11 @@ function Inspector({ graph, selected, onSelect }: { graph: WikiGraph; selected?:
         <div><dt>Words</dt><dd>{selected.wordCount}</dd></div>
         <div><dt>Tags</dt><dd>{selected.tags.length ? selected.tags.map((tag) => <span className="tag" key={tag}>{tag}</span>) : "—"}</dd></div>
       </dl>
+      <section className="context-handoff" aria-label="Agent context command">
+        <div><span><p className="section-kicker">Agent handoff</p><h3>Bound the evidence</h3></span><button type="button" onClick={() => void copyText(contextCommand).then(setContextCopied)}>{contextCopied ? "Copied" : "Copy"}</button></div>
+        <p>Export this page and its direct relationships with explicit page and word limits.</p>
+        <code>{contextCommand}</code>
+      </section>
       <section className="relations">
         <h3>Connections <span>{relations.length}</span></h3>
         {relations.length ? relations.map(({ node, direction, kind }, index) => <button key={`${node.id}-${index}`} onClick={() => onSelect(node.id)}>

@@ -11,6 +11,7 @@ LLM Wiki Canvas 把可重建的生成文件仍然视为公开接口。所有 JSO
 | Proposal | `schemaVersion: 1` | Exact changes, hashes, lifecycle state, and optional intake provenance keep their semantics. |
 | Agent compatibility and scaffold plans | `schemaVersion: 1` | Repository-relative evidence remains portable and host status meanings remain stable. |
 | Host runtime report | `schemaVersion: 1` | `status` and `evidenceKind` distinguish pass, block, unavailable, and failure. |
+| Bounded context bundle | `schemaVersion: 1` | Focus, limits, relative paths, hashes, distances, truncation, and omission retain their meanings. |
 | Obsidian Canvas | JSON Canvas `1.0` | Generated nodes/edges use the open format; known manual positions are preserved. |
 | Excalidraw | file format `version: 2` | Scene elements stay editable; stable generated IDs preserve positions when possible. |
 | Mermaid | text export | Output targets broadly supported flowchart syntax; it is a derived view, not persisted truth. |

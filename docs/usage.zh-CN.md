@@ -79,6 +79,19 @@ lwc diagram /path/to/vault \
 
 `--focus` 接受准确标题、稳定节点 ID 或相对 Markdown 路径。深度有意限制为 1 或 2；方向可以是 `incoming`、`outgoing` 或 `both`；格式可以是 `mermaid` 或 `excalidraw`。标题存在歧义时，命令会列出匹配路径并失败，不会静默猜测。所选页面存在断链时，Mermaid 输出会保留对应注释。
 
+### 给 Agent 有限的本地上下文
+
+不要把整个 Vault 都附加给 Agent；从所选页面导出受页面数和字数约束的关系邻域：
+
+```bash
+lwc context /path/to/vault --focus "Human Review" \
+  --depth 1 --direction both \
+  --max-pages 8 --max-words 2000 \
+  --output .lwc/context/human-review.md
+```
+
+自动化可以使用 `--format json`，也可以用 `--kind` 限制邻居类型。结果包含相对来源路径、完整文件哈希、截断/遗漏计数，并且只保留已纳入页面之间的关系。命令只读；文件不变时结果确定；符号链接 Markdown 会被拒绝。详见[有限 Agent 上下文](context.md)。
+
 ## 3. 衡量当前知识库
 
 把便于人阅读的报告输出到终端：

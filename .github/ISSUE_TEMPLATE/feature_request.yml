@@ -27,6 +27,7 @@ body:
         - Drafts and source intake
         - Changes and review
         - Canvas, Excalidraw, or Mermaid
+        - Bounded Agent context and retrieval
         - Agent compatibility and Skills
         - CLI and automation
     validations:

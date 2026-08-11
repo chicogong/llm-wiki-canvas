@@ -117,7 +117,7 @@ async function openDraftsFixture(page: Page): Promise<string[]> {
   return errors;
 }
 
-test("@smoke filters the map and opens a relationship", async ({ page }) => {
+test("@smoke filters the map and opens a relationship", async ({ page }, testInfo) => {
   const errors = await openWorkbench(page);
   await page.getByRole("searchbox", { name: "Search pages" }).fill("review");
   await expect(page.getByText("1 of 8")).toBeVisible();
@@ -125,6 +125,11 @@ test("@smoke filters the map and opens a relationship", async ({ page }) => {
   await expect(page.getByText("1 of 8")).toBeVisible();
   await page.getByRole("button", { name: /Human Review/ }).first().click();
   await expect(page.getByRole("heading", { name: "Human Review" })).toBeVisible();
+  await expect(page.getByLabel("Agent context command")).toContainText("lwc context <vault>");
+  await expect(page.getByLabel("Agent context command")).toContainText("--max-words 2000");
+  await page.getByLabel("Agent context command").getByRole("button", { name: "Copy" }).click();
+  await expect(page.getByLabel("Agent context command").getByRole("button", { name: "Copied" })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath("map-context.png"), fullPage: true });
   expect(errors).toEqual([]);
 });
 

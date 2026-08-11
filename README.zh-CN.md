@@ -124,6 +124,7 @@ lwc serve /path/to/vault
 lwc scan /path/to/vault -o .lwc/graph.json
 lwc lint /path/to/vault
 lwc report /path/to/vault
+lwc context /path/to/vault --focus "Human Review" --depth 1 --max-pages 8 --max-words 2000
 lwc agents /path/to/workspace --strict
 lwc init /path/to/workspace             # dry-run
 lwc init /path/to/workspace --write     # 仅创建缺失文件
@@ -192,8 +193,10 @@ flowchart LR
   C --> G["graph.json"]
   C --> J["Obsidian JSON Canvas"]
   C --> E["Excalidraw 场景"]
+  C --> K["有限 Agent 上下文"]
   G --> V["本地关系 Viewer"]
   S["Codex / Claude / Qoder / TRAE / WorkBuddy"] --> P["Proposal 人工审查门"]
+  K --> S
   P --> M
   S --> C
 ```
@@ -206,6 +209,7 @@ Markdown 是长期保存的知识；关系图、Canvas 和 Viewer 数据都是�
 - 生成稳定的节点和关系 ID。
 - 报告断链、歧义链接、缺少标题和孤立页面。
 - 基于实际结构生成 Markdown 或 JSON 健康报告，不虚构综合评分。
+- 按关系、页面数和字数预算导出确定性、带来源哈希的 Agent 上下文包。
 - 为一份明确来源创建 Markdown/文本 Intake，复制来源快照，记录 SHA-256 与生成者，隔离唯一目标并检查漂移和篡改。
 - 在应用 Agent 修改前完成 Markdown 草稿隔离、diff、review、reject 和哈希校验。
 - 生成 Obsidian 兼容 `.canvas` 文件。
@@ -227,7 +231,7 @@ pnpm verify
 
 ## 后续方向
 
-受控 Intake、Agent 安全初始化、静态兼容校验和可选真实宿主 fixture 已形成一个经过测试的闭环。真实宿主证据与确定性 CI 严格分开，登录阻塞或命令未安装绝不会被算作通过。详见 [Host 运行 fixture](docs/host-runtime.md)、[Schema 兼容策略](docs/schema-compatibility.md)和[发布流程](RELEASING.md)。
+受控 Intake、Agent 安全初始化、静态兼容校验、可选真实宿主 fixture 和有限本地上下文已经形成经过测试的闭环。真实宿主证据与确定性 CI 严格分开，登录阻塞或命令未安装绝不会被算作通过。详见[有限 Agent 上下文](docs/context.md)、[Host 运行 fixture](docs/host-runtime.md)、[Schema 兼容策略](docs/schema-compatibility.md)和[发布流程](RELEASING.md)。
 
 另见 [贡献指南](CONTRIBUTING.md)、[安全策略](SECURITY.md)和[变更记录](CHANGELOG.md)。
 

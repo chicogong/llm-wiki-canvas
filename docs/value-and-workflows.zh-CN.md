@@ -29,7 +29,7 @@ pnpm dev
 
 这些是仓库当前状态的观测值，不是通用性能基准，也不代表虚构的“健康分”。
 
-## 四类直接收益
+## 五类直接收益
 
 ### 1. 理解知识库
 
@@ -79,6 +79,16 @@ pnpm lwc build /path/to/vault \
 
 自动化负责建立和更新连接；人负责空间布局与最终表达。
 
+### 5. 限定 Agent 获得的内容
+
+从一个准确页面出发，同时限制披露范围和 Prompt 大小，不再附加整个 Vault：
+
+```bash
+lwc context /path/to/vault --focus "Human Review" --depth 1 --max-pages 8 --max-words 2000
+```
+
+结果保留原始 Markdown 证据、相对路径、SHA-256、关系距离和截断/遗漏计数。这里的收益是范围可以验证，并不宣称拓扑检索替代语义检索，也不宣称字数更少就必然回答更好。
+
 ## 三种推荐用法
 
 ### 个人 Obsidian Vault
@@ -92,14 +102,15 @@ pnpm lwc build /path/to/vault \
 
 1. 把 `AGENTS.md` 和 `llm-wiki-canvas` Skill 放进仓库。
 2. 要求 Agent 先运行 `report` 和 `lint`，只读描述现状。
-3. 对明确选择的来源先执行 `intake create`；Agent 只编辑声明的 `.lwc/drafts/<intake-id>/<target>`，再执行 `intake show` 和 `intake propose`。只有没有外部来源的维护任务才直接使用 `proposal create`。
-4. 人执行 `proposal review` 或 `proposal reject`；只有 reviewed proposal 才能 apply。
-5. Apply 后重新执行 `report`、`lint` 和 `build`，检查源文件与生成产物 diff。
+3. 对最小相关焦点使用 `context`，把输出交给 Agent 前检查路径、哈希和预算证据。
+4. 对明确选择的来源先执行 `intake create`；Agent 只编辑声明的 `.lwc/drafts/<intake-id>/<target>`，再执行 `intake show` 和 `intake propose`。只有没有外部来源的维护任务才直接使用 `proposal create`。
+5. 人执行 `proposal review` 或 `proposal reject`；只有 reviewed proposal 才能 apply。
+6. Apply 后重新执行 `report`、`lint` 和 `build`，检查源文件与生成产物 diff。
 
 可直接复制的任务：
 
 ```text
-使用 llm-wiki-canvas Skill。先运行 report 和 lint，只读说明当前页面规模、连接情况、来源元数据、结构诊断和高连接页面。
+使用 llm-wiki-canvas Skill。先运行 report 和 lint，只读说明当前页面规模、连接情况、来源元数据、结构诊断和高连接页面。用 lwc context 导出最小相关焦点，在使用引用证据前展示页面/字数限制、哈希、截断和遗漏。
 对于明确选择的 Markdown/文本来源，创建只声明一个目标的 Intake，只编辑打印出的草稿，展示来源哈希，再转换为 Proposal。没有外部来源的维护任务可以直接从隔离草稿创建 Proposal。停在 review/apply 之前；人作出决定后，只用准确 ID 应用 reviewed proposal，再运行 report、lint 和 build 并对比结果。
 ```
 

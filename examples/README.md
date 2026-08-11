@@ -25,6 +25,7 @@ Build and check it from the repository root:
 pnpm demo:build
 pnpm lint:demo
 pnpm report:demo
+pnpm context:demo
 pnpm proposal:demo
 pnpm dev
 ```
@@ -38,13 +39,16 @@ Built 8 files · 16 links · 0 broken
 
 The report additionally verifies **8 / 8 connected pages**, **2 / 8 pages with source metadata**, and the most-connected pages. It uses observed counts and intentionally does not invent a health score.
 
+`context:demo` writes an ignored JSON bundle around **Human Review** with at most **4 pages and 400 words**. It includes exact relative paths, full-file hashes, relationship distance, and any truncation or omitted-page evidence; it never writes the Atlas Markdown.
+
 `proposal:demo` compares [`proposal-draft`](proposal-draft/) with the formal Atlas Wiki, writes an ignored local proposal, and prints a hash-bound diff. It never applies the example change.
 
-Try these three checks in the Viewer:
+Try these four checks in the Viewer:
 
 1. Search for `review`; the graph should narrow to **1 / 8** pages.
 2. Select **Human Review**; its evidence card should show its source path, tags, and neighboring pages.
 3. Filter by **Source**; only source notes should remain emphasized.
+4. Select **Human Review** and copy the bounded `lwc context` handoff from Page details.
 
 Export the Human Review neighborhood in two equivalent formats:
 
@@ -123,6 +127,7 @@ lwc lint /path/to/wiki
 pnpm demo:build
 pnpm lint:demo
 pnpm report:demo
+pnpm context:demo
 pnpm proposal:demo
 pnpm dev
 ```
@@ -136,13 +141,16 @@ Built 8 files · 16 links · 0 broken
 
 报告还会验证 **8 / 8 个页面已连接**、**2 / 8 个页面声明来源元数据**，并列出高连接页面。它只使用实际观测值，不虚构综合健康分。
 
+`context:demo` 会围绕 **Human Review** 写出一份被忽略的 JSON 上下文包，最多包含 **4 个页面和 400 words**。它保留准确相对路径、完整文件哈希、关系距离以及截断/遗漏证据，不会修改 Atlas Markdown。
+
 `proposal:demo` 会把 [`proposal-draft`](proposal-draft/) 与正式 Atlas Wiki 对比，生成一份被忽略的本地 proposal，并打印绑定哈希的 diff；它不会应用示例修改。
 
-在 Viewer 中可以做三个验证：
+在 Viewer 中可以做四个验证：
 
 1. 搜索 `review`，关系图应缩小到 **1 / 8** 个页面。
 2. 选择 **Human Review**，证据卡应显示源文件路径、标签和相邻页面。
 3. 按 **来源**筛选，只有来源笔记保持突出显示。
+4. 选择 **Human Review**，从 Page details 复制有限 `lwc context` handoff。
 
 把 Human Review 邻域导出为两种等价格式：
 

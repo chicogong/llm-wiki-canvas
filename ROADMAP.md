@@ -12,6 +12,8 @@ flowchart LR
   B --> C["Workbench<br/>Map · Health · Drafts · Changes"]
   B --> D["Obsidian Canvas<br/>spatial editing"]
   E["Codex · Claude Code<br/>Qoder · TRAE · WorkBuddy"] --> G["Source intake<br/>snapshot · isolated draft"]
+  B --> H["Bounded context<br/>focus · pages · words"]
+  H --> E
   G --> C
   G --> F
   E --> F["Proposal<br/>hash-bound diff"]
@@ -69,6 +71,7 @@ The daily loop is deliberately small:
 | **0.4 Source intake** | Turn selected local material into reviewable wiki drafts | Start with Markdown/text; preserve source path/hash; generated pages stay in `.lwc/drafts`; human-approved proposal required | Shipped — 0.4.1–0.4.3 |
 | **0.5 Agent compatibility** | Verify that multiple coding Agents share one knowledge contract | Deterministic repository checks; safe scaffolding; public matrix; static contract evidence separated from real host execution | Shipped — 0.5.1–0.5.3 |
 | **0.6 Open-source readiness** | Make cloning, testing, packaging, and contributing reproducible | Bilingual quick starts; synthetic fixtures; release and schema policy; Linux/macOS Node 20/22 package CI | Shipped |
+| **0.7 Bounded Agent context** | Give any Agent a finite evidence pack instead of the whole Vault | Exact focus; depth/direction/type filters; page/word budgets; raw Markdown hashes; Markdown/JSON output | Shipped |
 
 ## Execution plan / 执行计划
 
@@ -131,6 +134,14 @@ Acceptance requires a public compatibility matrix with reproducible commands. A 
 - A changelog documents graph, proposal, Canvas, and export schema compatibility.
 
 These gates are implemented by `pnpm verify`, the Linux/macOS Node 20/22 package matrix, [release instructions](RELEASING.md), and the [schema compatibility policy](docs/schema-compatibility.md). Publishing a version remains an explicit maintainer action.
+
+### Completed — 0.7 Bounded Agent context / 已完成：有限 Agent 上下文
+
+`lwc context` packages one exact page and a 0–2 layer relationship neighborhood for Codex, Claude Code, Qoder, TRAE, or WorkBuddy. Explicit page and word budgets bound disclosure and prompt size; relative paths, full-file SHA-256, distance, relationships, diagnostics, truncation, and omission remain visible. The Workbench inspector exposes the copy-ready command without reading or sending full page content in the browser.
+
+`lwc context` 可以为 Codex、Claude Code、Qoder、TRAE 或 WorkBuddy 打包一个准确页面及其 0–2 层关系邻域。页面数和字数预算明确限制披露范围与 Prompt 大小；相对路径、完整文件 SHA-256、距离、关系、诊断、截断和遗漏全部可见。Workbench 检查器只提供可复制命令，不会在浏览器里读取或发送完整页面正文。
+
+This is deterministic topology-bounded retrieval, not semantic ranking. QMD remains the recommended complement when a focus page must first be found through lexical or semantic search.
 
 ## Release gates / 发布门槛
 

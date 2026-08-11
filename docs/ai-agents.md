@@ -119,6 +119,8 @@ A WorkBuddy custom Skill normally contains `skill.yml`, implementation files, an
 
 Static adapter checks do not execute a model. Maintainers can run the separate synthetic, opt-in fixture for installed Codex and Claude Code CLIs; its validator requires the same provenance, Proposal lifecycle, and zero-formal-write boundary. Blocked authentication and missing Qoder, TRAE, or WorkBuddy executables remain explicit non-pass states. See [Host runtime fixtures](host-runtime.md).
 
+For ordinary knowledge work, prefer `lwc context <vault> --focus <page> --depth 1 --max-pages 8 --max-words 2000` over attaching an entire Vault. The bundle is read-only, source-hashed, topology-bounded, and portable across all hosts. See [Bounded Agent context](context.md).
+
 ## Permissions and open-source boundaries
 
 - Use read-only or plan mode for first inspection. Do not enable Full Access or skip permission checks by default.

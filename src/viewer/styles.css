@@ -108,6 +108,15 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(49, 89, 232,
 .metadata dt { color: var(--faint); font: 600 9px/1.5 ui-monospace, "SFMono-Regular", Consolas, monospace; text-transform: uppercase; }
 .metadata dd { margin: 0; overflow-wrap: anywhere; color: #3e4943; font-size: 11px; line-height: 1.5; }
 .tag { display: inline-block; margin: 0 4px 4px 0; padding: 2px 6px; border-radius: 4px; background: var(--canvas); color: #59645e; }
+.context-handoff { margin-top: 18px; padding: 13px; border: 1px solid rgba(49,89,232,.16); border-radius: 9px; background: linear-gradient(145deg, rgba(235,239,255,.7), rgba(255,255,255,.8)); }
+.context-handoff > div { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.context-handoff > div > span { display: grid; gap: 3px; }
+.context-handoff .section-kicker { margin: 0; font-size: 8px; }
+.context-handoff h3 { margin: 0; color: var(--ink); font-size: 11px; }
+.context-handoff button { padding: 4px 7px; border: 1px solid rgba(49,89,232,.2); border-radius: 5px; background: rgba(255,255,255,.8); color: var(--blue); cursor: pointer; font: 700 8px/1 ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.context-handoff button:hover { border-color: rgba(49,89,232,.4); background: #fff; }
+.context-handoff p { margin: 9px 0; color: var(--muted); font-size: 9px; line-height: 1.5; }
+.context-handoff code { display: block; padding: 8px; overflow-x: auto; border-radius: 6px; background: rgba(255,255,255,.82); color: #263b91; font-size: 8px; line-height: 1.45; white-space: nowrap; }
 .relations { margin-top: 22px; }
 .relations h3 { display: flex; justify-content: space-between; margin: 0 0 7px; color: var(--muted); font-size: 10px; letter-spacing: .05em; text-transform: uppercase; }
 .relations h3 span { color: var(--faint); font: 600 9px/1.2 ui-monospace, "SFMono-Regular", Consolas, monospace; }

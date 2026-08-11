@@ -124,6 +124,7 @@ lwc serve /path/to/vault
 lwc scan /path/to/vault -o .lwc/graph.json
 lwc lint /path/to/vault
 lwc report /path/to/vault
+lwc context /path/to/vault --focus "Human Review" --depth 1 --max-pages 8 --max-words 2000
 lwc agents /path/to/workspace --strict
 lwc init /path/to/workspace             # dry-run
 lwc init /path/to/workspace --write     # create missing files only
@@ -192,8 +193,10 @@ flowchart LR
   C --> G["graph.json"]
   C --> J["Obsidian JSON Canvas"]
   C --> E["Excalidraw scene"]
+  C --> K["Bounded Agent context"]
   G --> V["Local relationship Viewer"]
   S["Codex / Claude / Qoder / TRAE / WorkBuddy"] --> P["Proposal review gate"]
+  K --> S
   P --> M
   S --> C
 ```
@@ -206,6 +209,7 @@ Markdown is durable knowledge. The graph, Canvas, and Viewer data are disposable
 - Generate stable node and edge IDs.
 - Report broken and ambiguous links, missing titles, and orphan pages.
 - Produce Markdown or JSON health reports from observed structure without inventing a score.
+- Export a deterministic, source-hashed Agent context bundle with explicit relationship, page, and word limits.
 - Create one source-bound Markdown/text intake with a copied snapshot, SHA-256 provenance, generator record, isolated target, and drift/tamper checks.
 - Stage, diff, review, reject, and hash-check Markdown proposals before applying Agent changes.
 - Generate an Obsidian-compatible `.canvas` file.
@@ -227,7 +231,7 @@ It performs secret scanning, dependency auditing, unit tests, a reproducible dem
 
 ## Direction
 
-Governed source intake, Agent scaffolding, static compatibility, and opt-in host execution fixtures now form one tested loop. Real host evidence remains separate from deterministic CI and never turns a blocked login or missing binary into a pass. See [Host runtime fixtures](docs/host-runtime.md), [Schema compatibility](docs/schema-compatibility.md), and [Releasing](RELEASING.md).
+Governed source intake, Agent scaffolding, static compatibility, opt-in host execution, and bounded local context now form one tested loop. Real host evidence remains separate from deterministic CI and never turns a blocked login or missing binary into a pass. See [Bounded Agent context](docs/context.md), [Host runtime fixtures](docs/host-runtime.md), [Schema compatibility](docs/schema-compatibility.md), and [Releasing](RELEASING.md).
 
 See [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), and the [Changelog](CHANGELOG.md).
 

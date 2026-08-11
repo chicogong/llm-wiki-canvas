@@ -10,6 +10,7 @@ import {
   agentCompatibilityToMarkdown,
   agentScaffoldToMarkdown,
   buildGraph,
+  buildKnowledgeContext,
   buildWikiReport,
   createKnowledgeIntake,
   createKnowledgeProposal,
@@ -18,6 +19,7 @@ import {
   graphToMermaid,
   inspectAgentCompatibility,
   intakeToMarkdown,
+  knowledgeContextToMarkdown,
   parseKnowledgeProposal,
   parseAgentHosts,
   planAgentScaffold,
@@ -167,6 +169,47 @@ program.command("report")
     if (options.output) {
       await writeText(options.output, output);
       console.log(`Report → ${options.output}`);
+    } else {
+      process.stdout.write(output);
+    }
+  });
+
+program.command("context")
+  .argument("[root]", "wiki root", ".")
+  .requiredOption("--focus <page>", "focus page title, ID, or relative Markdown path")
+  .option("--depth <number>", "relationship depth: 0, 1, or 2", "1")
+  .option("--direction <direction>", "both, incoming, or outgoing", "both")
+  .option("--kind <kind...>", "neighbor page kinds: index, concept, source, note")
+  .option("--max-pages <count>", "maximum included pages, from 1 to 50", "8")
+  .option("--max-words <count>", "maximum included Markdown words, from 1 to 100000", "2000")
+  .option("--format <format>", "markdown or json", "markdown")
+  .option("-o, --output <file>", "write the context bundle to a file instead of stdout")
+  .description("Export a bounded, source-cited Markdown context bundle for an Agent")
+  .action(async (root, options) => {
+    const depth = Number.parseInt(options.depth, 10);
+    const maxPages = Number.parseInt(options.maxPages, 10);
+    const maxWords = Number.parseInt(options.maxWords, 10);
+    if (![0, 1, 2].includes(depth) || String(depth) !== String(options.depth)) throw new Error(`Context depth must be 0, 1, or 2: ${options.depth}`);
+    if (!Number.isInteger(maxPages) || String(maxPages) !== String(options.maxPages)) throw new Error(`Invalid context max pages: ${options.maxPages}`);
+    if (!Number.isInteger(maxWords) || String(maxWords) !== String(options.maxWords)) throw new Error(`Invalid context max words: ${options.maxWords}`);
+    if (!["both", "incoming", "outgoing"].includes(options.direction)) throw new Error(`Invalid context direction: ${options.direction}`);
+    if (!["markdown", "json"].includes(options.format)) throw new Error(`Invalid context format: ${options.format}`);
+    const allowedKinds = new Set<NodeKind>(["index", "concept", "source", "note"]);
+    const kinds = options.kind?.map((kind: string) => kind.toLocaleLowerCase()) as NodeKind[] | undefined;
+    const invalidKinds = kinds?.filter((kind) => !allowedKinds.has(kind)) ?? [];
+    if (invalidKinds.length) throw new Error(`Invalid context page kind: ${invalidKinds.join(", ")}`);
+    const graph = await buildGraph(root);
+    const bundle = await buildKnowledgeContext(root, graph, options.focus, {
+      depth: depth as 0 | 1 | 2,
+      direction: options.direction,
+      kinds,
+      maxPages,
+      maxWords,
+    });
+    const output = options.format === "json" ? `${JSON.stringify(bundle, null, 2)}\n` : knowledgeContextToMarkdown(bundle);
+    if (options.output) {
+      await writeText(options.output, output);
+      console.log(`Context ${bundle.summary.selectedPages} pages, ${bundle.summary.includedWords} words around ${bundle.focus.path} → ${options.output}`);
     } else {
       process.stdout.write(output);
     }

@@ -32,10 +32,11 @@
     "generated:check": "git diff --exit-code -- public/graph.json examples/atlas-wiki/Atlas.canvas examples/atlas-wiki/Atlas.excalidraw docs/agent-compatibility.md",
     "lint:demo": "tsx src/cli/index.ts lint examples/atlas-wiki",
     "report:demo": "tsx src/cli/index.ts report examples/atlas-wiki --generated-at 2026-08-10T00:00:00.000Z",
+    "context:demo": "tsx src/cli/index.ts context examples/atlas-wiki --focus 'Human Review' --depth 1 --max-pages 4 --max-words 400 --format json -o .lwc/atlas-context.json",
     "agents:matrix": "tsx src/cli/index.ts agents . --strict -o docs/agent-compatibility.md",
     "proposal:demo": "tsx src/cli/index.ts proposal create examples/atlas-wiki --from examples/proposal-draft --summary 'Demonstrate reviewed knowledge changes' --created-at 2026-08-10T00:00:00.000Z -o .lwc/atlas-demo-proposal.json && tsx src/cli/index.ts proposal show .lwc/atlas-demo-proposal.json",
     "validate:skill": "node scripts/validate-skill.mjs",
-    "check": "pnpm test && pnpm demo:build && pnpm report:demo && pnpm agents:matrix && pnpm proposal:demo && pnpm generated:check && pnpm build && pnpm validate:skill && pnpm test:hosts",
+    "check": "pnpm test && pnpm demo:build && pnpm report:demo && pnpm context:demo && pnpm agents:matrix && pnpm proposal:demo && pnpm generated:check && pnpm build && pnpm validate:skill && pnpm test:hosts",
     "verify": "pnpm audit:secrets && pnpm audit:deps && pnpm check && pnpm test:package && pnpm test:e2e:prod",
     "release:check": "pnpm verify && pnpm pack --dry-run",
     "prepack": "pnpm build && pnpm validate:skill"

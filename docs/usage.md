@@ -79,6 +79,19 @@ lwc diagram /path/to/vault \
 
 `--focus` accepts an exact title, stable node ID, or relative Markdown path. Depth is deliberately limited to 1 or 2. Direction can be `incoming`, `outgoing`, or `both`; format can be `mermaid` or `excalidraw`. An ambiguous title fails with the matching paths instead of choosing silently. Mermaid output includes comments for broken links originating from selected pages.
 
+### Give an Agent finite local context
+
+Export the selected page and a bounded relationship neighborhood instead of attaching the whole Vault:
+
+```bash
+lwc context /path/to/vault --focus "Human Review" \
+  --depth 1 --direction both \
+  --max-pages 8 --max-words 2000 \
+  --output .lwc/context/human-review.md
+```
+
+Use `--format json` for structured automation and `--kind` to limit neighbor types. The result includes relative source paths, full-file hashes, truncation and omission counts, and only relationships between included pages. It is read-only, deterministic for unchanged files, and refuses symlinked Markdown. See [Bounded Agent context](context.md).
+
 ## 3. Measure the current wiki
 
 Generate a human-readable report to stdout:

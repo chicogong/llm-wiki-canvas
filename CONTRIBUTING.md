@@ -43,4 +43,4 @@ Before staging, run `git status --short`, inspect `git diff`, and stage explicit
 
 ## Pull requests
 
-Keep changes focused, add regression tests, and explain any graph schema, Canvas, or Agent-contract compatibility impact. Viewer changes should include desktop and mobile evidence. Rebuild the public Agent matrix with `pnpm agents:matrix` when rules or adapters change. Route feature requests to the smallest affected product surface in the issue template: Map, Health, Drafts/Intake, Changes, spatial exports, Agent compatibility, or CLI automation.
+Keep changes focused, add regression tests, and explain any graph schema, Canvas, context-bundle, or Agent-contract compatibility impact. Viewer changes should include desktop and mobile evidence. Rebuild the public Agent matrix with `pnpm agents:matrix` when rules or adapters change. Route feature requests to the smallest affected product surface in the issue template: Map, Health, Drafts/Intake, Changes, spatial exports, bounded Agent context, Agent compatibility, or CLI automation.

@@ -119,6 +119,8 @@ WorkBuddy 的自定义 Skill 通常是 `skill.yml + 实现文件 + README`，与
 
 静态适配检查不会执行模型。维护者可以使用独立的合成 fixture，显式启用已安装的 Codex 与 Claude Code CLI；验证器要求它们满足相同来源、Proposal 生命周期和正式知识零写入边界。认证阻塞以及 Qoder、TRAE、WorkBuddy 命令未安装都必须保留为非通过状态。详见 [Host 运行 fixture](host-runtime.md)。
 
+日常知识任务优先使用 `lwc context <vault> --focus <page> --depth 1 --max-pages 8 --max-words 2000`，不要直接附加整个 Vault。该上下文包只读、带来源哈希、受拓扑边界限制，并可供所有宿主使用。详见[有限 Agent 上下文](context.md)。
+
 ## 权限与开源边界
 
 - 第一次分析使用只读或计划模式；日常不要默认开启 Full Access 或跳过权限确认。

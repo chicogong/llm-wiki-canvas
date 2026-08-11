@@ -27,9 +27,11 @@ All notable changes will be documented here. This project follows Semantic Versi
 - Dry-run-first cross-Agent scaffolding through `lwc init`, with host selection, packaged canonical Skill resources, preservation of valid workspace-owned rules, all-or-nothing conflict blocking, exclusive file creation, and packaged CLI regression coverage.
 - An opt-in synthetic host runtime fixture that distinguishes deterministic reference evidence, real host execution, authentication blocks, unavailable binaries, and semantic failures without touching formal Markdown or storing sessions.
 - Linux and macOS package CI across Node.js 20 and 22, plus repeatable release checks and a documented schema compatibility policy.
+- Bounded, read-only Agent context export through `lwc context`, with exact focus resolution, relationship depth/direction/type filters, page and word budgets, source hashes, truncation evidence, symlink refusal, Markdown/JSON output, and a copy-ready Workbench handoff.
 
 ### Compatibility
 
 - Graph/report, intake, proposal, Agent compatibility, scaffolding, and host-runtime JSON remain at `schemaVersion: 1`; readers must reject unsupported future versions instead of guessing.
 - Obsidian Canvas output follows JSON Canvas `1.0`; generated Excalidraw scenes use Excalidraw file format version `2`.
 - Stable IDs and preserved positions remain compatibility promises within schema version 1. See [Schema compatibility](docs/schema-compatibility.md) for the change policy.
+- Context bundles use `schemaVersion: 1`; relative paths, full-file hashes, explicit limits, and truncation/omission counts are compatibility fields. Page content is evidence, not an instruction channel.
