@@ -19,6 +19,7 @@ LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性�
 - **关系可以直接看见。** 搜索、筛选页面，并查看一个页面周围的证据与相邻关系。
 - **知识库质量可以测试。** 断链、歧义链接、缺少标题和孤立页面都有准确路径。
 - **明确选择的资料会进入受控草稿。** 登记一份 Markdown/文本，保留来源快照和 SHA-256，让任意 Agent 只编辑隔离草稿，再进入现有 Proposal 审查门。
+- **进入审查前即可看见草稿溯源。** Drafts 对照来源快照与隔离产物，校验哈希和目标范围，并解释阻塞原因，但不会写入 Vault。
 - **Canvas 的所有权仍属于你。** 重建时保留节点位置、文字/链接/分组批注和手工连线，只安置新增页面。
 - **Excalidraw 仍是开放交接文件。** 重建时保留页面位置、手绘批注和嵌入文件，同时刷新分类关系。
 - **把大图变成小型解释图。** 选择一个页面及一至两层关系，把同一份证据导出到 Mermaid 或 Excalidraw。
@@ -131,13 +132,13 @@ lwc build /path/to/vault \
   --excalidraw /path/to/vault/Wiki.excalidraw
 ```
 
-`lwc serve` 会在 <http://127.0.0.1:4173> 打开包含 Map、Health 和 Changes 的完整 Workbench，并在 Markdown 或 proposal 变化后刷新。默认只监听本机回环地址；重建失败时保留上一份有效图，也不会向 Vault 写入临时生成状态。可用 `--port <端口>` 修改端口，或用 `--no-watch` 查看固定快照。
+`lwc serve` 会在 <http://127.0.0.1:4173> 打开包含 Map、Health、Drafts 和 Changes 的完整 Workbench，并在 Markdown、Intake 或 Proposal 变化后刷新。默认只监听本机回环地址；重建失败时保留上一份有效图，也不会向 Vault 写入临时生成状态。可用 `--port <端口>` 修改端口，或用 `--no-watch` 查看固定快照。
 
 如果要把生成结果提交到 Git，请给 `lwc build` 传入 `--generated-at <ISO 时间>`，固定该次输出中的生成时间和节点修改时间。
 
 Obsidian、QMD、Agent Skill 和 CI 的具体用法见[使用指南](docs/usage.zh-CN.md)。
 
-资料导入时，只编辑 `lwc intake create` 打印的草稿路径；用 `lwc intake show <manifest>` 检查证据，再运行 `lwc intake propose <manifest> /path/to/vault`。CLI 会重新校验原来源、复制的快照、声明目标和草稿状态，然后才创建 Proposal；它不会调用模型，也不会修改正式 Markdown。详见[受控资料进入知识库](docs/intake.zh-CN.md)。
+资料导入时，只编辑 `lwc intake create` 打印的草稿路径；在 **Drafts** 中检查实时证据，或使用 `lwc intake show <manifest>`，再运行 `lwc intake propose <manifest> /path/to/vault`。CLI 会重新校验原来源、复制的快照、声明目标和草稿状态，然后才创建 Proposal；它不会调用模型，也不会修改正式 Markdown。详见[受控资料进入知识库](docs/intake.zh-CN.md)。
 
 ## 与 AI 编码 Agent 配合
 
@@ -219,7 +220,7 @@ pnpm verify
 
 ## 后续方向
 
-CLI 已经交付单来源受控文本 Intake。下一项是 Workbench 的只读 Drafts 页面，在转换 Proposal 前展示 Intake 证据和校验状态。
+单来源受控 Intake 已形成完整可见闭环：**Drafts** 校验“来源 → 隔离草稿 → Proposal”，**Changes** 把同一份溯源带入人工审查。下一项是路线图中的跨 Agent 兼容矩阵与可复现宿主 fixture。
 
 另见 [贡献指南](CONTRIBUTING.md)、[安全策略](SECURITY.md)和[变更记录](CHANGELOG.md)。
 

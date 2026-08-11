@@ -70,4 +70,4 @@ lwc proposal apply examples/atlas-wiki/.lwc/proposals/<proposal-id>.json \
 - 一份 Intake 只有一个声明目标。在恢复与审查语义设计完成前，不开放多页面批量综合。
 - 本阶段不包含 PDF、OCR、网页抓取、Office 文档、批量目录、向量检索和 MCP。
 
-下一项产品增量是 Workbench 的只读 Drafts 页面：在转换 Proposal 之前展示同一份清单、来源证据、校验状态和目标路径。
+运行 `lwc serve <vault>` 并打开 **Drafts**，即可检查清单、原来源与复制快照状态、准确哈希、生成者、声明范围、来源/草稿内容和预期目标。该页面保持只读：只有证据门通过时才展示 CLI 下一步，Proposal 审查仍在 **Changes** 中完成。

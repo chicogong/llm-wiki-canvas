@@ -19,6 +19,7 @@ It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
 - **Relationships become visible.** Search, filter, and inspect the evidence around a page.
 - **Wiki quality becomes testable.** Broken links, ambiguous links, missing titles, and orphan pages have exact paths.
 - **Selected sources become governed drafts.** Register one Markdown/text source, retain its snapshot and SHA-256, let any Agent edit an isolated draft, then convert it into the existing proposal gate.
+- **Draft provenance is visible before review.** Drafts compares the captured source and isolated output, verifies hashes and target scope, and explains blockers without writing to the Vault.
 - **The Canvas stays yours.** Rebuilds preserve adjusted positions, text/link/group annotations, and manual edges while placing only new pages.
 - **Excalidraw stays an open handoff.** Rebuilds retain page positions, hand-drawn annotations, and embedded files while refreshing typed relationships.
 - **Large maps become small explanations.** Select one page and one or two relationship layers, then export the same evidence to Mermaid or Excalidraw.
@@ -131,13 +132,13 @@ lwc build /path/to/vault \
   --excalidraw /path/to/vault/Wiki.excalidraw
 ```
 
-`lwc serve` opens the complete Map, Health, and Changes Workbench at <http://127.0.0.1:4173>. It refreshes after Markdown or proposal changes, binds to loopback by default, keeps the last valid graph if a rebuild fails, and does not write generated state into the Vault. Use `--port <number>` to change the port or `--no-watch` for a fixed snapshot.
+`lwc serve` opens the complete Map, Health, Drafts, and Changes Workbench at <http://127.0.0.1:4173>. It refreshes after Markdown, intake, or proposal changes, binds to loopback by default, keeps the last valid graph if a rebuild fails, and does not write generated state into the Vault. Use `--port <number>` to change the port or `--no-watch` for a fixed snapshot.
 
 For reproducible checked-in fixtures, pass `--generated-at <ISO timestamp>` to `lwc build`. It fixes graph generation and node modification timestamps for that output.
 
 For Obsidian, QMD, Agent Skill, and CI workflows, see the [usage guide](docs/usage.md).
 
-For source intake, edit only the draft path printed by `lwc intake create`, inspect it with `lwc intake show <manifest>`, then run `lwc intake propose <manifest> /path/to/vault`. The CLI rechecks the original source, copied snapshot, declared target, and draft state before creating a proposal. It does not call a model or change formal Markdown. See [Governed source intake](docs/intake.md).
+For source intake, edit only the draft path printed by `lwc intake create`, inspect the live evidence in **Drafts** or with `lwc intake show <manifest>`, then run `lwc intake propose <manifest> /path/to/vault`. The CLI rechecks the original source, copied snapshot, declared target, and draft state before creating a proposal. It does not call a model or change formal Markdown. See [Governed source intake](docs/intake.md).
 
 ## Use it with AI coding agents
 
@@ -219,7 +220,7 @@ It performs secret scanning, dependency auditing, unit tests, a reproducible dem
 
 ## Direction
 
-Governed single-source text intake is now shipped in the CLI. The next increment is a read-only Drafts view that exposes intake evidence and validation state in the Workbench before proposal conversion.
+Governed single-source intake now has a complete visible path: **Drafts** verifies `source → isolated draft → proposal`, and **Changes** carries the same provenance into human review. The next increment is the cross-Agent compatibility matrix and reproducible host fixtures described in the roadmap.
 
 See [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), and the [Changelog](CHANGELOG.md).
 

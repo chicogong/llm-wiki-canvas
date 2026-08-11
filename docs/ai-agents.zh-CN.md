@@ -40,7 +40,7 @@ flowchart LR
 4. **人工确认**：检查 Agent 的计划或 Changes / diff，再授权写入。
 5. **重建验证**：执行 `lwc build`，检查诊断、Markdown diff、`graph.json` 和 `.canvas` diff。
 
-对于明确选择的 Markdown/文本来源，先执行 `lwc intake create → show → propose`，再进入已经交付的 `lwc proposal show → review/reject → apply` 生命周期。Intake 绑定来源、快照哈希和唯一目标；Proposal 绑定准确草稿、审查记录和当前目标状态。没有外部来源的维护任务可以直接使用 `proposal create`。详见[受控资料进入知识库](intake.zh-CN.md)和[审查式知识修改](proposals.zh-CN.md)。
+对于明确选择的 Markdown/文本来源，先执行 `lwc intake create → show → propose`，再进入已经交付的 `lwc proposal show → review/reject → apply` 生命周期。Intake 绑定来源、快照哈希和唯一目标；Proposal 绑定准确草稿、审查记录和当前目标状态。人可以在 Workbench **Drafts** 中检查同一条证据链，再进入 **Changes**；两个页面都不会执行状态转换。没有外部来源的维护任务可以直接使用 `proposal create`。详见[受控资料进入知识库](intake.zh-CN.md)和[审查式知识修改](proposals.zh-CN.md)。
 
 ## 可以直接复制的任务
 

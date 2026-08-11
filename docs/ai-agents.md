@@ -40,7 +40,7 @@ Local files and the CLI are already the common interface for these agents, so th
 4. **Review:** inspect the plan or Changes / diff before authorizing writes.
 5. **Rebuild and verify:** run `lwc build`; inspect diagnostics and the Markdown, `graph.json`, and `.canvas` diffs.
 
-For a selected Markdown/text source, use `lwc intake create → show → propose` before the shipped `lwc proposal show → review/reject → apply` lifecycle. Intake binds source and snapshot hashes plus one target; Proposal binds the exact draft, review record, and current target state. For maintenance without an external source, use `proposal create` directly. See [Governed source intake](intake.md) and [Reviewed knowledge changes](proposals.md).
+For a selected Markdown/text source, use `lwc intake create → show → propose` before the shipped `lwc proposal show → review/reject → apply` lifecycle. Intake binds source and snapshot hashes plus one target; Proposal binds the exact draft, review record, and current target state. A person can inspect the same chain in Workbench **Drafts**, then continue into **Changes**; neither view performs a transition. For maintenance without an external source, use `proposal create` directly. See [Governed source intake](intake.md) and [Reviewed knowledge changes](proposals.md).
 
 ## Copy-ready tasks
 

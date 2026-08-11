@@ -70,4 +70,4 @@ lwc proposal apply examples/atlas-wiki/.lwc/proposals/<proposal-id>.json \
 - One intake has one declared target. Multi-page synthesis remains out of scope until recovery and review semantics are designed.
 - PDF, OCR, web crawling, Office documents, bulk folders, vector search, and MCP are not part of this increment.
 
-The next product increment is a read-only Drafts view in the Workbench that surfaces the same manifest, source evidence, validation state, and intended target before proposal conversion.
+Run `lwc serve <vault>` and open **Drafts** to inspect the manifest, original and copied-source state, exact hashes, generator, declared scope, source/draft content, and intended target. The view is read-only: it shows a CLI command only when the evidence gate is ready, and proposal review remains in **Changes**.

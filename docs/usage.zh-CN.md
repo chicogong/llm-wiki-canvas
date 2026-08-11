@@ -231,6 +231,6 @@ git diff --exit-code -- ./fixtures/graph.json ./wiki/Wiki.canvas
 
 ## 11. 当前 Viewer 能做和不能做什么
 
-Workbench 有三个基于本地事实的视图。**Map** 支持关系图浏览、元数据搜索、页面类型筛选、节点证据卡、关系方向和直接邻居跳转；**Health** 展示页面与关系总数、断链、孤立页面、诊断、页面类型分布和高连接页面；**Changes** 展示本地 proposal 生命周期、哈希和精确 diff，但不替人做审查决定。当前不渲染完整 Markdown 页面、不做语义搜索、不编辑源文件，也不调用 LLM。
+Workbench 有四个基于本地事实的视图。**Map** 支持关系图浏览、元数据搜索、页面类型筛选、节点证据卡、关系方向和直接邻居跳转；**Health** 展示页面与关系总数、断链、孤立页面、诊断、页面类型分布和高连接页面；**Drafts** 校验来源快照、隔离草稿内容、目标范围、哈希与 Proposal 关联；**Changes** 展示本地 Proposal 生命周期、溯源、哈希、关系影响和精确 diff，但不替人做审查决定。当前不渲染完整正式 Markdown 页面、不做语义搜索、不编辑源文件，也不调用 LLM。
 
 遇到问题时先执行 `lwc lint`，确认 Viewer 的 graph 路径返回 JSON，并检查 Wiki 根目录中是否存在可读 `.md` 文件。

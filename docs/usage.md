@@ -231,6 +231,6 @@ Use a deliberate fixed timestamp only for checked-in fixtures. Do not hide real 
 
 ## 11. What the current Viewer does and does not do
 
-The Workbench has three factual views. **Map** supports graph browsing, metadata search, page-kind filters, node evidence cards, relationship direction, and direct-neighbor navigation. **Health** reports compiled page/link totals, broken links, orphan pages, diagnostics, page-type distribution, and the most-connected pages. **Changes** renders the local proposal lifecycle, hashes, and exact diffs without making the review decision. It does not currently render full Markdown pages, perform semantic search, edit source files, or call an LLM.
+The Workbench has four factual views. **Map** supports graph browsing, metadata search, page-kind filters, node evidence cards, relationship direction, and direct-neighbor navigation. **Health** reports compiled page/link totals, broken links, orphan pages, diagnostics, page-type distribution, and the most-connected pages. **Drafts** verifies source snapshots, isolated draft content, target scope, hashes, and proposal linkage. **Changes** renders the local proposal lifecycle, provenance, hashes, topology impact, and exact diffs without making the review decision. It does not currently render full formal Markdown pages, perform semantic search, edit source files, or call an LLM.
 
 For failures, run `lwc lint` first, check that the Viewer graph path returns JSON, and verify that the Wiki root contains readable `.md` files.

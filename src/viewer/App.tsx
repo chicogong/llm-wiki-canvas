@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import cytoscape, { type Core } from "cytoscape";
-import type { ProposalInbox, ProposalInboxItem, ProposalStatus } from "../core/index.js";
+import type { DraftInbox, DraftInboxItem, DraftInboxState, EvidenceState, ProposalInbox, ProposalInboxItem, ProposalStatus } from "../core/index.js";
 import type { NodeKind, WikiGraph, WikiNode } from "../core/types";
 
-type WorkbenchView = "map" | "health" | "changes";
+type WorkbenchView = "map" | "health" | "drafts" | "changes";
 
 const KINDS: Array<{ value: "all" | NodeKind; label: string }> = [
   { value: "all", label: "All" },
@@ -26,6 +26,7 @@ function Icon({ children }: { children: ReactNode }) {
 
 const mapIcon = <Icon><circle cx="12" cy="12" r="2.5" /><circle cx="5" cy="6" r="2" /><circle cx="19" cy="6" r="2" /><path d="m6.7 7 3.5 3.4M17.3 7l-3.5 3.4M12 14.5V20" /></Icon>;
 const healthIcon = <Icon><path d="M4 12h4l2-6 4 12 2-6h4" /></Icon>;
+const draftsIcon = <Icon><path d="M7 3h8l3 3v15H7z" /><path d="M15 3v4h4M10 11h5M10 15h5" /><path d="M4 7v13" /></Icon>;
 const changesIcon = <Icon><path d="M7 4h10M7 12h10M7 20h10" /><circle cx="4" cy="4" r="1" fill="currentColor" stroke="none" /><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="4" cy="20" r="1" fill="currentColor" stroke="none" /></Icon>;
 
 function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
@@ -102,13 +103,16 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
   return <div ref={ref} className="graph-canvas" data-testid="graph-canvas" aria-label="Wiki relationship map" />;
 }
 
-function AppNavigation({ view, onView, changes }: { view: WorkbenchView; onView: (view: WorkbenchView) => void; changes: number }) {
+function AppNavigation({ view, onView, drafts, changes }: { view: WorkbenchView; onView: (view: WorkbenchView) => void; drafts: number; changes: number }) {
   return <nav className="app-nav" aria-label="Workspace views">
     <button className={view === "map" ? "active" : ""} onClick={() => onView("map")} aria-current={view === "map" ? "page" : undefined}>
       {mapIcon}<span>Map</span>
     </button>
     <button className={view === "health" ? "active" : ""} onClick={() => onView("health")} aria-current={view === "health" ? "page" : undefined}>
       {healthIcon}<span>Health</span>
+    </button>
+    <button className={view === "drafts" ? "active" : ""} onClick={() => onView("drafts")} aria-current={view === "drafts" ? "page" : undefined}>
+      {draftsIcon}<span>Drafts</span>{drafts > 0 && <b className="nav-count draft" aria-label={`${drafts} intakes need attention`}>{drafts}</b>}
     </button>
     <button className={view === "changes" ? "active" : ""} onClick={() => onView("changes")} aria-current={view === "changes" ? "page" : undefined}>
       {changesIcon}<span>Changes</span>{changes > 0 && <b className="nav-count" aria-label={`${changes} open proposals`}>{changes}</b>}
@@ -313,6 +317,11 @@ function ProposalDossier({ proposal }: { proposal: ProposalInboxItem }) {
 
     <Lifecycle proposal={proposal} />
 
+    {proposal.intake && <section className="intake-provenance" aria-label="Source intake provenance">
+      <div><p className="section-kicker">Source provenance</p><h3>{proposal.intake.sourceName}</h3></div>
+      <dl><div><dt>Intake</dt><dd><code>{proposal.intake.id}</code></dd></div><div><dt>Source SHA-256</dt><dd><code>{proposal.intake.sourceHash}</code></dd></div><div><dt>Declared target</dt><dd><code>{proposal.intake.target}</code></dd></div>{proposal.intake.generator && <div><dt>Generator</dt><dd>{proposal.intake.generator}</dd></div>}</dl>
+    </section>}
+
     <TopologyPreview proposal={proposal} />
 
     {(proposal.review || proposal.rejection || proposal.application) && <section className="decision-record">
@@ -376,11 +385,122 @@ function ChangesView({ inbox, error, live }: { inbox?: ProposalInbox; error?: st
   </div>;
 }
 
+const DRAFT_STATE_LABEL: Record<DraftInboxState, string> = {
+  ready: "Ready to propose",
+  "needs-draft": "Needs writing",
+  blocked: "Blocked",
+  proposed: "Proposal created",
+};
+
+const EVIDENCE_LABEL: Record<EvidenceState, string> = {
+  verified: "Verified",
+  changed: "Changed",
+  missing: "Missing",
+  unsafe: "Unsafe",
+};
+
+function DraftRelay({ draft }: { draft: DraftInboxItem }) {
+  const sourceComplete = draft.source.state === "verified" && draft.source.snapshotState === "verified";
+  const draftComplete = draft.draft.state === "edited" && draft.draft.scope === "declared-only";
+  const proposalComplete = draft.proposal?.state === "verified";
+  return <ol className="evidence-relay" aria-label="Source to proposal evidence chain">
+    <li className={sourceComplete ? "complete" : "blocked"}><i>{sourceComplete ? "✓" : "!"}</i><span><b>01</b><strong>Source</strong><small>{sourceComplete ? "Original + snapshot verified" : "Evidence needs attention"}</small></span></li>
+    <li className={draftComplete ? "complete current" : draft.state === "blocked" ? "blocked current" : "current"}><i>{draftComplete ? "✓" : draft.state === "blocked" ? "!" : "2"}</i><span><b>02</b><strong>Draft</strong><small>{draft.draft.state === "edited" ? draft.draft.scope === "declared-only" ? "Edited in isolated scope" : "Scope expanded" : draft.draft.state === "placeholder" ? "Placeholder awaits editing" : "Declared draft missing"}</small></span></li>
+    <li className={proposalComplete ? "complete" : "pending"}><i>{proposalComplete ? "✓" : "3"}</i><span><b>03</b><strong>Proposal</strong><small>{proposalComplete ? "Provenance verified" : "Not in review queue"}</small></span></li>
+  </ol>;
+}
+
+function EvidenceBadge({ state, label }: { state: EvidenceState; label: string }) {
+  return <span className={`evidence-badge ${state}`}><i aria-hidden="true" />{label} {EVIDENCE_LABEL[state].toLowerCase()}</span>;
+}
+
+function DraftDossier({ draft }: { draft: DraftInboxItem }) {
+  const nextCommand = `lwc intake propose '${draft.file.replaceAll("'", "'\\''")}' . --summary "Explain why this knowledge belongs in the Vault"`;
+  return <article className="draft-dossier" data-testid="draft-dossier">
+    <header className="dossier-header draft-header">
+      <div><p className="section-kicker">Declared knowledge target</p><h2>{draft.draft.path}</h2><p>{draft.source.name} <span>→</span> {draft.target.operation === "create" ? "new page" : draft.target.operation === "update" ? "existing page" : "unsafe target"}</p></div>
+      <span className={`draft-state ${draft.state}`}>{DRAFT_STATE_LABEL[draft.state]}</span>
+    </header>
+
+    <DraftRelay draft={draft} />
+
+    {draft.blockers.length > 0 && <section className="draft-blockers" role="alert"><div><strong>Evidence gate closed</strong><span>{draft.blockers.length} {draft.blockers.length === 1 ? "issue" : "issues"}</span></div><ul>{draft.blockers.map((blocker) => <li key={blocker}>{blocker}</li>)}</ul></section>}
+
+    <section className="evidence-ledger">
+      <header><div><p className="section-kicker">Evidence ledger</p><h3>What the agent received and produced</h3></div><span>Read-only · local</span></header>
+      <div className="ledger-grid">
+        <dl>
+          <div><dt>Original source</dt><dd><code>{draft.source.path}</code><EvidenceBadge state={draft.source.state} label="Original" /></dd></div>
+          <div><dt>Captured copy</dt><dd><code>{draft.source.snapshot}</code><EvidenceBadge state={draft.source.snapshotState} label="Snapshot" /></dd></div>
+          <div><dt>Source SHA-256</dt><dd><code>{draft.source.sha256}</code></dd></div>
+        </dl>
+        <dl>
+          <div><dt>Generator</dt><dd>{draft.generator ?? "Not recorded"}</dd></div>
+          <div><dt>Created</dt><dd><code>{draft.createdAt}</code></dd></div>
+          <div><dt>Draft scope</dt><dd><span className={`scope-state ${draft.draft.scope}`}>{draft.draft.scope === "declared-only" ? "One declared target" : "Expanded beyond target"}</span></dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section className="evidence-compare">
+      <article><header><span>Source snapshot</span><EvidenceBadge state={draft.source.snapshotState} label="Copy" /></header><pre>{draft.source.snapshotContent ?? "Source snapshot is unavailable."}</pre><footer><code>{draft.source.sha256}</code></footer></article>
+      <article className="generated"><header><span>Isolated draft</span><span className={`draft-edit-state ${draft.draft.state}`}>{draft.draft.state}</span></header><pre>{draft.draft.content ?? "Declared draft is unavailable."}</pre><footer><code>{draft.draft.currentHash ?? "no draft hash"}</code></footer></article>
+    </section>
+
+    <section className={`draft-next-step ${draft.state}`}>
+      <div><p className="section-kicker">Safe next step</p><h3>{draft.state === "ready" ? "Promote the draft into the review queue." : draft.state === "needs-draft" ? "Write inside the isolated draft first." : draft.state === "proposed" ? "Continue in Changes." : "Repair the evidence before proposing."}</h3><p>{draft.state === "ready" ? "This creates a hash-bound Proposal; it does not edit the formal Vault." : draft.state === "needs-draft" ? `Edit ${draft.draft.path}; the live inbox will re-check it.` : draft.state === "proposed" ? `Linked proposal ${draft.proposal?.id ?? "is unavailable"}. Review remains a separate human decision.` : "Blocked intakes cannot safely enter review."}</p></div>
+      {draft.state === "ready" && <code>{nextCommand}</code>}
+      {draft.state === "needs-draft" && <code>{draft.file.replace(/intake\.json$/, draft.draft.path)}</code>}
+      {draft.state === "proposed" && draft.proposal && <code>{draft.proposal.file}</code>}
+    </section>
+  </article>;
+}
+
+function DraftsView({ inbox, error, live }: { inbox?: DraftInbox; error?: string; live: boolean }) {
+  const [filter, setFilter] = useState<"all" | "actionable" | "proposed">("all");
+  const [selectedId, setSelectedId] = useState<string>();
+  const drafts = inbox?.drafts ?? [];
+  const filtered = drafts.filter((draft) => filter === "all" || (filter === "actionable" ? draft.state !== "proposed" : draft.state === "proposed"));
+
+  useEffect(() => {
+    if (!filtered.some((draft) => draft.id === selectedId)) setSelectedId(filtered[0]?.id);
+  }, [filter, inbox, selectedId]);
+  const selected = drafts.find((draft) => draft.id === selectedId);
+
+  if (!live) return <div className="changes-unavailable" data-testid="drafts-view"><div className="empty-symbol violet">↗</div><p className="section-kicker">Local server required</p><h2>Open Drafts with live source evidence.</h2><p>The generated Viewer does not read local intake files. Start the loopback-only Workbench to inspect isolated drafts.</p><code>lwc serve &lt;vault&gt;</code></div>;
+  if (error) return <div className="changes-unavailable" data-testid="drafts-view"><div className="empty-symbol issue">!</div><p className="section-kicker">Draft inbox unavailable</p><h2>Intake evidence could not be read.</h2><p>{error}</p></div>;
+  if (!inbox) return <div className="changes-unavailable" data-testid="drafts-view"><div className="loading-mark violet" /><p className="section-kicker">Reading source intake</p><h2>Verifying the evidence chain…</h2></div>;
+
+  return <div className="drafts-view" data-testid="drafts-view">
+    <aside className="inbox-panel draft-inbox">
+      <header><div><p className="section-kicker">Source intake</p><h2>Drafts</h2></div><strong>{drafts.length}</strong></header>
+      <div className="inbox-filters" role="group" aria-label="Filter drafts">
+        <button className={filter === "all" ? "active" : ""} onClick={() => setFilter("all")}>All</button>
+        <button className={filter === "actionable" ? "active" : ""} onClick={() => setFilter("actionable")}>Active</button>
+        <button className={filter === "proposed" ? "active" : ""} onClick={() => setFilter("proposed")}>Proposed</button>
+      </div>
+      <div className="proposal-list draft-list">
+        {filtered.map((draft) => <button key={draft.id} className={draft.id === selectedId ? "active" : ""} onClick={() => setSelectedId(draft.id)}>
+          <span className={`draft-state ${draft.state}`}>{DRAFT_STATE_LABEL[draft.state]}</span>
+          <strong>{draft.draft.path}</strong>
+          <small>{draft.source.name} · {draft.generator ?? "unknown generator"}</small>
+          <code>{draft.id}</code>
+        </button>)}
+        {!filtered.length && <div className="inbox-empty"><strong>{drafts.length ? "No intakes in this state" : "No source intakes yet"}</strong><p>{drafts.length ? "Choose another filter." : "Capture a source into an isolated, hash-bound draft workspace."}</p>{!drafts.length && <code>lwc intake create &lt;source&gt; &lt;vault&gt; --target &lt;page.md&gt;</code>}</div>}
+      </div>
+      {inbox.issues.length > 0 && <section className="inbox-issues"><h3>Unreadable intakes <span>{inbox.issues.length}</span></h3>{inbox.issues.map((issue) => <div key={issue.file}><strong>{issue.file}</strong><small>{issue.message}</small></div>)}</section>}
+    </aside>
+    <div className="dossier-panel">{selected ? <DraftDossier draft={selected} /> : <div className="dossier-empty"><span className="violet-arrow">←</span><p>Select an intake to inspect its source-to-proposal evidence.</p></div>}</div>
+  </div>;
+}
+
 export function App() {
   const [graph, setGraph] = useState<WikiGraph>();
   const [error, setError] = useState<string>();
   const [inbox, setInbox] = useState<ProposalInbox>();
   const [inboxError, setInboxError] = useState<string>();
+  const [drafts, setDrafts] = useState<DraftInbox>();
+  const [draftsError, setDraftsError] = useState<string>();
   const [view, setView] = useState<WorkbenchView>("map");
   const [selectedId, setSelectedId] = useState<string>();
   const live = new URLSearchParams(location.search).get("live") === "1";
@@ -419,11 +539,26 @@ export function App() {
         if (active) setInboxError(reason instanceof Error ? reason.message : String(reason));
       }
     };
+    const loadDrafts = async () => {
+      if (!live) return;
+      try {
+        const response = await fetch("/__lwc/drafts", { cache: "no-store" });
+        if (!response.ok) throw new Error(`Unable to read drafts: HTTP ${response.status}`);
+        const value = await response.json() as DraftInbox;
+        if (!active) return;
+        setDrafts(value);
+        setDraftsError(undefined);
+      } catch (reason) {
+        if (active) setDraftsError(reason instanceof Error ? reason.message : String(reason));
+      }
+    };
     void load();
     void loadInbox();
+    void loadDrafts();
     const events = live ? new EventSource("/__lwc/events") : undefined;
     events?.addEventListener("graph", () => { void load(); });
     events?.addEventListener("proposals", () => { void loadInbox(); });
+    events?.addEventListener("drafts", () => { void loadDrafts(); });
     return () => { active = false; events?.close(); };
   }, [live]);
 
@@ -432,13 +567,14 @@ export function App() {
 
   const switchToPage = (id: string) => { setSelectedId(id); setView("map"); };
   const openChanges = inbox?.proposals.filter((proposal) => proposal.status === "proposed" || proposal.status === "reviewed").length ?? 0;
-  const viewTitle = view === "map" ? "Knowledge map" : view === "health" ? "Vault health" : "Changes inbox";
+  const activeDrafts = drafts?.drafts.filter((draft) => draft.state !== "proposed").length ?? 0;
+  const viewTitle = view === "map" ? "Knowledge map" : view === "health" ? "Vault health" : view === "drafts" ? "Draft intake" : "Changes inbox";
 
   return <main className="workbench-shell">
     <aside className="sidebar">
       <div className="brand"><span className="brand-mark">L</span><div><strong>LLM Wiki Canvas</strong><small>Local knowledge workbench</small></div></div>
       <div className="vault-label"><span>Workspace</span><strong>{graph.rootName}</strong></div>
-      <AppNavigation view={view} onView={setView} changes={openChanges} />
+      <AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} />
       <div className="sidebar-note"><span className="status-dot" /><div><strong>{live ? "Watching locally" : "Local only"}</strong><small>{live ? "Refreshes when Markdown changes" : "Markdown stays on this machine"}</small></div></div>
     </aside>
 
@@ -448,9 +584,10 @@ export function App() {
         <div className="breadcrumb"><span>{graph.rootName}</span><b>/</b><strong>{viewTitle}</strong></div>
         <div className="topbar-meta"><span className="status-dot" />{live ? "Live" : "Generated"} {graph.generatedAt.slice(0, 10)}</div>
       </header>
-      <div className="mobile-nav"><AppNavigation view={view} onView={setView} changes={openChanges} /></div>
+      <div className="mobile-nav"><AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} /></div>
       {view === "map" && <MapView graph={graph} selectedId={selectedId} onSelect={setSelectedId} />}
       {view === "health" && <HealthView graph={graph} onOpenPage={switchToPage} />}
+      {view === "drafts" && <DraftsView inbox={drafts} error={draftsError} live={live} />}
       {view === "changes" && <ChangesView inbox={inbox} error={inboxError} live={live} />}
     </section>
   </main>;

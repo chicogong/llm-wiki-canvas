@@ -29,6 +29,13 @@ async function openChangesFixture(page: Page): Promise<string[]> {
         summary: "Add reviewed source guidance",
         status: "proposed",
         createdAt: "2026-08-10T00:00:00.000Z",
+        intake: {
+          id: "intake-fedcba987654",
+          sourceName: "review-notes.txt",
+          sourceHash: "c".repeat(64),
+          target: "concepts/Human Review.md",
+          generator: "Codex",
+        },
         changes: [{
           path: "concepts/Human Review.md",
           operation: "update",
@@ -51,10 +58,62 @@ async function openChangesFixture(page: Page): Promise<string[]> {
       issues: [],
     }),
   }));
+  await page.route("**/__lwc/drafts", async (route) => route.fulfill({ contentType: "application/json", body: JSON.stringify({ drafts: [], issues: [] }) }));
   await page.goto("/?live=1");
   await page.waitForLoadState("networkidle");
   await page.getByRole("button", { name: /Changes/ }).click();
   await expect(page.getByTestId("changes-view")).toBeVisible();
+  return errors;
+}
+
+async function openDraftsFixture(page: Page): Promise<string[]> {
+  const errors: string[] = [];
+  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.addInitScript(() => {
+    class SilentEventSource { addEventListener() {} close() {} }
+    Object.defineProperty(window, "EventSource", { configurable: true, value: SilentEventSource });
+  });
+  await page.route("**/__lwc/proposals", async (route) => route.fulfill({ contentType: "application/json", body: JSON.stringify({ proposals: [], issues: [] }) }));
+  await page.route("**/__lwc/drafts", async (route) => route.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify({
+      drafts: [{
+        file: ".lwc/drafts/intake-123456789abc/intake.json",
+        id: "intake-123456789abc",
+        rootName: "atlas-wiki",
+        status: "draft",
+        state: "ready",
+        createdAt: "2026-08-10T08:30:00.000Z",
+        generator: "Codex",
+        source: {
+          name: "architecture-review.txt",
+          path: "/local/research/architecture-review.txt",
+          snapshot: ".source/architecture-review.txt",
+          sha256: "a".repeat(64),
+          bytes: 162,
+          state: "verified",
+          snapshotState: "verified",
+          snapshotContent: "Decision: local Markdown remains the source of truth.\nEvidence: every generated change must enter a human review queue.",
+        },
+        draft: {
+          path: "concepts/Controlled Knowledge.md",
+          initialHash: "b".repeat(64),
+          state: "edited",
+          currentHash: "c".repeat(64),
+          content: "---\ntitle: Controlled Knowledge\nkind: concept\n---\n\n# Controlled Knowledge\n\nAgent output is evidence-bound before it enters the Vault.",
+          scope: "declared-only",
+        },
+        target: { operation: "create", currentHash: null },
+        blockers: [],
+      }],
+      issues: [],
+    }),
+  }));
+  await page.goto("/?live=1");
+  await page.waitForLoadState("networkidle");
+  await page.getByRole("button", { name: /Drafts/ }).click();
+  await expect(page.getByTestId("drafts-view")).toBeVisible();
   return errors;
 }
 
@@ -95,10 +154,29 @@ test("@smoke reviews proposal lifecycle, hashes, and exact diff without applying
   await expect(page.getByLabel("Diff for concepts/Human Review.md")).toContainText("Apply changes directly.");
   await expect(page.getByLabel("Diff for concepts/Human Review.md")).toContainText("Review the exact diff before apply.");
   await expect(page.getByText("The Workbench does not make this decision.")).toBeVisible();
+  await expect(page.getByLabel("Source intake provenance")).toContainText("review-notes.txt");
+  await expect(page.getByLabel("Source intake provenance")).toContainText("Codex");
   await expect(page.getByText(/lwc proposal review/)).toBeVisible();
   expect(await page.getByRole("button", { name: /apply/i }).count()).toBe(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath("changes.png"), fullPage: true });
+  expect(errors).toEqual([]);
+});
+
+test("@smoke traces a source intake into an isolated draft without mutating the Vault", async ({ page }, testInfo) => {
+  const errors = await openDraftsFixture(page);
+  await expect(page.getByRole("heading", { name: "concepts/Controlled Knowledge.md" })).toBeVisible();
+  await expect(page.getByText("Ready to propose").first()).toBeVisible();
+  await expect(page.getByLabel("Source to proposal evidence chain")).toContainText("Original + snapshot verified");
+  await expect(page.getByLabel("Source to proposal evidence chain")).toContainText("Edited in isolated scope");
+  await expect(page.getByLabel("Source to proposal evidence chain")).toContainText("Not in review queue");
+  await expect(page.getByText("architecture-review.txt").first()).toBeVisible();
+  await expect(page.getByText("One declared target")).toBeVisible();
+  await expect(page.getByText("Agent output is evidence-bound before it enters the Vault.")).toBeVisible();
+  await expect(page.getByText(/lwc intake propose/)).toBeVisible();
+  expect(await page.getByRole("button", { name: /^(review|apply)/i }).count()).toBe(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("drafts.png"), fullPage: true });
   expect(errors).toEqual([]);
 });
 

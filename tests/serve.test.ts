@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { startWikiServer, type WikiServer } from "../src/cli/serve.js";
-import { createKnowledgeProposal, type ProposalInbox, type WikiGraph } from "../src/core/index.js";
+import { createKnowledgeIntake, createKnowledgeProposal, type DraftInbox, type ProposalInbox, type WikiGraph } from "../src/core/index.js";
 
 const scratchDirectories: string[] = [];
 const servers: WikiServer[] = [];
@@ -59,6 +59,8 @@ describe("local Workbench server", () => {
     expect(status).toMatchObject({ live: true, watching: false });
     const inbox = await fetch(`${server.url}/__lwc/proposals`).then((response) => response.json()) as ProposalInbox;
     expect(inbox).toEqual({ proposals: [], issues: [] });
+    const drafts = await fetch(`${server.url}/__lwc/drafts`).then((response) => response.json()) as DraftInbox;
+    expect(drafts).toEqual({ drafts: [], issues: [] });
 
     const post = await fetch(`${server.url}/graph.json`, { method: "POST" });
     expect(post.status).toBe(405);
@@ -122,6 +124,29 @@ describe("local Workbench server", () => {
     }
     expect(eventText).toContain("event: proposals");
     expect(messages).toContain("Proposal inbox refreshed: 1 proposal(s) · 0 issue(s)");
+
+    const source = path.join(path.dirname(root), "source.txt");
+    await writeFile(source, "Draft source evidence.\n");
+    const created = await createKnowledgeIntake(root, source, "Draft.md", "Serve test", new Date("2026-08-11T00:00:00Z"));
+    await writeFile(created.draftPath, "# Draft\n\nSource-grounded draft.\n");
+    let drafts = await fetch(`${server.url}/__lwc/drafts`).then((response) => response.json()) as DraftInbox;
+    const draftsDeadline = Date.now() + 3000;
+    while (drafts.drafts.length !== 1 && Date.now() < draftsDeadline) {
+      await new Promise((resolve) => setTimeout(resolve, 40));
+      drafts = await fetch(`${server.url}/__lwc/drafts`).then((response) => response.json()) as DraftInbox;
+    }
+    expect(drafts.drafts[0]).toMatchObject({ id: created.intake.id, state: "ready", generator: "Serve test" });
+    eventText = "";
+    const draftEventDeadline = Date.now() + 1000;
+    while (!eventText.includes("event: drafts") && Date.now() < draftEventDeadline && eventsReader) {
+      const chunk = await Promise.race([
+        eventsReader.read(),
+        new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 100)),
+      ]);
+      if (chunk?.value) eventText += new TextDecoder().decode(chunk.value);
+    }
+    expect(eventText).toContain("event: drafts");
+    expect(messages).toContain("Draft inbox refreshed: 1 intake(s) · 0 issue(s)");
     eventsController.abort();
   });
 

@@ -55,7 +55,7 @@ Open `Wiki.canvas` in Obsidian for position-preserving spatial editing. Open `Wi
 
 For a small diagram that explains one page instead of the whole Vault, run `lwc diagram <root> --focus <title-or-path> --depth 1 --format mermaid -o Focus.mmd`. Use depth 1 or 2, `--direction incoming|outgoing|both`, optional `--kind`, and either `mermaid` or `excalidraw`. Both formats must come from the same focused subgraph.
 
-For a live local Workbench, run `lwc serve <root>`. Use Map for relationships, Health for compiler facts, and Changes to inspect proposal lifecycle, hashes, and diffs. Changes is evidence only: never claim that viewing a proposal reviewed, rejected, or applied it, and run those state transitions only after the person gives explicit direction.
+For a live local Workbench, run `lwc serve <root>`. Use Map for relationships, Health for compiler facts, Drafts for source-to-draft provenance and validation, and Changes for proposal lifecycle, hashes, topology impact, and diffs. Drafts and Changes are evidence only: never claim that viewing them proposed, reviewed, rejected, or applied anything, and run those state transitions only after the person gives explicit direction.
 
 ## Safety Rules
 

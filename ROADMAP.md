@@ -9,9 +9,11 @@ LLM Wiki Canvas 是一个**给人和编程 Agent 共用的本地知识工作台*
 ```mermaid
 flowchart LR
   A["Markdown vault<br/>source of truth"] --> B["lwc CLI<br/>scan · lint · build"]
-  B --> C["Workbench<br/>Map · Health · Changes"]
+  B --> C["Workbench<br/>Map · Health · Drafts · Changes"]
   B --> D["Obsidian Canvas<br/>spatial editing"]
-  E["Codex · Claude Code<br/>Qoder · TRAE · WorkBuddy"] --> A
+  E["Codex · Claude Code<br/>Qoder · TRAE · WorkBuddy"] --> G["Source intake<br/>snapshot · isolated draft"]
+  G --> C
+  G --> F
   E --> F["Proposal<br/>hash-bound diff"]
   F --> C
   C -->|"human review"| A
@@ -64,7 +66,7 @@ The daily loop is deliberately small:
 | **0.2.2 Changes inbox** | Review Agent proposals inside the Workbench | List proposal status; show file diff and evidence; CLI remains the only apply path initially; no invented reviewer identity | Shipped in current iteration |
 | **0.2.3 Proposal topology** | See the structural effect before accepting a proposal | Added edges green, changed pages amber, conflicts red; base/proposal hashes visible; empty and conflict states tested | Shipped in current iteration |
 | **0.3 Spatial views** | Generate useful diagrams without locking users in | JSON Canvas remains canonical output; optional Excalidraw export uses its open file format; Mermaid/Markmap are derived views; rebuild never overwrites hand-edited positions silently | Shipped — 0.3.1–0.3.3 |
-| **0.4 Source intake** | Turn selected local material into reviewable wiki drafts | Start with Markdown/text; preserve source path/hash; generated pages stay in `.lwc/drafts`; human-approved proposal required | In progress — 0.4.1 shipped |
+| **0.4 Source intake** | Turn selected local material into reviewable wiki drafts | Start with Markdown/text; preserve source path/hash; generated pages stay in `.lwc/drafts`; human-approved proposal required | Shipped — 0.4.1–0.4.3 |
 
 ## Execution plan / 执行计划
 
@@ -82,13 +84,13 @@ This phase does **not** add collaborative whiteboards, an Excalidraw editor clon
 
 这一阶段不做多人白板、不复制 Excalidraw 编辑器，也不生成缺乏证据的装饰性图片。
 
-### Now — 0.4 Governed source intake / 当前：受控资料进入知识库
+### Completed — 0.4 Governed source intake / 已完成：受控资料进入知识库
 
-| Increment | User outcome | In scope | Acceptance gate |
-| --- | --- | --- | --- |
+| Increment | User outcome | In scope | Acceptance gate | Status |
+| --- | --- | --- | --- | --- |
 | **0.4.1 Text intake** | Give an Agent a selected Markdown or text file and receive a reviewable draft | Explicit input allowlist; copied source snapshot; source path, SHA-256, imported time, generator; one declared `.lwc/drafts` target | Source file remains untouched; source/snapshot drift and duplicate source-target pairs are blocked; formal Markdown stays unchanged | **Shipped** |
-| **0.4.2 Draft workspace** | Inspect generated pages before they become a formal proposal | Draft list, provenance panel, validation errors, exact target paths | Drafts never appear as formal Map nodes; invalid targets cannot become proposals |
-| **0.4.3 Intake-to-proposal** | Convert an inspected draft into the existing review lifecycle | Create proposal from selected draft; show text and topology delta | Zero Vault change before review; hash drift blocks apply; audit record survives rejection |
+| **0.4.2 Draft workspace** | Inspect generated pages before they become a formal proposal | Draft list, source/draft comparison, provenance ledger, validation errors, exact target paths | Drafts never appear as formal Map nodes; invalid targets cannot become proposals; desktop/mobile read-only E2E | **Shipped** |
+| **0.4.3 Intake-to-proposal** | Convert an inspected draft into the existing review lifecycle | Create proposal from selected draft; carry provenance; show text and topology delta in Changes | Zero Vault change before review; hash drift blocks apply; audit record survives rejection | **Shipped** |
 
 PDF, OCR, web crawling, office documents, and bulk folder ingestion stay out until the Markdown/text loop proves useful.
 
