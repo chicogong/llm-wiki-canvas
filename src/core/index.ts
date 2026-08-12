@@ -1,5 +1,7 @@
 export { buildGraph } from "./graph.js";
-export { checkOkfBundle, okfReportToMarkdown } from "./okf.js";
+export { checkOkfBundle, okfReportToMarkdown, parseVerified } from "./okf.js";
+export { isIso8601Instant, isIsoCalendarDate, latestVerification } from "./trust.js";
+export { jsonSafeMetadata, parseMarkdown } from "./frontmatter.js";
 export type { OkfConformanceReport, OkfIssue } from "./okf.js";
 export { graphToCanvas, summarizeCanvasLayout } from "./canvas.js";
 export { graphToExcalidraw, summarizeExcalidrawLayout } from "./excalidraw.js";

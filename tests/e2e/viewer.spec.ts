@@ -157,6 +157,39 @@ test("@smoke inspects OKF trust signals without offering execution", async ({ pa
   expect(errors).toEqual([]);
 });
 
+test("@critical surfaces OKF checker findings and preserves extension metadata", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.route(/\/okf-graph\.json$/, async (route) => {
+    if (new URL(route.request().url()).pathname !== "/okf-graph.json") return route.continue();
+    const response = await route.fetch();
+    const graph = await response.json();
+    graph.okf = {
+      ...graph.okf,
+      conformant: false,
+      issues: [
+        { level: "error", code: "OKF_INVALID_VERIFIED", path: "metrics/release-readiness.md", message: "verified contains an invalid ISO 8601 datetime" },
+        { level: "warning", code: "OKF_INVALID_VERSION", path: "index.md", message: "best-effort compatibility warning" },
+      ],
+    };
+    const metric = graph.nodes.find((node: { path: string }) => node.path === "metrics/release-readiness.md");
+    metric.resource = "urn:example:release-readiness";
+    metric.metadata = { ...metric.metadata, experimental_route: { mode: "shadow" } };
+    await route.fulfill({ response, json: graph });
+  });
+  await page.goto("/?graph=/okf-graph.json");
+  await expect(page.getByLabel("OKF checker findings")).toContainText("1 errors · 1 warnings");
+  await expect(page.getByLabel("OKF checker findings")).toContainText("OKF_INVALID_VERIFIED");
+  await page.getByRole("button", { name: /Release readiness/ }).click();
+  await expect(page.getByText("urn:example:release-readiness")).toBeVisible();
+  await page.getByText("Additional metadata").click();
+  await expect(page.getByText(/experimental_route/)).toBeVisible();
+  await page.getByRole("button", { name: "Health", exact: true }).click();
+  await expect(page.getByText("1 errors · 2 warnings")).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test("@smoke health view reports only compiled graph facts", async ({ page }) => {
   const errors = await openWorkbench(page);
   await page.getByRole("button", { name: "Health", exact: true }).click();

@@ -122,6 +122,7 @@ export async function buildKnowledgeContext(root: string, graph: WikiGraph, quer
       resource: node.resource,
       trust: node.trust,
       attestedComputation: node.attestedComputation,
+      metadata: node.metadata,
       distance: distances.get(node.id) ?? 0,
       content: sliced.content,
       contentSha256: createHash("sha256").update(raw).digest("hex"),

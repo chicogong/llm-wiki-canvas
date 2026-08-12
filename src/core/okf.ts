@@ -1,7 +1,8 @@
 import { lstat, readFile, realpath } from "node:fs/promises";
 import path from "node:path";
 import fg from "fast-glob";
-import matter from "gray-matter";
+import { parseMarkdown, type FrontmatterData } from "./frontmatter.js";
+import { isIso8601Instant, isIsoCalendarDate } from "./trust.js";
 import type {
   AttestedComputationContract,
   KnowledgeActorEvent,
@@ -39,23 +40,17 @@ export interface OkfConformanceReport {
   issues: OkfIssue[];
 }
 
-type Data = Record<string, unknown>;
-const dateOnly = /^\d{4}-\d{2}-\d{2}$/;
+type Data = FrontmatterData;
 const unix = (value: string) => value.split(path.sep).join("/");
 const mapping = (value: unknown): Data | undefined => value && typeof value === "object" && !Array.isArray(value) ? value as Data : undefined;
-const nonEmpty = (value: unknown): string | undefined => {
-  if (value instanceof Date && !Number.isNaN(value.getTime())) return value.toISOString();
-  return typeof value === "string" && value.trim() ? value.trim() : undefined;
-};
-const dateValue = (value: unknown): string | undefined => value instanceof Date && !Number.isNaN(value.getTime())
-  ? value.toISOString().slice(0, 10)
-  : nonEmpty(value);
+const nonEmpty = (value: unknown): string | undefined => typeof value === "string" && value.trim() ? value.trim() : undefined;
+
 
 function usageWindow(value: unknown): { from?: string; to?: string } | undefined {
   const item = mapping(value);
   if (!item) return undefined;
-  const from = nonEmpty(item.from);
-  const to = nonEmpty(item.to);
+  const from = isIsoCalendarDate(item.from) ? item.from : undefined;
+  const to = isIsoCalendarDate(item.to) ? item.to : undefined;
   return from || to ? { from, to } : undefined;
 }
 
@@ -72,7 +67,7 @@ export function parseOkfSources(value: unknown, sharedWindow?: unknown): Knowled
       title: nonEmpty(item.title),
       author: nonEmpty(item.author),
       usageCount: count,
-      lastModified: dateValue(item.last_modified),
+      lastModified: isIsoCalendarDate(item.last_modified) ? item.last_modified : undefined,
       usageWindow: usageWindow(item.usage_window) ?? usageWindow(sharedWindow),
     }];
   });
@@ -82,14 +77,19 @@ export function parseActorEvent(value: unknown): KnowledgeActorEvent | undefined
   const item = mapping(value);
   const by = nonEmpty(item?.by);
   if (!item || !by) return undefined;
-  return { by, at: nonEmpty(item.at) };
+  return { by, at: isIso8601Instant(item.at) ? item.at : undefined };
 }
 
 export function parseVerified(value: unknown): KnowledgeActorEvent[] {
   const values = Array.isArray(value) ? value : value === undefined ? [] : [value];
   return values.flatMap((entry) => {
-    const event = parseActorEvent(entry);
-    return event ? [event] : [];
+    const item = mapping(entry);
+    const by = nonEmpty(item?.by);
+    return by && isIso8601Instant(item?.at) ? [{ by, at: item.at }] : [];
+  }).sort((left, right) => {
+    const leftTime = left.at && isIso8601Instant(left.at) ? Date.parse(left.at) : Number.NEGATIVE_INFINITY;
+    const rightTime = right.at && isIso8601Instant(right.at) ? Date.parse(right.at) : Number.NEGATIVE_INFINITY;
+    return leftTime - rightTime || left.by.localeCompare(right.by);
   });
 }
 
@@ -128,7 +128,7 @@ export function parseKnowledgeTrust(data: Data, now: Date, okfDocument = false):
   const hasSignals = okfDocument || ["sources", "generated", "verified", "status", "stale_after"].some((key) => data[key] !== undefined);
   if (!hasSignals) return undefined;
   const verified = parseVerified(data.verified);
-  const staleAfter = dateValue(data.stale_after);
+  const staleAfter = isIsoCalendarDate(data.stale_after) ? data.stale_after : undefined;
   const today = now.toISOString().slice(0, 10);
   return {
     tier: deriveTrustTier(verified),
@@ -136,7 +136,7 @@ export function parseKnowledgeTrust(data: Data, now: Date, okfDocument = false):
     verified,
     status: lifecycleStatus(data.status),
     staleAfter,
-    stale: Boolean(staleAfter && dateOnly.test(staleAfter) && today >= staleAfter),
+    stale: Boolean(staleAfter && isIsoCalendarDate(staleAfter) && today >= staleAfter),
     sources: parseOkfSources(data.sources, data.usage_window),
   };
 }
@@ -146,14 +146,27 @@ function hasFrontmatter(raw: string): boolean {
 }
 
 function validInstant(value: unknown): boolean {
-  return (value instanceof Date && !Number.isNaN(value.getTime())) || (typeof value === "string" && value.trim() !== "" && !Number.isNaN(new Date(value).getTime()));
+  return isIso8601Instant(value);
+}
+
+function validUsageWindow(value: unknown): boolean {
+  const window = mapping(value);
+  return Boolean(window && (window.from === undefined || isIsoCalendarDate(window.from)) && (window.to === undefined || isIsoCalendarDate(window.to)));
 }
 
 function validateTrust(pathname: string, data: Data, issues: OkfIssue[]): void {
   if (data.sources !== undefined) {
-    if (!Array.isArray(data.sources) || data.sources.some((entry) => !nonEmpty(mapping(entry)?.resource))) {
-      issues.push({ level: "error", code: "OKF_INVALID_SOURCES", path: pathname, message: "sources must be a list whose entries each have a non-empty resource" });
+    if (!Array.isArray(data.sources) || data.sources.some((entry) => {
+      const source = mapping(entry);
+      return !nonEmpty(source?.resource)
+        || (source?.last_modified !== undefined && !isIsoCalendarDate(source.last_modified))
+        || (source?.usage_window !== undefined && !validUsageWindow(source.usage_window));
+    })) {
+      issues.push({ level: "error", code: "OKF_INVALID_SOURCES", path: pathname, message: "sources must be a list with resource and valid YYYY-MM-DD credibility dates when declared" });
     }
+  }
+  if (data.usage_window !== undefined && !validUsageWindow(data.usage_window)) {
+    issues.push({ level: "error", code: "OKF_INVALID_SOURCES", path: pathname, message: "usage_window from/to values must use valid YYYY-MM-DD dates" });
   }
   if (data.generated !== undefined) {
     const generated = mapping(data.generated);
@@ -171,7 +184,7 @@ function validateTrust(pathname: string, data: Data, issues: OkfIssue[]): void {
   if (data.status !== undefined && !["draft", "stable", "deprecated"].includes(String(data.status))) {
     issues.push({ level: "error", code: "OKF_INVALID_STATUS", path: pathname, message: "status must be draft, stable, or deprecated" });
   }
-  if (data.stale_after !== undefined && !dateOnly.test(dateValue(data.stale_after) ?? "")) {
+  if (data.stale_after !== undefined && !isIsoCalendarDate(data.stale_after)) {
     issues.push({ level: "error", code: "OKF_INVALID_STALE_AFTER", path: pathname, message: "stale_after must use YYYY-MM-DD" });
   }
   if (String(data.type ?? "").toLocaleLowerCase() === "attested computation") {
@@ -205,8 +218,8 @@ export async function checkOkfBundle(root: string): Promise<OkfConformanceReport
     }
     const raw = await readFile(absolute, "utf8");
     const frontmatter = hasFrontmatter(raw);
-    const parsed = matter(raw);
-    const data = parsed.data as Data;
+    const parsed = parseMarkdown(raw);
+    const data = parsed.data;
     const base = path.basename(pathname).toLocaleLowerCase();
     const reserved = base === "index.md" || base === "log.md";
     const rootIndex = pathname.toLocaleLowerCase() === "index.md";

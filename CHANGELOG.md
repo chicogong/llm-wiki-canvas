@@ -4,6 +4,10 @@ All notable changes will be documented here. This project follows Semantic Versi
 
 ## [Unreleased]
 
+No unreleased changes. Version `0.1.0` is frozen as a release candidate and has not been published.
+
+## [0.1.0] - 2026-08-12
+
 ### Added
 
 - Markdown, YAML frontmatter, WikiLink, embed, and Markdown-link compiler.
@@ -29,6 +33,14 @@ All notable changes will be documented here. This project follows Semantic Versi
 - Linux and macOS package CI across Node.js 20 and 22, plus repeatable release checks and a documented schema compatibility policy.
 - Bounded, read-only Agent context export through `lwc context`, with exact focus resolution, relationship depth/direction/type filters, page and word budgets, source hashes, truncation evidence, symlink refusal, Markdown/JSON output, and a copy-ready Workbench handoff.
 - Open Knowledge Format v0.2 consumption through `lwc okf check`, arbitrary concept types, trust/provenance/freshness fields, bundle-root links, descriptive Attested Computation contracts, a no-execution boundary, and a responsive Workbench Trust Inspector.
+
+### Fixed
+
+- Strict ISO 8601 datetime and calendar-date validation for OKF trust, freshness, provenance, and usage-window signals.
+- Latest verification selection by timestamp rather than frontmatter array order.
+- Visible OKF checker warnings/errors in Map and Health, plus preservation of unknown concept types, recommended optional fields, and producer-defined frontmatter.
+- A pinned official Acme Retail OKF bundle regression at upstream commit `374e0bc4c644310ff56cdf9c0fe81eccdec862b0`.
+- Generated third-party licenses and copyright notices included and checked in the npm package.
 
 ### Compatibility
 

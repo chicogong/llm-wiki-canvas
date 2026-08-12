@@ -41,4 +41,8 @@ Open <http://127.0.0.1:4173/?graph=/okf-graph.json>, choose **Release readiness*
 
 Unknown concept types and extra frontmatter fields are preserved/tolerated where possible. The checker rejects malformed trust fields, invalid lifecycle values, unsupported declared OKF versions, symlinked concept files, and reserved-file frontmatter violations. LLM Wiki Canvas remains a v0.2 consumer rather than claiming to be the canonical OKF validator.
 
+Datetime fields use strict ISO 8601 forms with `T` and an explicit timezone; calendar signals use real `YYYY-MM-DD` dates. The latest verification is selected by timestamp, not YAML list order. Map and Health surface every checker warning/error, while the graph and bounded context preserve producer-defined frontmatter under node `metadata`.
+
+Compatibility is pinned against Google Cloud's synthetic Acme Retail bundle at commit `374e0bc4c644310ff56cdf9c0fe81eccdec862b0`. The upstream fixture's `log.md` contains frontmatter even though the v0.2 reserved-file rule disallows it; the regression deliberately retains and reports that normative error instead of silently weakening the checker.
+
 Background: Google Cloud's [OKF v0.2 trust-signals announcement](https://cloud.google.com/blog/products/data-analytics/okf-v0-2-adds-trust-signals/) and the [reference repository](https://github.com/GoogleCloudPlatform/knowledge-catalog/tree/main/okf).

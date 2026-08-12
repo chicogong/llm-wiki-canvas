@@ -51,6 +51,7 @@ export interface WikiNode {
   resource?: string;
   trust?: KnowledgeTrust;
   attestedComputation?: AttestedComputationContract;
+  metadata?: Record<string, unknown>;
 }
 
 export interface WikiEdge {
@@ -73,7 +74,12 @@ export interface WikiGraph {
   schemaVersion: 1;
   rootName: string;
   generatedAt: string;
-  okf?: { version: string; recognized: boolean };
+  okf?: {
+    version: string;
+    recognized: boolean;
+    conformant: boolean;
+    issues: Array<{ level: "error" | "warning"; code: string; path: string; message: string }>;
+  };
   nodes: WikiNode[];
   edges: WikiEdge[];
   diagnostics: Diagnostic[];

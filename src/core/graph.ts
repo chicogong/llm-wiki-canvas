@@ -2,8 +2,8 @@ import { createHash } from "node:crypto";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import fg from "fast-glob";
-import matter from "gray-matter";
-import { parseAttestedComputation, parseKnowledgeTrust } from "./okf.js";
+import { jsonSafeMetadata, parseMarkdown } from "./frontmatter.js";
+import { checkOkfBundle, parseAttestedComputation, parseKnowledgeTrust } from "./okf.js";
 import type { Diagnostic, NodeKind, WikiEdge, WikiGraph, WikiNode } from "./types.js";
 
 type Draft = WikiNode & { rawLinks: RawLink[]; missingTitle: boolean };
@@ -28,13 +28,13 @@ function firstParagraph(content: string): string {
     ?.slice(0, 220) ?? "";
 }
 
-function nodeKind(relativePath: string, data: Record<string, unknown>, okfDocument: boolean): NodeKind {
+function nodeKind(relativePath: string, data: Record<string, unknown>): NodeKind {
   const explicit = String(data.type ?? data.kind ?? "").toLowerCase();
   if (["index", "concept", "source", "note"].includes(explicit)) return explicit as NodeKind;
   if (/^(index|home|readme)\.md$/i.test(path.basename(relativePath))) return "index";
   if (/^(sources|references)\//i.test(relativePath)) return "source";
   if (relativePath.toLowerCase().startsWith("concepts/")) return "concept";
-  if (okfDocument && explicit) return "concept";
+  if (explicit) return "concept";
   return "note";
 }
 
@@ -58,7 +58,7 @@ export async function buildGraph(root: string, now = new Date(), fixedModifiedAt
   const rootInfo = await stat(absoluteRoot).catch(() => undefined);
   if (!rootInfo?.isDirectory()) throw new Error(`Wiki root is not a directory: ${absoluteRoot}`);
   const okfVersion = await readFile(path.join(absoluteRoot, "index.md"), "utf8")
-    .then((raw) => matter(raw).data.okf_version)
+    .then((raw) => parseMarkdown(raw).data.okf_version)
     .catch(() => undefined);
   const declaredOkfVersion = okfVersion === undefined ? undefined : String(okfVersion);
   const files = await fg(["**/*.md"], {
@@ -70,7 +70,7 @@ export async function buildGraph(root: string, now = new Date(), fixedModifiedAt
   const drafts: Draft[] = await Promise.all(files.sort().map(async (relative) => {
     const absolute = path.join(absoluteRoot, relative);
     const [raw, info] = await Promise.all([readFile(absolute, "utf8"), stat(absolute)]);
-    const parsed = matter(raw);
+    const parsed = parseMarkdown(raw);
     const heading = parsed.content.match(/^#\s+(.+)$/m)?.[1]?.trim();
     const title = String(parsed.data.title ?? heading ?? path.basename(relative, ".md"));
     const rawTags = parsed.data.tags ?? [];
@@ -78,7 +78,7 @@ export async function buildGraph(root: string, now = new Date(), fixedModifiedAt
     const cleanPath = unix(relative);
     const rawType = String(parsed.data.type ?? parsed.data.kind ?? "").trim();
     const okfDocument = declaredOkfVersion !== undefined && !/^(index|log)\.md$/i.test(path.basename(cleanPath));
-    const kind = nodeKind(cleanPath, parsed.data, okfDocument);
+    const kind = nodeKind(cleanPath, parsed.data);
     return {
       id: stableId("node", normalizedKey(cleanPath)),
       path: cleanPath,
@@ -94,6 +94,7 @@ export async function buildGraph(root: string, now = new Date(), fixedModifiedAt
       resource: parsed.data.resource ? String(parsed.data.resource) : undefined,
       trust: parseKnowledgeTrust(parsed.data, now, okfDocument),
       attestedComputation: parseAttestedComputation(parsed.data),
+      metadata: jsonSafeMetadata(parsed.data),
       rawLinks: extractLinks(parsed.content),
       missingTitle: !parsed.data.title && !heading,
     };
@@ -143,11 +144,17 @@ export async function buildGraph(root: string, now = new Date(), fixedModifiedAt
   for (const node of nodes.filter((item) => !connected.has(item.id))) {
     diagnostics.push({ level: "warning", code: "ORPHAN_PAGE", path: node.path, message: "Page has no resolved incoming or outgoing relationships" });
   }
+  const okfCheck = declaredOkfVersion === undefined ? undefined : await checkOkfBundle(absoluteRoot);
   return {
     schemaVersion: 1,
     rootName: path.basename(absoluteRoot),
     generatedAt: now.toISOString(),
-    okf: declaredOkfVersion === undefined ? undefined : { version: declaredOkfVersion, recognized: declaredOkfVersion === "0.2" },
+    okf: declaredOkfVersion === undefined ? undefined : {
+      version: declaredOkfVersion,
+      recognized: declaredOkfVersion === "0.2",
+      conformant: okfCheck?.conformant ?? false,
+      issues: okfCheck?.issues ?? [],
+    },
     nodes,
     edges: uniqueEdges,
     diagnostics,

@@ -1,0 +1,5 @@
+Source: https://github.com/GoogleCloudPlatform/knowledge-catalog/tree/374e0bc4c644310ff56cdf9c0fe81eccdec862b0/okf/bundles/acme_retail
+Commit: 374e0bc4c644310ff56cdf9c0fe81eccdec862b0
+Snapshot: all bundle files except generated viz.html
+License: Apache-2.0; see LICENSE.txt
+Purpose: fixed OKF v0.2 consumer compatibility regression; fixture code is never executed

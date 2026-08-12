@@ -41,4 +41,8 @@ pnpm dev
 
 未知概念类型和额外 frontmatter 字段会尽量保留或容忍。检查器会拒绝格式错误的信任字段、无效生命周期、项目不支持的 OKF 版本、符号链接概念文件以及保留文件的 frontmatter 违规。LLM Wiki Canvas 是 OKF v0.2 消费者，不宣称替代官方规范或成为唯一验证器。
 
+Datetime 字段必须使用带 `T` 和明确时区的严格 ISO 8601 形式；日历信号必须是真实存在的 `YYYY-MM-DD` 日期。最新 verification 按时间戳选择，不依赖 YAML 数组顺序。Map 和 Health 会展示全部 checker warning/error；图谱与有限上下文通过节点 `metadata` 保留生产者自定义 frontmatter。
+
+兼容回归固定使用 Google Cloud 在提交 `374e0bc4c644310ff56cdf9c0fe81eccdec862b0` 中的合成 Acme Retail Bundle。该上游 fixture 的 `log.md` 带有 frontmatter，与 v0.2 保留文件规则不符；回归会保留并明确报告这一规范错误，而不是静默放宽检查器。
+
 背景资料：Google Cloud 的 [OKF v0.2 信任信号介绍](https://cloud.google.com/blog/products/data-analytics/okf-v0-2-adds-trust-signals/)与[参考仓库](https://github.com/GoogleCloudPlatform/knowledge-catalog/tree/main/okf)。

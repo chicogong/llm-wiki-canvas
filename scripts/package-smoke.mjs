@@ -52,6 +52,13 @@ try {
   mkdirSync(okfWiki, { recursive: true });
   writeFileSync(path.join(consumer, "package.json"), '{"name":"lwc-package-smoke","private":true}\n');
   run("npm", ["install", "--ignore-scripts", "--no-audit", "--no-fund", tarball], { cwd: consumer });
+  const installedPackage = path.join(consumer, "node_modules", "@chicogong", "llm-wiki-canvas");
+  const installedManifest = JSON.parse(readFileSync(path.join(installedPackage, "package.json"), "utf8"));
+  if (installedManifest.version !== "0.1.0") throw new Error(`packed release-candidate version drifted: ${installedManifest.version}`);
+  const thirdPartyNotices = readFileSync(path.join(installedPackage, "THIRD_PARTY_LICENSES.txt"), "utf8");
+  if (!thirdPartyNotices.includes("commander@") || !thirdPartyNotices.includes("cytoscape@") || !thirdPartyNotices.includes("yaml@") || !thirdPartyNotices.includes("License:")) {
+    throw new Error("packed npm artifact is missing complete third-party license notices");
+  }
   const lwc = path.join(consumer, "node_modules", ".bin", "lwc");
   writeFileSync(path.join(wiki, "index.md"), "# Package Smoke\n[[Missing]]\n");
   writeFileSync(path.join(okfWiki, "index.md"), "---\nokf_version: '0.2'\n---\n# OKF Package Smoke\n[Metric](/metric.md)\n");

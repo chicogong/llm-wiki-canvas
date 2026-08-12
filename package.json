@@ -11,7 +11,7 @@
     "llm-wiki-canvas": "./dist/index.js",
     "lwc": "./dist/index.js"
   },
-  "files": ["dist", "viewer-dist", ".agents/skills/llm-wiki-canvas", "NOTICE"],
+  "files": ["dist", "viewer-dist", ".agents/skills/llm-wiki-canvas", "NOTICE", "THIRD_PARTY_LICENSES.txt"],
   "scripts": {
     "lwc": "tsx src/cli/index.ts",
     "dev": "vite --host 127.0.0.1",
@@ -28,6 +28,8 @@
     "test:release-matrix": "pnpm audit:secrets && pnpm test && pnpm build && pnpm validate:skill && pnpm test:hosts && pnpm test:package",
     "audit:secrets": "node scripts/scan-secrets.mjs",
     "audit:deps": "pnpm audit --audit-level low",
+    "licenses:check": "node scripts/third-party-notices.mjs --check",
+    "release:metadata": "node scripts/check-release-metadata.mjs",
     "demo:build": "tsx src/cli/index.ts build examples/atlas-wiki --graph public/graph.json --canvas examples/atlas-wiki/Atlas.canvas --excalidraw examples/atlas-wiki/Atlas.excalidraw --generated-at 2026-08-10T00:00:00.000Z",
     "generated:check": "git diff --exit-code -- public/graph.json public/okf-graph.json examples/atlas-wiki/Atlas.canvas examples/atlas-wiki/Atlas.excalidraw docs/agent-compatibility.md",
     "lint:demo": "tsx src/cli/index.ts lint examples/atlas-wiki",
@@ -39,8 +41,8 @@
     "proposal:demo": "tsx src/cli/index.ts proposal create examples/atlas-wiki --from examples/proposal-draft --summary 'Demonstrate reviewed knowledge changes' --created-at 2026-08-10T00:00:00.000Z -o .lwc/atlas-demo-proposal.json && tsx src/cli/index.ts proposal show .lwc/atlas-demo-proposal.json",
     "validate:skill": "node scripts/validate-skill.mjs",
     "check": "pnpm test && pnpm demo:build && pnpm okf:build && pnpm report:demo && pnpm context:demo && pnpm okf:demo && pnpm agents:matrix && pnpm proposal:demo && pnpm generated:check && pnpm build && pnpm validate:skill && pnpm test:hosts",
-    "verify": "pnpm audit:secrets && pnpm audit:deps && pnpm check && pnpm test:package && pnpm test:e2e:prod",
-    "release:check": "pnpm verify && pnpm pack --dry-run",
+    "verify": "pnpm audit:secrets && pnpm audit:deps && pnpm licenses:check && pnpm release:metadata && pnpm check && pnpm test:package && pnpm test:e2e:prod",
+    "release:check": "pnpm verify && pnpm licenses:check && pnpm release:metadata && pnpm pack --dry-run",
     "prepack": "pnpm build && pnpm validate:skill"
   },
   "dependencies": {
@@ -49,7 +51,8 @@
     "fast-glob": "^3.3.3",
     "gray-matter": "^4.0.3",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "yaml": "^2.8.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.54.2",

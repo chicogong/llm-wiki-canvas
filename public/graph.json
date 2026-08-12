@@ -16,7 +16,16 @@
       "summary": "Coding agents read local rules, inspect the graph, propose focused edits, and rebuild disposable views.",
       "headings": [],
       "wordCount": 17,
-      "modifiedAt": "2026-08-10T00:00:00.000Z"
+      "modifiedAt": "2026-08-10T00:00:00.000Z",
+      "metadata": {
+        "title": "Agent Workflow",
+        "type": "note",
+        "tags": [
+          "codex",
+          "workflow"
+        ],
+        "summary": "Coding agents read local rules, inspect the graph, propose focused edits, and rebuild disposable views."
+      }
     },
     {
       "id": "node-ba7753d60e35",
@@ -31,7 +40,16 @@
       "summary": "Agent changes remain proposals until a person reviews their evidence and diff.",
       "headings": [],
       "wordCount": 15,
-      "modifiedAt": "2026-08-10T00:00:00.000Z"
+      "modifiedAt": "2026-08-10T00:00:00.000Z",
+      "metadata": {
+        "title": "Human Review",
+        "type": "concept",
+        "tags": [
+          "governance",
+          "trust"
+        ],
+        "summary": "Agent changes remain proposals until a person reviews their evidence and diff."
+      }
     },
     {
       "id": "node-8dc4d7918bf9",
@@ -48,7 +66,16 @@
         "Operations"
       ],
       "wordCount": 35,
-      "modifiedAt": "2026-08-10T00:00:00.000Z"
+      "modifiedAt": "2026-08-10T00:00:00.000Z",
+      "metadata": {
+        "title": "LLM Wiki",
+        "type": "concept",
+        "tags": [
+          "compiler",
+          "knowledge"
+        ],
+        "summary": "Treat a maintained wiki like a codebase that an LLM can inspect, edit, lint, and improve."
+      }
     },
     {
       "id": "node-fc94fa44f573",
@@ -63,7 +90,16 @@
       "summary": "Relationships become a navigable atlas while Markdown remains the durable source of truth.",
       "headings": [],
       "wordCount": 26,
-      "modifiedAt": "2026-08-10T00:00:00.000Z"
+      "modifiedAt": "2026-08-10T00:00:00.000Z",
+      "metadata": {
+        "title": "Visual Knowledge",
+        "type": "concept",
+        "tags": [
+          "graph",
+          "canvas"
+        ],
+        "summary": "Relationships become a navigable atlas while Markdown remains the durable source of truth."
+      }
     },
     {
       "id": "node-e540cdd1328b",
@@ -78,7 +114,16 @@
       "summary": "A small working atlas showing how local sources, concepts, and agent workflows connect.",
       "headings": [],
       "wordCount": 38,
-      "modifiedAt": "2026-08-10T00:00:00.000Z"
+      "modifiedAt": "2026-08-10T00:00:00.000Z",
+      "metadata": {
+        "title": "Agent Knowledge Atlas",
+        "type": "index",
+        "tags": [
+          "llm-wiki",
+          "local-first"
+        ],
+        "summary": "A small working atlas showing how local sources, concepts, and agent workflows connect."
+      }
     },
     {
       "id": "node-7babc233de26",
@@ -94,7 +139,15 @@
         "2026-08-10"
       ],
       "wordCount": 23,
-      "modifiedAt": "2026-08-10T00:00:00.000Z"
+      "modifiedAt": "2026-08-10T00:00:00.000Z",
+      "metadata": {
+        "title": "Atlas Log",
+        "type": "note",
+        "tags": [
+          "maintenance"
+        ],
+        "summary": "Append-only maintenance notes for the demo wiki."
+      }
     },
     {
       "id": "node-c3ba326f222d",
@@ -110,7 +163,17 @@
       "headings": [],
       "wordCount": 19,
       "modifiedAt": "2026-08-10T00:00:00.000Z",
-      "source": "https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f"
+      "source": "https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f",
+      "metadata": {
+        "title": "Karpathy LLM Wiki Pattern",
+        "type": "source",
+        "tags": [
+          "source",
+          "llm-wiki"
+        ],
+        "source": "https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f",
+        "summary": "Raw sources, a generated wiki, and a schema form a compact knowledge programming environment."
+      }
     },
     {
       "id": "node-1ab2e511f573",
@@ -126,7 +189,17 @@
       "headings": [],
       "wordCount": 19,
       "modifiedAt": "2026-08-10T00:00:00.000Z",
-      "source": "https://jsoncanvas.org/spec/1.0/"
+      "source": "https://jsoncanvas.org/spec/1.0/",
+      "metadata": {
+        "title": "Obsidian JSON Canvas",
+        "type": "source",
+        "tags": [
+          "source",
+          "obsidian"
+        ],
+        "source": "https://jsoncanvas.org/spec/1.0/",
+        "summary": "JSON Canvas is an open file format for infinite-canvas data using nodes and edges."
+      }
     }
   ],
   "edges": [

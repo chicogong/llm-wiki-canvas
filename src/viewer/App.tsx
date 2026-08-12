@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import cytoscape, { type Core } from "cytoscape";
 import type { DraftInbox, DraftInboxItem, DraftInboxState, EvidenceState, ProposalInbox, ProposalInboxItem, ProposalStatus } from "../core/index.js";
+import { latestVerification } from "../core/trust.js";
 import type { NodeKind, WikiGraph, WikiNode } from "../core/types";
 
 type WorkbenchView = "map" | "health" | "drafts" | "changes";
@@ -167,6 +168,8 @@ function Inspector({ graph, selected, onSelect }: { graph: WikiGraph; selected?:
     }, []);
   }, [graph, selected]);
   const contextCommand = selected ? `lwc context <vault> --focus ${shellQuote(selected.path)} --depth 1 --max-pages 8 --max-words 2000` : "";
+  const knownMetadata = new Set(["type", "kind", "title", "description", "summary", "resource", "tags", "source", "sources", "usage_window", "generated", "verified", "status", "stale_after", "runtime", "parameters", "computation", "executor", "attester"]);
+  const extensions = selected?.metadata ? Object.fromEntries(Object.entries(selected.metadata).filter(([key]) => !knownMetadata.has(key))) : {};
   useEffect(() => setContextCopied(false), [selected?.id]);
 
   return <aside className="inspector" aria-live="polite">
@@ -177,9 +180,14 @@ function Inspector({ graph, selected, onSelect }: { graph: WikiGraph; selected?:
       <dl className="metadata">
         <div><dt>Path</dt><dd>{selected.path}</dd></div>
         {selected.type && <div><dt>Type</dt><dd>{selected.type}</dd></div>}
+        {selected.resource && <div><dt>Resource</dt><dd>{selected.resource}</dd></div>}
         <div><dt>Words</dt><dd>{selected.wordCount}</dd></div>
         <div><dt>Tags</dt><dd>{selected.tags.length ? selected.tags.map((tag) => <span className="tag" key={tag}>{tag}</span>) : "—"}</dd></div>
       </dl>
+      {Object.keys(extensions).length > 0 && <details className="metadata-extensions">
+        <summary>Additional metadata <span>{Object.keys(extensions).length}</span></summary>
+        <pre>{JSON.stringify(extensions, null, 2)}</pre>
+      </details>}
       {selected.trust && <TrustInspector node={selected} />}
       <section className="context-handoff" aria-label="Agent context command">
         <div><span><p className="section-kicker">Agent handoff</p><h3>Bound the evidence</h3></span><button type="button" onClick={() => void copyText(contextCommand).then(setContextCopied)}>{contextCopied ? "Copied" : "Copy"}</button></div>
@@ -198,6 +206,18 @@ function Inspector({ graph, selected, onSelect }: { graph: WikiGraph; selected?:
   </aside>;
 }
 
+function OkfFindings({ graph }: { graph: WikiGraph }) {
+  if (!graph.okf?.issues.length) return null;
+  const errors = graph.okf.issues.filter((issue) => issue.level === "error").length;
+  const warnings = graph.okf.issues.length - errors;
+  return <section className={`okf-findings${errors ? " has-errors" : ""}`} aria-label="OKF checker findings">
+    <header><strong>OKF checker</strong><span>{errors} errors · {warnings} warnings</span></header>
+    <ul>{graph.okf.issues.map((issue, index) => <li key={`${issue.path}-${issue.code}-${index}`}>
+      <b className={issue.level}>{issue.level}</b><span>{issue.message}<small>{issue.path} · {issue.code}</small></span>
+    </li>)}</ul>
+  </section>;
+}
+
 const TRUST_LABEL = {
   "unverified": "Unverified",
   "machine-confirmed": "Machine confirmed",
@@ -212,7 +232,7 @@ function readableDate(value?: string): string {
 
 function TrustInspector({ node }: { node: WikiNode }) {
   const trust = node.trust!;
-  const latestVerifier = trust.verified.at(-1);
+  const latestVerifier = latestVerification(trust.verified);
   const freshness = trust.stale
     ? `Stale since ${readableDate(trust.staleAfter)}`
     : trust.staleAfter ? `Fresh through ${readableDate(trust.staleAfter)}` : "No expiry declared";
@@ -273,6 +293,7 @@ function MapView({ graph, selectedId, onSelect }: { graph: WikiGraph; selectedId
         </div>
         <span className="visible-count" aria-live="polite"><b>{visibleIds.size}</b> of {graph.nodes.length}</span>
       </div>
+      <OkfFindings graph={graph} />
       <div className="canvas-frame">
         <GraphStage graph={graph} visibleIds={visibleIds} selectedId={selectedId} onSelect={onSelect} />
         <div className="legend" aria-label="Map legend">
@@ -286,8 +307,9 @@ function MapView({ graph, selectedId, onSelect }: { graph: WikiGraph; selectedId
 }
 
 function HealthView({ graph, onOpenPage }: { graph: WikiGraph; onOpenPage: (id: string) => void }) {
-  const errors = graph.diagnostics.filter((item) => item.level === "error").length;
-  const warnings = graph.diagnostics.filter((item) => item.level === "warning").length;
+  const allDiagnostics = [...graph.diagnostics, ...(graph.okf?.issues ?? [])];
+  const errors = allDiagnostics.filter((item) => item.level === "error").length;
+  const warnings = allDiagnostics.filter((item) => item.level === "warning").length;
   const healthyPages = Math.max(0, graph.stats.files - graph.stats.orphanNodes);
   const kindCounts = KINDS.slice(1).map((item) => ({ ...item, count: graph.nodes.filter((node) => node.kind === item.value).length }));
   const hubs = graph.nodes.map((node) => ({ node, connections: graph.edges.filter((edge) => edge.source === node.id || edge.target === node.id).length }))
@@ -307,7 +329,7 @@ function HealthView({ graph, onOpenPage }: { graph: WikiGraph; onOpenPage: (id: 
     <div className="health-columns">
       <section className="health-card diagnostics-card">
         <div className="card-title"><div><p className="section-kicker">Diagnostics</p><h3>Scan results</h3></div><span>{errors} errors · {warnings} warnings</span></div>
-        {graph.diagnostics.length ? <ul className="diagnostic-list">{graph.diagnostics.map((item, index) => <li key={`${item.path}-${item.code}-${index}`}>
+        {allDiagnostics.length ? <ul className="diagnostic-list">{allDiagnostics.map((item, index) => <li key={`${item.path}-${item.code}-${index}`}>
           <span className={`diagnostic-level ${item.level}`} />
           <div><strong>{item.message}</strong><small>{item.path} · {item.code}</small></div>
         </li>)}</ul> : <div className="healthy-state"><span>✓</span><div><strong>No structural issues found</strong><p>All links resolve and every page participates in the graph.</p></div></div>}
