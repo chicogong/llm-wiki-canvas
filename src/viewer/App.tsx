@@ -62,7 +62,14 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
     const cy = cytoscape({
       container: ref.current,
       elements: [
-        ...graph.nodes.map((node) => ({ data: { id: node.id, label: node.title, kind: node.kind } })),
+        ...graph.nodes.map((node) => ({ data: {
+          id: node.id,
+          label: node.title,
+          kind: node.kind,
+          trust: node.trust?.tier ?? "none",
+          stale: node.trust?.stale ? "yes" : "no",
+          lifecycle: node.trust?.status ?? "none",
+        } })),
         ...graph.edges.map((edge) => ({ data: { id: edge.id, source: edge.source, target: edge.target, kind: edge.kind } })),
       ],
       style: [
@@ -71,6 +78,10 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
         { selector: "node[kind = 'concept']", style: { "background-color": "#a9b9ff", "border-color": "#5570da", shape: "diamond", width: 31, height: 31 } },
         { selector: "node[kind = 'source']", style: { "background-color": "#f3c778", "border-color": "#bf7c18", shape: "round-rectangle", width: 32, height: 25 } },
         { selector: "node[kind = 'note']", style: { "background-color": "#ffffff", "border-color": "#77847d", shape: "ellipse" } },
+        { selector: "node[trust = 'machine-confirmed']", style: { "border-color": "#6477d8", "border-width": 2.5 } },
+        { selector: "node[trust = 'human-reviewed']", style: { "border-color": "#2f8060", "border-width": 3 } },
+        { selector: "node[lifecycle = 'deprecated']", style: { "border-color": "#c47c16", "border-style": "dashed", "border-width": 3 } },
+        { selector: "node[stale = 'yes']", style: { "border-color": "#c94f43", "border-style": "dashed", "border-width": 3 } },
         { selector: "edge", style: { width: 1.2, "line-color": "#b8c0bb", "target-arrow-color": "#9ca6a0", "target-arrow-shape": "triangle", "arrow-scale": 0.55, "curve-style": "bezier", opacity: 0.7 } },
         { selector: "edge.context", style: { width: 2, "line-color": "#3159e8", "target-arrow-color": "#3159e8", opacity: 0.95, "z-index": 20 } },
         { selector: "node.context", style: { "border-color": "#3159e8", "border-width": 2.5 } },
@@ -165,9 +176,11 @@ function Inspector({ graph, selected, onSelect }: { graph: WikiGraph; selected?:
       <p className="summary">{selected.summary || "This page does not have a summary yet."}</p>
       <dl className="metadata">
         <div><dt>Path</dt><dd>{selected.path}</dd></div>
+        {selected.type && <div><dt>Type</dt><dd>{selected.type}</dd></div>}
         <div><dt>Words</dt><dd>{selected.wordCount}</dd></div>
         <div><dt>Tags</dt><dd>{selected.tags.length ? selected.tags.map((tag) => <span className="tag" key={tag}>{tag}</span>) : "—"}</dd></div>
       </dl>
+      {selected.trust && <TrustInspector node={selected} />}
       <section className="context-handoff" aria-label="Agent context command">
         <div><span><p className="section-kicker">Agent handoff</p><h3>Bound the evidence</h3></span><button type="button" onClick={() => void copyText(contextCommand).then(setContextCopied)}>{contextCopied ? "Copied" : "Copy"}</button></div>
         <p>Export this page and its direct relationships with explicit page and word limits.</p>
@@ -185,11 +198,63 @@ function Inspector({ graph, selected, onSelect }: { graph: WikiGraph; selected?:
   </aside>;
 }
 
+const TRUST_LABEL = {
+  "unverified": "Unverified",
+  "machine-confirmed": "Machine confirmed",
+  "human-reviewed": "Human reviewed",
+} as const;
+
+function readableDate(value?: string): string {
+  if (!value) return "Not declared";
+  const date = new Date(value);
+  return Number.isNaN(date.valueOf()) ? value : date.toISOString().slice(0, 10);
+}
+
+function TrustInspector({ node }: { node: WikiNode }) {
+  const trust = node.trust!;
+  const latestVerifier = trust.verified.at(-1);
+  const freshness = trust.stale
+    ? `Stale since ${readableDate(trust.staleAfter)}`
+    : trust.staleAfter ? `Fresh through ${readableDate(trust.staleAfter)}` : "No expiry declared";
+  const sourceSummary = trust.sources.length
+    ? trust.sources.slice(0, 2).map((source) => source.title ?? source.id ?? source.resource).join(" · ")
+    : "No material source declared";
+
+  return <section className={`trust-inspector tier-${trust.tier}${trust.stale ? " is-stale" : ""}`} aria-label="Knowledge trust signals">
+    <header>
+      <div><p className="section-kicker">OKF trust signals</p><h3>Evidence, not a score</h3></div>
+      <span className="trust-tier"><i />{TRUST_LABEL[trust.tier]}</span>
+    </header>
+    <div className="trust-signal-grid">
+      <article>
+        <span>01 · Origin</span>
+        <strong>{trust.generated?.by ?? "Not declared"}</strong>
+        <small>{readableDate(trust.generated?.at)} · {trust.sources.length} source{trust.sources.length === 1 ? "" : "s"}</small>
+      </article>
+      <article>
+        <span>02 · Review</span>
+        <strong>{latestVerifier?.by ?? "No verifier"}</strong>
+        <small>{latestVerifier ? readableDate(latestVerifier.at) : TRUST_LABEL[trust.tier]}</small>
+      </article>
+      <article className={trust.stale ? "attention" : ""}>
+        <span>03 · Freshness</span>
+        <strong>{freshness}</strong>
+        <small>{trust.status} lifecycle</small>
+      </article>
+    </div>
+    <div className="trust-source"><span>Material source</span><p>{sourceSummary}</p></div>
+    {node.attestedComputation && <div className="attested-contract">
+      <div><span>Attested computation</span><strong>{node.attestedComputation.runtime ?? "Runtime not declared"} · {node.attestedComputation.parameters.length} parameter{node.attestedComputation.parameters.length === 1 ? "" : "s"}</strong></div>
+      <b>Contract only — not executed</b>
+    </div>}
+  </section>;
+}
+
 function MapView({ graph, selectedId, onSelect }: { graph: WikiGraph; selectedId?: string; onSelect: (id: string) => void }) {
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<"all" | NodeKind>("all");
   const visibleIds = useMemo(() => new Set(graph.nodes.filter((node) => {
-    const text = `${node.title} ${node.path} ${node.tags.join(" ")} ${node.summary}`.toLowerCase();
+    const text = `${node.title} ${node.path} ${node.type ?? ""} ${node.tags.join(" ")} ${node.summary} ${node.trust?.tier ?? ""} ${node.trust?.sources.map((source) => `${source.id ?? ""} ${source.title ?? ""} ${source.resource}`).join(" ") ?? ""}`.toLowerCase();
     return (kind === "all" || node.kind === kind) && text.includes(query.trim().toLowerCase());
   }).map((node) => node.id)), [graph, kind, query]);
   const selected = graph.nodes.find((node) => node.id === selectedId);
@@ -548,7 +613,9 @@ export function App() {
         setError(undefined);
         setSelectedId((current) => value.nodes.some((node) => node.id === current)
           ? current
-          : value.nodes.find((node) => node.kind === "index")?.id ?? value.nodes[0]?.id);
+          : value.nodes.find((node) => node.path === "index.md")?.id
+            ?? value.nodes.find((node) => node.kind === "index")?.id
+            ?? value.nodes[0]?.id);
       } catch (reason) {
         if (active) setError(reason instanceof Error ? reason.message : String(reason));
       }
@@ -609,7 +676,7 @@ export function App() {
       <header className="topbar">
         <div className="mobile-brand"><span className="brand-mark">L</span><strong>{graph.rootName}</strong></div>
         <div className="breadcrumb"><span>{graph.rootName}</span><b>/</b><strong>{viewTitle}</strong></div>
-        <div className="topbar-meta"><span className="status-dot" />{live ? "Live" : "Generated"} {graph.generatedAt.slice(0, 10)}</div>
+        <div className="topbar-meta">{graph.okf && <span className="okf-version">OKF {graph.okf.version}</span>}<span className="status-dot" />{live ? "Live" : "Generated"} {graph.generatedAt.slice(0, 10)}</div>
       </header>
       <div className="mobile-nav"><AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} /></div>
       {view === "map" && <MapView graph={graph} selectedId={selectedId} onSelect={setSelectedId} />}

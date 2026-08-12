@@ -1,0 +1,354 @@
+{
+  "schemaVersion": 1,
+  "rootName": "okf-trust",
+  "generatedAt": "2026-08-10T00:00:00.000Z",
+  "okf": {
+    "version": "0.2",
+    "recognized": true
+  },
+  "nodes": [
+    {
+      "id": "node-9b5a1184f5bd",
+      "path": "computations/index.md",
+      "title": "Computations",
+      "kind": "index",
+      "type": "index",
+      "tags": [],
+      "summary": "- - The sanctioned, parameter-bound release evidence definition.",
+      "headings": [],
+      "wordCount": 12,
+      "modifiedAt": "2026-08-10T00:00:00.000Z"
+    },
+    {
+      "id": "node-83a5ef7cfacc",
+      "path": "computations/release-check.md",
+      "title": "Release check",
+      "kind": "concept",
+      "type": "Attested Computation",
+      "tags": [
+        "release",
+        "attested"
+      ],
+      "summary": "Declares the checks required for one release candidate without executing them.",
+      "headings": [],
+      "wordCount": 29,
+      "modifiedAt": "2026-08-10T00:00:00.000Z",
+      "trust": {
+        "tier": "machine-confirmed",
+        "generated": {
+          "by": "fixture-agent/reference",
+          "at": "2026-08-12T00:00:00.000Z"
+        },
+        "verified": [
+          {
+            "by": "process:fixture-checker",
+            "at": "2026-08-12T00:30:00.000Z"
+          }
+        ],
+        "status": "stable",
+        "staleAfter": "2026-12-31",
+        "stale": false,
+        "sources": [
+          {
+            "resource": "/references/release-policy.md",
+            "id": "release-policy",
+            "title": "Local release policy",
+            "author": "human:maintainer",
+            "lastModified": "2026-08-12"
+          }
+        ]
+      },
+      "attestedComputation": {
+        "runtime": "node",
+        "parameters": [
+          {
+            "name": "commit",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "executor": {
+          "resource": "/skills/run-release-check.md",
+          "receipt": [
+            "commit",
+            "checks",
+            "conclusion"
+          ]
+        },
+        "attester": {
+          "resource": "/references/receipt-checker.md"
+        }
+      }
+    },
+    {
+      "id": "node-e540cdd1328b",
+      "path": "index.md",
+      "title": "Local Release Knowledge",
+      "kind": "index",
+      "type": "index",
+      "tags": [],
+      "summary": "- - The reviewed definition of a release-ready local knowledge tool. - - A descriptive Attested Computation contract that this fixture never executes. - - The material policy source.",
+      "headings": [],
+      "wordCount": 39,
+      "modifiedAt": "2026-08-10T00:00:00.000Z"
+    },
+    {
+      "id": "node-7babc233de26",
+      "path": "log.md",
+      "title": "Bundle history",
+      "kind": "note",
+      "type": "note",
+      "tags": [],
+      "summary": "- **Creation**: Added a synthetic OKF v0.2 trust fixture for local, deterministic tests.",
+      "headings": [
+        "2026-08-12"
+      ],
+      "wordCount": 18,
+      "modifiedAt": "2026-08-10T00:00:00.000Z"
+    },
+    {
+      "id": "node-ba1ba9313592",
+      "path": "metrics/index.md",
+      "title": "Metrics",
+      "kind": "index",
+      "type": "index",
+      "tags": [],
+      "summary": "- - A human-reviewed release definition backed by a policy and a sanctioned check.",
+      "headings": [],
+      "wordCount": 18,
+      "modifiedAt": "2026-08-10T00:00:00.000Z"
+    },
+    {
+      "id": "node-9eed6139eddf",
+      "path": "metrics/release-readiness.md",
+      "title": "Release readiness",
+      "kind": "concept",
+      "type": "Metric",
+      "tags": [
+        "release",
+        "trust",
+        "local-first"
+      ],
+      "summary": "A release is ready only when its public checks pass and a person accepts the candidate.",
+      "headings": [],
+      "wordCount": 45,
+      "modifiedAt": "2026-08-10T00:00:00.000Z",
+      "trust": {
+        "tier": "human-reviewed",
+        "generated": {
+          "by": "fixture-agent/reference",
+          "at": "2026-08-12T00:00:00.000Z"
+        },
+        "verified": [
+          {
+            "by": "human:maintainer",
+            "at": "2026-08-12T01:00:00.000Z"
+          }
+        ],
+        "status": "stable",
+        "staleAfter": "2026-12-31",
+        "stale": false,
+        "sources": [
+          {
+            "resource": "/references/release-policy.md",
+            "id": "release-policy",
+            "title": "Local release policy",
+            "author": "human:maintainer",
+            "lastModified": "2026-08-12"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node-e51d7428d786",
+      "path": "references/index.md",
+      "title": "References",
+      "kind": "index",
+      "type": "index",
+      "tags": [],
+      "summary": "- - The reviewed boundary for public release claims. - - A non-executable description of receipt validation.",
+      "headings": [],
+      "wordCount": 25,
+      "modifiedAt": "2026-08-10T00:00:00.000Z"
+    },
+    {
+      "id": "node-c05a6d08f642",
+      "path": "references/receipt-checker.md",
+      "title": "Receipt checker contract",
+      "kind": "source",
+      "type": "Reference",
+      "tags": [
+        "attestation",
+        "receipt"
+      ],
+      "summary": "A descriptive contract for comparing a release receipt with the required check set.",
+      "headings": [],
+      "wordCount": 23,
+      "modifiedAt": "2026-08-10T00:00:00.000Z",
+      "trust": {
+        "tier": "machine-confirmed",
+        "generated": {
+          "by": "process:fixture-builder",
+          "at": "2026-08-12T00:00:00.000Z"
+        },
+        "verified": [
+          {
+            "by": "process:fixture-checker",
+            "at": "2026-08-12T00:30:00.000Z"
+          }
+        ],
+        "status": "stable",
+        "stale": false,
+        "sources": []
+      }
+    },
+    {
+      "id": "node-bb9d90139694",
+      "path": "references/release-policy.md",
+      "title": "Local release policy",
+      "kind": "source",
+      "type": "Reference",
+      "tags": [
+        "policy",
+        "release"
+      ],
+      "summary": "Public releases require reproducible checks and an explicit maintainer action.",
+      "headings": [],
+      "wordCount": 19,
+      "modifiedAt": "2026-08-10T00:00:00.000Z",
+      "trust": {
+        "tier": "human-reviewed",
+        "generated": {
+          "by": "human:maintainer",
+          "at": "2026-08-12T00:00:00.000Z"
+        },
+        "verified": [
+          {
+            "by": "human:maintainer",
+            "at": "2026-08-12T01:00:00.000Z"
+          }
+        ],
+        "status": "stable",
+        "stale": false,
+        "sources": []
+      }
+    },
+    {
+      "id": "node-f41a6d4c6829",
+      "path": "skills/index.md",
+      "title": "Skills",
+      "kind": "index",
+      "type": "index",
+      "tags": [],
+      "summary": "- - Describes how an external executor could produce a receipt.",
+      "headings": [],
+      "wordCount": 16,
+      "modifiedAt": "2026-08-10T00:00:00.000Z"
+    },
+    {
+      "id": "node-94b13e2f1942",
+      "path": "skills/run-release-check.md",
+      "title": "Run release check",
+      "kind": "concept",
+      "type": "Skill",
+      "tags": [
+        "release",
+        "executor"
+      ],
+      "summary": "Descriptive run instructions for an external, explicitly authorized executor.",
+      "headings": [],
+      "wordCount": 19,
+      "modifiedAt": "2026-08-10T00:00:00.000Z",
+      "trust": {
+        "tier": "unverified",
+        "generated": {
+          "by": "process:fixture-builder",
+          "at": "2026-08-12T00:00:00.000Z"
+        },
+        "verified": [],
+        "status": "stable",
+        "stale": false,
+        "sources": []
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-b2d36204e319",
+      "source": "node-9b5a1184f5bd",
+      "target": "node-83a5ef7cfacc",
+      "kind": "markdown",
+      "label": "Release check"
+    },
+    {
+      "id": "edge-01258e0f60bc",
+      "source": "node-e540cdd1328b",
+      "target": "node-9eed6139eddf",
+      "kind": "markdown",
+      "label": "Release readiness"
+    },
+    {
+      "id": "edge-1f019cc74eef",
+      "source": "node-e540cdd1328b",
+      "target": "node-83a5ef7cfacc",
+      "kind": "markdown",
+      "label": "Release check"
+    },
+    {
+      "id": "edge-fd2a8a10a08f",
+      "source": "node-e540cdd1328b",
+      "target": "node-bb9d90139694",
+      "kind": "markdown",
+      "label": "Release policy"
+    },
+    {
+      "id": "edge-c6eb73d5fc59",
+      "source": "node-ba1ba9313592",
+      "target": "node-9eed6139eddf",
+      "kind": "markdown",
+      "label": "Release readiness"
+    },
+    {
+      "id": "edge-8ae6b33943af",
+      "source": "node-9eed6139eddf",
+      "target": "node-83a5ef7cfacc",
+      "kind": "markdown",
+      "label": "sanctioned release check"
+    },
+    {
+      "id": "edge-6e5c7fc8b1ed",
+      "source": "node-e51d7428d786",
+      "target": "node-bb9d90139694",
+      "kind": "markdown",
+      "label": "Local release policy"
+    },
+    {
+      "id": "edge-e92cd935b2e4",
+      "source": "node-e51d7428d786",
+      "target": "node-c05a6d08f642",
+      "kind": "markdown",
+      "label": "Receipt checker contract"
+    },
+    {
+      "id": "edge-7157eb241b58",
+      "source": "node-f41a6d4c6829",
+      "target": "node-94b13e2f1942",
+      "kind": "markdown",
+      "label": "Run release check"
+    }
+  ],
+  "diagnostics": [
+    {
+      "level": "warning",
+      "code": "ORPHAN_PAGE",
+      "path": "log.md",
+      "message": "Page has no resolved incoming or outgoing relationships"
+    }
+  ],
+  "stats": {
+    "files": 11,
+    "links": 9,
+    "brokenLinks": 0,
+    "orphanNodes": 1
+  }
+}

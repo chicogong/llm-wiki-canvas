@@ -1,16 +1,56 @@
 export type NodeKind = "index" | "concept" | "source" | "note";
 
+export type KnowledgeTrustTier = "unverified" | "machine-confirmed" | "human-reviewed";
+export type KnowledgeLifecycleStatus = "draft" | "stable" | "deprecated";
+
+export interface KnowledgeActorEvent {
+  by: string;
+  at?: string;
+}
+
+export interface KnowledgeSource {
+  id?: string;
+  resource: string;
+  title?: string;
+  author?: string;
+  usageCount?: number;
+  lastModified?: string;
+  usageWindow?: { from?: string; to?: string };
+}
+
+export interface AttestedComputationContract {
+  runtime?: string;
+  parameters: Array<{ name: string; type: string; required?: boolean }>;
+  computation?: string;
+  executor?: { resource?: string; receipt: string[] };
+  attester?: { resource?: string };
+}
+
+export interface KnowledgeTrust {
+  tier: KnowledgeTrustTier;
+  generated?: KnowledgeActorEvent;
+  verified: KnowledgeActorEvent[];
+  status: KnowledgeLifecycleStatus;
+  staleAfter?: string;
+  stale: boolean;
+  sources: KnowledgeSource[];
+}
+
 export interface WikiNode {
   id: string;
   path: string;
   title: string;
   kind: NodeKind;
+  type?: string;
   tags: string[];
   summary: string;
   headings: string[];
   wordCount: number;
   modifiedAt: string;
   source?: string;
+  resource?: string;
+  trust?: KnowledgeTrust;
+  attestedComputation?: AttestedComputationContract;
 }
 
 export interface WikiEdge {
@@ -33,6 +73,7 @@ export interface WikiGraph {
   schemaVersion: 1;
   rootName: string;
   generatedAt: string;
+  okf?: { version: string; recognized: boolean };
   nodes: WikiNode[];
   edges: WikiEdge[];
   diagnostics: Diagnostic[];

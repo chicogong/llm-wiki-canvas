@@ -12,6 +12,7 @@ import {
   buildGraph,
   buildKnowledgeContext,
   buildWikiReport,
+  checkOkfBundle,
   createKnowledgeIntake,
   createKnowledgeProposal,
   graphToCanvas,
@@ -20,6 +21,7 @@ import {
   inspectAgentCompatibility,
   intakeToMarkdown,
   knowledgeContextToMarkdown,
+  okfReportToMarkdown,
   parseKnowledgeProposal,
   parseAgentHosts,
   planAgentScaffold,
@@ -213,6 +215,28 @@ program.command("context")
     } else {
       process.stdout.write(output);
     }
+  });
+
+const okf = program.command("okf")
+  .description("Inspect Open Knowledge Format bundles without executing their runtime contracts");
+
+okf.command("check")
+  .argument("[root]", "OKF bundle root", ".")
+  .option("-o, --output <file>", "write the conformance report to a file instead of stdout")
+  .option("--format <format>", "report format: markdown or json", "markdown")
+  .option("--strict", "exit non-zero on warnings too", false)
+  .description("Validate the file and frontmatter contract for an OKF v0.2 bundle")
+  .action(async (root, options) => {
+    if (!["markdown", "json"].includes(options.format)) throw new Error(`Invalid --format value: ${options.format}`);
+    const report = await checkOkfBundle(root);
+    const output = options.format === "json" ? `${JSON.stringify(report, null, 2)}\n` : okfReportToMarkdown(report);
+    if (options.output) {
+      await writeText(options.output, output);
+      console.log(`OKF v0.2 conformance → ${options.output}`);
+    } else {
+      process.stdout.write(output);
+    }
+    if (!report.conformant || (options.strict && report.summary.warnings > 0)) process.exitCode = 1;
   });
 
 program.command("agents")

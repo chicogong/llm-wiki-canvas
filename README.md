@@ -18,6 +18,7 @@ It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
 - **Markdown stays the source of truth.** No proprietary database or forced migration.
 - **Relationships become visible.** Search, filter, and inspect the evidence around a page.
 - **Wiki quality becomes testable.** Broken links, ambiguous links, missing titles, and orphan pages have exact paths.
+- **OKF trust stays inspectable.** Open Knowledge Format v0.2 origin, verification, freshness, lifecycle, sources, and Attested Computation contracts travel through the graph and bounded context without becoming an opaque score or executable payload.
 - **Selected sources become governed drafts.** Register one Markdown/text source, retain its snapshot and SHA-256, let any Agent edit an isolated draft, then convert it into the existing proposal gate.
 - **Draft provenance is visible before review.** Drafts compares the captured source and isolated output, verifies hashes and target scope, and explains blockers without writing to the Vault.
 - **The Canvas stays yours.** Rebuilds preserve adjusted positions, text/link/group annotations, and manual edges while placing only new pages.
@@ -125,6 +126,7 @@ lwc scan /path/to/vault -o .lwc/graph.json
 lwc lint /path/to/vault
 lwc report /path/to/vault
 lwc context /path/to/vault --focus "Human Review" --depth 1 --max-pages 8 --max-words 2000
+lwc okf check /path/to/okf-bundle --strict
 lwc agents /path/to/workspace --strict
 lwc init /path/to/workspace             # dry-run
 lwc init /path/to/workspace --write     # create missing files only
@@ -179,6 +181,7 @@ Apply verifies the reviewed payload, review record, target paths, and original S
 
 - Markdown files and headings
 - YAML frontmatter: `title`, `type`/`kind`, `tags`, `summary`, and `source`
+- OKF v0.2 trust metadata: `sources`, `generated`, `verified`, `status`, `stale_after`, and descriptive Attested Computation contracts
 - WikiLinks: `[[Page]]`, aliases, headings, paths, and embeds
 - Markdown links to `.md` files
 - Page kinds: `index`, `concept`, `source`, and `note`
@@ -206,6 +209,7 @@ Markdown is durable knowledge. The graph, Canvas, and Viewer data are disposable
 ## Current capabilities
 
 - Parse Markdown, YAML frontmatter, WikiLinks, embeds, and `.md` links.
+- Check OKF v0.2 bundles and surface factual origin, review, freshness, lifecycle, source, and computation-contract signals without executing them.
 - Generate stable node and edge IDs.
 - Report broken and ambiguous links, missing titles, and orphan pages.
 - Produce Markdown or JSON health reports from observed structure without inventing a score.
@@ -231,7 +235,7 @@ It performs secret scanning, dependency auditing, unit tests, a reproducible dem
 
 ## Direction
 
-Governed source intake, Agent scaffolding, static compatibility, opt-in host execution, and bounded local context now form one tested loop. Real host evidence remains separate from deterministic CI and never turns a blocked login or missing binary into a pass. See [Bounded Agent context](docs/context.md), [Host runtime fixtures](docs/host-runtime.md), [Schema compatibility](docs/schema-compatibility.md), and [Releasing](RELEASING.md).
+Governed source intake, OKF trust inspection, Agent scaffolding, static compatibility, opt-in host execution, and bounded local context now form one tested loop. Real host evidence remains separate from deterministic CI and never turns a blocked login or missing binary into a pass. See [Open Knowledge Format v0.2](docs/okf.md), [Bounded Agent context](docs/context.md), [Host runtime fixtures](docs/host-runtime.md), [Schema compatibility](docs/schema-compatibility.md), and [Releasing](RELEASING.md).
 
 See [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), and the [Changelog](CHANGELOG.md).
 

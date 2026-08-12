@@ -134,6 +134,29 @@ test("@smoke filters the map and opens a relationship", async ({ page }, testInf
   expect(errors).toEqual([]);
 });
 
+test("@smoke inspects OKF trust signals without offering execution", async ({ page }, testInfo) => {
+  const errors: string[] = [];
+  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/?graph=/okf-graph.json");
+  await page.waitForLoadState("networkidle");
+  await expect(page.getByText("OKF 0.2")).toBeVisible();
+  await page.getByRole("button", { name: /Release readiness/ }).click();
+  const trust = page.getByLabel("Knowledge trust signals");
+  await expect(trust).toContainText("Evidence, not a score");
+  await expect(trust).toContainText("Human reviewed");
+  await expect(trust).toContainText("human:maintainer");
+  await expect(trust).toContainText("Fresh through 2026-12-31");
+  await expect(trust).toContainText("Local release policy");
+  await page.getByRole("button", { name: /Release check/ }).click();
+  await expect(page.getByLabel("Knowledge trust signals")).toContainText("Attested computation");
+  await expect(page.getByLabel("Knowledge trust signals")).toContainText("Contract only — not executed");
+  expect(await page.getByRole("button", { name: /^(run|execute)/i }).count()).toBe(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("okf-trust.png"), fullPage: true });
+  expect(errors).toEqual([]);
+});
+
 test("@smoke health view reports only compiled graph facts", async ({ page }) => {
   const errors = await openWorkbench(page);
   await page.getByRole("button", { name: "Health", exact: true }).click();

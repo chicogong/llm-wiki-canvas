@@ -1,4 +1,6 @@
 export { buildGraph } from "./graph.js";
+export { checkOkfBundle, okfReportToMarkdown } from "./okf.js";
+export type { OkfConformanceReport, OkfIssue } from "./okf.js";
 export { graphToCanvas, summarizeCanvasLayout } from "./canvas.js";
 export { graphToExcalidraw, summarizeExcalidrawLayout } from "./excalidraw.js";
 export { resolveFocusNode, selectFocusedGraph } from "./focus.js";

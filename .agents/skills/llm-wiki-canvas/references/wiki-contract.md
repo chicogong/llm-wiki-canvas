@@ -4,6 +4,7 @@
 
 - Markdown files under the selected root.
 - YAML frontmatter fields: `title`, `type`, `tags`, `summary`, and `source`.
+- OKF v0.2 fields: root `okf_version`; concept `sources`, `usage_window`, `generated`, `verified`, `status`, and `stale_after`; descriptive Attested Computation runtime, parameters, executor receipt, and attester references.
 - Node types: `index`, `concept`, `source`, and `note`.
 - Obsidian WikiLinks: `[[Page]]`, `[[Page|Label]]`, and `![[Page]]`.
 - Relative Markdown file links: `[Label](path/Page.md)`.
@@ -11,6 +12,7 @@
 ## Generated artifacts
 
 - `graph.json` uses schema version 1 and contains nodes, edges, diagnostics, and aggregate stats.
+- OKF-aware graphs retain arbitrary concept `type`, trust/lifecycle data, material sources, and optional Attested Computation contracts as additive schema-version-1 fields. Consumers must not execute those contracts.
 - `.canvas` follows the JSON Canvas 1.0 shape with file nodes and directed edges.
 - `.excalidraw` follows Excalidraw's plaintext scene format with editable shapes, text, and arrows.
 - Node IDs derive from normalized relative paths and stay stable across builds.

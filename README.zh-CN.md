@@ -18,6 +18,7 @@ LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性�
 - **Markdown 始终是事实源。** 不引入专有数据库，也不强制迁移已有 Vault。
 - **关系可以直接看见。** 搜索、筛选页面，并查看一个页面周围的证据与相邻关系。
 - **知识库质量可以测试。** 断链、歧义链接、缺少标题和孤立页面都有准确路径。
+- **OKF 信任信号可以检查。** Open Knowledge Format v0.2 的来源、验证、时效、生命周期、资料与 Attested Computation 契约会进入图谱和有限上下文，但不会变成不透明评分或可执行载荷。
 - **明确选择的资料会进入受控草稿。** 登记一份 Markdown/文本，保留来源快照和 SHA-256，让任意 Agent 只编辑隔离草稿，再进入现有 Proposal 审查门。
 - **进入审查前即可看见草稿溯源。** Drafts 对照来源快照与隔离产物，校验哈希和目标范围，并解释阻塞原因，但不会写入 Vault。
 - **Canvas 的所有权仍属于你。** 重建时保留节点位置、文字/链接/分组批注和手工连线，只安置新增页面。
@@ -125,6 +126,7 @@ lwc scan /path/to/vault -o .lwc/graph.json
 lwc lint /path/to/vault
 lwc report /path/to/vault
 lwc context /path/to/vault --focus "Human Review" --depth 1 --max-pages 8 --max-words 2000
+lwc okf check /path/to/okf-bundle --strict
 lwc agents /path/to/workspace --strict
 lwc init /path/to/workspace             # dry-run
 lwc init /path/to/workspace --write     # 仅创建缺失文件
@@ -179,6 +181,7 @@ lwc proposal apply /path/to/proposal.json /path/to/vault --confirm <proposal-id>
 
 - Markdown 文件和标题
 - YAML frontmatter：`title`、`type`/`kind`、`tags`、`summary`、`source`
+- OKF v0.2 信任元数据：`sources`、`generated`、`verified`、`status`、`stale_after`，以及描述性的 Attested Computation 契约
 - WikiLink：普通链接、别名、标题锚点、相对路径和嵌入
 - 指向 `.md` 文件的 Markdown 链接
 - 页面类型：`index`、`concept`、`source`、`note`
@@ -206,6 +209,7 @@ Markdown 是长期保存的知识；关系图、Canvas 和 Viewer 数据都是�
 ## 当前能力
 
 - 解析 Markdown、YAML frontmatter、WikiLink、嵌入与 `.md` 链接。
+- 检查 OKF v0.2 Bundle，展示来源、复核、时效、生命周期、资料与计算契约事实，但不执行它们。
 - 生成稳定的节点和关系 ID。
 - 报告断链、歧义链接、缺少标题和孤立页面。
 - 基于实际结构生成 Markdown 或 JSON 健康报告，不虚构综合评分。
@@ -231,7 +235,7 @@ pnpm verify
 
 ## 后续方向
 
-受控 Intake、Agent 安全初始化、静态兼容校验、可选真实宿主 fixture 和有限本地上下文已经形成经过测试的闭环。真实宿主证据与确定性 CI 严格分开，登录阻塞或命令未安装绝不会被算作通过。详见[有限 Agent 上下文](docs/context.md)、[Host 运行 fixture](docs/host-runtime.md)、[Schema 兼容策略](docs/schema-compatibility.md)和[发布流程](RELEASING.md)。
+受控 Intake、OKF 信任检查、Agent 安全初始化、静态兼容校验、可选真实宿主 fixture 和有限本地上下文已经形成经过测试的闭环。真实宿主证据与确定性 CI 严格分开，登录阻塞或命令未安装绝不会被算作通过。详见[Open Knowledge Format v0.2](docs/okf.zh-CN.md)、[有限 Agent 上下文](docs/context.md)、[Host 运行 fixture](docs/host-runtime.md)、[Schema 兼容策略](docs/schema-compatibility.md)和[发布流程](RELEASING.md)。
 
 另见 [贡献指南](CONTRIBUTING.md)、[安全策略](SECURITY.md)和[变更记录](CHANGELOG.md)。
 

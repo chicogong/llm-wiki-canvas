@@ -28,6 +28,7 @@ All notable changes will be documented here. This project follows Semantic Versi
 - An opt-in synthetic host runtime fixture that distinguishes deterministic reference evidence, real host execution, authentication blocks, unavailable binaries, and semantic failures without touching formal Markdown or storing sessions.
 - Linux and macOS package CI across Node.js 20 and 22, plus repeatable release checks and a documented schema compatibility policy.
 - Bounded, read-only Agent context export through `lwc context`, with exact focus resolution, relationship depth/direction/type filters, page and word budgets, source hashes, truncation evidence, symlink refusal, Markdown/JSON output, and a copy-ready Workbench handoff.
+- Open Knowledge Format v0.2 consumption through `lwc okf check`, arbitrary concept types, trust/provenance/freshness fields, bundle-root links, descriptive Attested Computation contracts, a no-execution boundary, and a responsive Workbench Trust Inspector.
 
 ### Compatibility
 

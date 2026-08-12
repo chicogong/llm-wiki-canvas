@@ -47,11 +47,15 @@ try {
   const tarball = path.resolve(project, tarballName);
   const consumer = path.join(scratch, "consumer");
   const wiki = path.join(consumer, "wiki");
+  const okfWiki = path.join(consumer, "okf-wiki");
   mkdirSync(wiki, { recursive: true });
+  mkdirSync(okfWiki, { recursive: true });
   writeFileSync(path.join(consumer, "package.json"), '{"name":"lwc-package-smoke","private":true}\n');
   run("npm", ["install", "--ignore-scripts", "--no-audit", "--no-fund", tarball], { cwd: consumer });
   const lwc = path.join(consumer, "node_modules", ".bin", "lwc");
   writeFileSync(path.join(wiki, "index.md"), "# Package Smoke\n[[Missing]]\n");
+  writeFileSync(path.join(okfWiki, "index.md"), "---\nokf_version: '0.2'\n---\n# OKF Package Smoke\n[Metric](/metric.md)\n");
+  writeFileSync(path.join(okfWiki, "metric.md"), "---\ntype: Metric\ntitle: Metric\ndescription: A package-level OKF trust fixture.\ngenerated: { by: process:package-smoke, at: 2026-08-12T00:00:00Z }\nverified: { by: human:package-reviewer, at: 2026-08-12T01:00:00Z }\nstatus: stable\nstale_after: 2026-12-31\nsources:\n  - { resource: https://example.invalid/policy, id: policy }\n---\n# Metric\nPackage evidence.\n");
   run(lwc, ["--version"], { cwd: consumer });
   const agentWorkspace = path.join(consumer, "agent-workspace");
   mkdirSync(agentWorkspace, { recursive: true });
@@ -78,6 +82,11 @@ try {
   run(lwc, ["agents", agentWorkspace, "--strict"], { cwd: consumer, expectFailure: true });
   run(lwc, ["agents", agentWorkspace, "--format", "xml"], { cwd: consumer, expectFailure: true });
   run(lwc, ["serve", "--help"], { cwd: consumer });
+  const okfReportFile = path.join(consumer, "okf-report.json");
+  run(lwc, ["okf", "check", okfWiki, "--strict", "--format", "json", "-o", okfReportFile], { cwd: consumer });
+  run(lwc, ["okf", "check", okfWiki, "--format", "xml"], { cwd: consumer, expectFailure: true });
+  const okfReport = JSON.parse(readFileSync(okfReportFile, "utf8"));
+  if (!okfReport.conformant || okfReport.declaredVersion !== "0.2" || JSON.stringify(okfReport).includes(okfWiki)) throw new Error("packaged CLI OKF check failed or leaked an absolute bundle path");
   run(lwc, ["scan", wiki, "-o", path.join(consumer, "graph.json")], { cwd: consumer });
   run(lwc, ["lint", wiki], { cwd: consumer, expectFailure: true });
   writeFileSync(path.join(wiki, "Missing.md"), "# Missing\n[[index]]\n");
@@ -193,7 +202,7 @@ try {
   run(lwc, ["proposal", "apply", intakeProposalFile, wiki, "--confirm", intakeProposal.id, "--applied-at", "2026-08-10T06:00:00.000Z"], { cwd: consumer });
   if (!readFileSync(path.join(wiki, "Intake.md"), "utf8").includes("Source-grounded")) throw new Error("packaged CLI intake proposal did not pass the human review gate");
   run(lwc, ["scan", path.join(scratch, "missing-root")], { cwd: consumer, expectFailure: true });
-  console.log("Packaged CLI smoke passed: bin, safe Agent setup, Agent compatibility, scan, lint/strict, bounded context, report, build, local serve, intake and proposal lifecycles, focused Mermaid/Excalidraw exports, invalid root");
+  console.log("Packaged CLI smoke passed: bin, safe Agent setup, Agent compatibility, OKF v0.2 trust check, scan, lint/strict, bounded context, report, build, local serve, intake and proposal lifecycles, focused Mermaid/Excalidraw exports, invalid root");
 } finally {
   rmSync(scratch, { recursive: true, force: true });
 }

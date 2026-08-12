@@ -3,6 +3,7 @@ import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import fg from "fast-glob";
 import matter from "gray-matter";
+import { parseAttestedComputation, parseKnowledgeTrust } from "./okf.js";
 import type { Diagnostic, NodeKind, WikiEdge, WikiGraph, WikiNode } from "./types.js";
 
 type Draft = WikiNode & { rawLinks: RawLink[]; missingTitle: boolean };
@@ -14,7 +15,7 @@ function safeDecode(value: string): string {
   try { return decodeURIComponent(value); } catch { return value; }
 }
 
-const normalizedKey = (value: string) => safeDecode(withoutMd(unix(value))).replace(/^\.\//, "").toLocaleLowerCase();
+const normalizedKey = (value: string) => safeDecode(withoutMd(unix(value))).replace(/^\.\//, "").replace(/^\/+/, "").toLocaleLowerCase();
 const stableId = (prefix: string, value: string) => `${prefix}-${createHash("sha1").update(value).digest("hex").slice(0, 12)}`;
 
 function firstParagraph(content: string): string {
@@ -27,12 +28,13 @@ function firstParagraph(content: string): string {
     ?.slice(0, 220) ?? "";
 }
 
-function nodeKind(relativePath: string, data: Record<string, unknown>): NodeKind {
+function nodeKind(relativePath: string, data: Record<string, unknown>, okfDocument: boolean): NodeKind {
   const explicit = String(data.type ?? data.kind ?? "").toLowerCase();
   if (["index", "concept", "source", "note"].includes(explicit)) return explicit as NodeKind;
   if (/^(index|home|readme)\.md$/i.test(path.basename(relativePath))) return "index";
-  if (relativePath.toLowerCase().startsWith("sources/")) return "source";
+  if (/^(sources|references)\//i.test(relativePath)) return "source";
   if (relativePath.toLowerCase().startsWith("concepts/")) return "concept";
+  if (okfDocument && explicit) return "concept";
   return "note";
 }
 
@@ -55,6 +57,10 @@ export async function buildGraph(root: string, now = new Date(), fixedModifiedAt
   const absoluteRoot = path.resolve(root);
   const rootInfo = await stat(absoluteRoot).catch(() => undefined);
   if (!rootInfo?.isDirectory()) throw new Error(`Wiki root is not a directory: ${absoluteRoot}`);
+  const okfVersion = await readFile(path.join(absoluteRoot, "index.md"), "utf8")
+    .then((raw) => matter(raw).data.okf_version)
+    .catch(() => undefined);
+  const declaredOkfVersion = okfVersion === undefined ? undefined : String(okfVersion);
   const files = await fg(["**/*.md"], {
     cwd: absoluteRoot,
     onlyFiles: true,
@@ -70,17 +76,24 @@ export async function buildGraph(root: string, now = new Date(), fixedModifiedAt
     const rawTags = parsed.data.tags ?? [];
     const tags = Array.isArray(rawTags) ? rawTags.map(String) : String(rawTags).split(",").map((tag) => tag.trim()).filter(Boolean);
     const cleanPath = unix(relative);
+    const rawType = String(parsed.data.type ?? parsed.data.kind ?? "").trim();
+    const okfDocument = declaredOkfVersion !== undefined && !/^(index|log)\.md$/i.test(path.basename(cleanPath));
+    const kind = nodeKind(cleanPath, parsed.data, okfDocument);
     return {
       id: stableId("node", normalizedKey(cleanPath)),
       path: cleanPath,
       title,
-      kind: nodeKind(cleanPath, parsed.data),
+      kind,
+      type: rawType || kind,
       tags,
-      summary: String(parsed.data.summary ?? firstParagraph(parsed.content)),
+      summary: String(parsed.data.summary ?? parsed.data.description ?? firstParagraph(parsed.content)),
       headings: [...parsed.content.matchAll(/^#{2,6}\s+(.+)$/gm)].map((match) => match[1].trim()),
       wordCount: parsed.content.trim().split(/\s+|(?<=[\u4e00-\u9fff])/).filter(Boolean).length,
       modifiedAt: (fixedModifiedAt ?? info.mtime).toISOString(),
       source: parsed.data.source ? String(parsed.data.source) : undefined,
+      resource: parsed.data.resource ? String(parsed.data.resource) : undefined,
+      trust: parseKnowledgeTrust(parsed.data, now, okfDocument),
+      attestedComputation: parseAttestedComputation(parsed.data),
       rawLinks: extractLinks(parsed.content),
       missingTitle: !parsed.data.title && !heading,
     };
@@ -101,7 +114,7 @@ export async function buildGraph(root: string, now = new Date(), fixedModifiedAt
   }));
   for (const source of drafts) {
     for (const link of source.rawLinks) {
-      const relativeCandidate = normalizedKey(path.join(path.dirname(source.path), link.target));
+      const relativeCandidate = link.target.startsWith("/") ? normalizedKey(link.target) : normalizedKey(path.join(path.dirname(source.path), link.target));
       const directCandidate = normalizedKey(link.target);
       const candidates = byKey.get(relativeCandidate) ?? byKey.get(directCandidate) ?? byKey.get(normalizedKey(path.basename(link.target))) ?? [];
       const unique = [...new Map(candidates.map((candidate) => [candidate.id, candidate])).values()];
@@ -134,6 +147,7 @@ export async function buildGraph(root: string, now = new Date(), fixedModifiedAt
     schemaVersion: 1,
     rootName: path.basename(absoluteRoot),
     generatedAt: now.toISOString(),
+    okf: declaredOkfVersion === undefined ? undefined : { version: declaredOkfVersion, recognized: declaredOkfVersion === "0.2" },
     nodes,
     edges: uniqueEdges,
     diagnostics,

@@ -8,6 +8,7 @@
       "path": "Agent Workflow.md",
       "title": "Agent Workflow",
       "kind": "note",
+      "type": "note",
       "tags": [
         "codex",
         "workflow"
@@ -22,6 +23,7 @@
       "path": "concepts/Human Review.md",
       "title": "Human Review",
       "kind": "concept",
+      "type": "concept",
       "tags": [
         "governance",
         "trust"
@@ -36,6 +38,7 @@
       "path": "concepts/LLM Wiki.md",
       "title": "LLM Wiki",
       "kind": "concept",
+      "type": "concept",
       "tags": [
         "compiler",
         "knowledge"
@@ -52,6 +55,7 @@
       "path": "concepts/Visual Knowledge.md",
       "title": "Visual Knowledge",
       "kind": "concept",
+      "type": "concept",
       "tags": [
         "graph",
         "canvas"
@@ -66,6 +70,7 @@
       "path": "index.md",
       "title": "Agent Knowledge Atlas",
       "kind": "index",
+      "type": "index",
       "tags": [
         "llm-wiki",
         "local-first"
@@ -80,6 +85,7 @@
       "path": "log.md",
       "title": "Atlas Log",
       "kind": "note",
+      "type": "note",
       "tags": [
         "maintenance"
       ],
@@ -95,6 +101,7 @@
       "path": "sources/Karpathy Pattern.md",
       "title": "Karpathy LLM Wiki Pattern",
       "kind": "source",
+      "type": "source",
       "tags": [
         "source",
         "llm-wiki"
@@ -110,6 +117,7 @@
       "path": "sources/Obsidian Canvas.md",
       "title": "Obsidian JSON Canvas",
       "kind": "source",
+      "type": "source",
       "tags": [
         "source",
         "obsidian"

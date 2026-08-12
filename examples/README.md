@@ -76,6 +76,10 @@ The command creates ignored local state under `examples/atlas-wiki/.lwc/drafts/`
 
 The separate [`host-fixture`](host-fixture/) is the public cross-Agent execution case. `pnpm test:hosts` runs its deterministic reference implementation; explicitly enabled Codex or Claude Code runs must produce the same one-draft, one-proposal, zero-formal-write semantics. See [Host runtime fixtures](../docs/host-runtime.md).
 
+### OKF trust bundle
+
+[`okf-trust`](okf-trust/) is a synthetic Open Knowledge Format v0.2 bundle with human-reviewed, machine-confirmed, unverified, freshness, source, and Attested Computation examples. Run `pnpm okf:demo && pnpm okf:build`, then open <http://127.0.0.1:4173/?graph=/okf-graph.json>. LLM Wiki Canvas parses and displays the computation contract but never executes its command, executor, attester, or referenced Skill. See the [OKF guide](../docs/okf.md).
+
 ### Copy the pattern
 
 A minimal page looks like this:
@@ -177,6 +181,10 @@ pnpm lwc intake create examples/atlas-wiki \
 命令会在 `examples/atlas-wiki/.lwc/drafts/` 下创建被忽略的本地状态：复制来源、记录 SHA-256，并打印唯一的占位草稿。编辑草稿后，使用打印的 manifest 执行 `lwc intake show` 和 `lwc intake propose`；转换 Proposal 仍然不会直接应用页面。
 
 独立的 [`host-fixture`](host-fixture/) 是公开的跨 Agent 运行案例。`pnpm test:hosts` 执行确定性基准；显式启用的 Codex 或 Claude Code 必须产生相同的“一份草稿、一份 Proposal、正式知识零写入”语义。详见 [Host 运行 fixture](../docs/host-runtime.md)。
+
+### OKF 信任 Bundle
+
+[`okf-trust`](okf-trust/) 是一份合成 Open Knowledge Format v0.2 Bundle，覆盖人工复核、机器确认、未验证、时效、资料来源与 Attested Computation。运行 `pnpm okf:demo && pnpm okf:build`，再打开 <http://127.0.0.1:4173/?graph=/okf-graph.json>。LLM Wiki Canvas 会解析并展示计算契约，但绝不执行其中的命令、executor、attester 或引用的 Skill。详见 [OKF 指南](../docs/okf.zh-CN.md)。
 
 ### 复制这种模式
 
