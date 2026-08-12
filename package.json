@@ -56,16 +56,16 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.54.2",
-    "@types/node": "^24.2.1",
+    "@types/node": "^26.2.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
-    "@vitejs/plugin-react": "^5.0.4",
-    "jsdom": "^26.1.0",
+    "@vitejs/plugin-react": "^6.0.5",
+    "jsdom": "^30.0.1",
     "tsx": "^4.20.3",
     "tsup": "^8.5.0",
-    "typescript": "~5.8.3",
-    "vite": "^7.1.1",
-    "vitest": "^3.2.4"
+    "typescript": "~7.0.2",
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10"
   },
   "engines": {"node": ">=20"},
   "packageManager": "pnpm@10.34.5",
