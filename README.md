@@ -12,7 +12,7 @@ LLM Wiki Canvas turns Markdown, frontmatter, and WikiLinks into a deterministic 
 
 It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
 
-[Explore the synthetic Atlas](https://chicogong.github.io/llm-wiki-canvas/) · [Install from npm](#quick-start) · [Read the usage guide](docs/usage.md)
+[Explore the synthetic Atlas](https://realtime-ai.chat/llm-wiki-canvas/) · [Install from npm](#quick-start) · [Read the usage guide](docs/usage.md)
 
 ![LLM Wiki Canvas Atlas viewer](docs/assets/atlas-viewer.png)
 
