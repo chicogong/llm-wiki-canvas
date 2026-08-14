@@ -31,9 +31,9 @@ LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性�
 - **审核前即可看到关系影响。** Change blueprint 会标出受影响页面、新增或删除的链接，以及目标哈希冲突，且不会写入正式知识。
 - **生成视图可复现。** 稳定的节点和边 ID，让图谱 fixture 与 Git diff 有实际意义。
 
-## 运行真实示例
+## 运行可复现的合成示例
 
-仓库自带 **Agent Knowledge Atlas**：一个规模不大、可以逐页检查的知识库，内容涉及 LLM Wiki、可视化知识、来源追溯和人工审查。
+仓库自带 **Agent Knowledge Atlas**：一个规模不大、可以逐页检查的合成知识库，内容涉及 LLM Wiki、可视化知识、来源追溯和人工审查。它是产品测试夹具，不是真实用户 Vault 的使用证据。
 
 ```bash
 git clone https://github.com/chicogong/llm-wiki-canvas.git
@@ -45,6 +45,8 @@ pnpm dev
 ```
 
 浏览器打开 <http://127.0.0.1:4173>。
+
+静态 Viewer 只读取仓库内置的示例图。Drafts 和 Changes 需要本机回环地址上的 `lwc serve`；两种模式都不会上传 Vault。
 
 示例构建结果可以直接验证：
 
@@ -71,7 +73,7 @@ public/graph.json            # 确定性的 Viewer 输入
 
 更完整的操作步骤见 [Examples](examples/README.md)。
 
-Workbench、单命令本地服务、proposal 审查、关系变更叠层，以及可选 Excalidraw/Mermaid 视图的规划见[双语产品路线图](ROADMAP.md)。
+当前产品边界和下一步验证计划见[双语产品路线图](ROADMAP.md)。
 
 ## 与其他工具怎么选
 
@@ -105,6 +107,8 @@ LLM Wiki Canvas 有意只做很小的一层：编译并检查已经存在的 Mar
 执行 `pnpm report:demo` 可以复现完整结构快照，包括页面连接情况、来源元数据、诊断、页面类型和高连接页面。个人 Vault、Agent 和 CI 的具体收益与使用流程见[收益与使用场景](docs/value-and-workflows.zh-CN.md)。
 
 ## 用在自己的 Vault
+
+npm 包目前仍是尚未公开发布的 `0.1.0` 候选版。首次正式发布前请使用下面的源码方式；不要安装同名但无关的非 scoped `lwc` 包。
 
 开发环境可以直接执行：
 

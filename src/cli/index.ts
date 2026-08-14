@@ -87,6 +87,7 @@ async function readProposal(target: string): Promise<KnowledgeProposal> {
   try {
     return parseKnowledgeProposal(JSON.parse(await readFile(path.resolve(target), "utf8")));
   } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") throw new Error(`Proposal does not exist: ${target}`);
     if (error instanceof SyntaxError) throw new Error(`Proposal is not valid JSON: ${target}`);
     throw error;
   }
@@ -244,11 +245,14 @@ program.command("agents")
   .argument("[root]", "workspace root containing Agent integration files", ".")
   .option("-o, --output <file>", "write the compatibility report to a file instead of stdout")
   .option("--format <format>", "report format: markdown or json", "markdown")
+  .option("--title <name>", "stable display name for generated documentation")
   .option("--strict", "exit non-zero when a required host integration is incomplete", false)
   .description("Verify cross-Agent repository rules and Skill entry points")
   .action(async (root, options) => {
     if (!["markdown", "json"].includes(options.format)) throw new Error(`Invalid --format value: ${options.format}`);
-    const report = await inspectAgentCompatibility(root);
+    const inspected = await inspectAgentCompatibility(root);
+    if (options.title !== undefined && (!options.title.trim() || /[\r\n]/.test(options.title))) throw new Error("Invalid --title value");
+    const report = options.title ? { ...inspected, rootName: options.title.trim() } : inspected;
     const output = options.format === "json" ? `${JSON.stringify(report, null, 2)}\n` : agentCompatibilityToMarkdown(report);
     if (options.output) {
       await writeText(options.output, output);

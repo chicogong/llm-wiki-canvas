@@ -60,14 +60,18 @@ try {
     throw new Error("packed npm artifact is missing complete third-party license notices");
   }
   const lwc = path.join(consumer, "node_modules", ".bin", "lwc");
+  const longBin = path.join(consumer, "node_modules", ".bin", "llm-wiki-canvas");
   const help = run(lwc, ["--help"], { cwd: consumer }).stdout;
   if (!help.startsWith("Usage: lwc") || !help.includes("Also installed as: llm-wiki-canvas")) {
     throw new Error("packaged CLI help does not present the short command clearly");
   }
+  for (const binary of [lwc, longBin]) {
+    const version = run(binary, ["--version"], { cwd: consumer }).stdout.trim();
+    if (version !== installedManifest.version) throw new Error(`packaged CLI version drifted: ${version}`);
+  }
   writeFileSync(path.join(wiki, "index.md"), "# Package Smoke\n[[Missing]]\n");
   writeFileSync(path.join(okfWiki, "index.md"), "---\nokf_version: '0.2'\n---\n# OKF Package Smoke\n[Metric](/metric.md)\n");
   writeFileSync(path.join(okfWiki, "metric.md"), "---\ntype: Metric\ntitle: Metric\ndescription: A package-level OKF trust fixture.\ngenerated: { by: process:package-smoke, at: 2026-08-12T00:00:00Z }\nverified: { by: human:package-reviewer, at: 2026-08-12T01:00:00Z }\nstatus: stable\nstale_after: 2026-12-31\nsources:\n  - { resource: https://example.invalid/policy, id: policy }\n---\n# Metric\nPackage evidence.\n");
-  run(lwc, ["--version"], { cwd: consumer });
   const agentWorkspace = path.join(consumer, "agent-workspace");
   mkdirSync(agentWorkspace, { recursive: true });
   const agentPreviewFile = path.join(consumer, "agents-preview.json");

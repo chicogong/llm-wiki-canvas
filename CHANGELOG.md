@@ -4,7 +4,7 @@ All notable changes will be documented here. This project follows Semantic Versi
 
 ## [Unreleased]
 
-No unreleased changes. Version `0.1.0` is frozen as a release candidate and has not been published.
+No unreleased changes. Version `0.1.0` is frozen as an updated release candidate and has not been published.
 
 ## [0.1.0] - 2026-08-12
 
@@ -41,6 +41,8 @@ No unreleased changes. Version `0.1.0` is frozen as a release candidate and has 
 - Visible OKF checker warnings/errors in Map and Health, plus preservation of unknown concept types, recommended optional fields, and producer-defined frontmatter.
 - A pinned official Acme Retail OKF bundle regression at upstream commit `374e0bc4c644310ff56cdf9c0fe81eccdec862b0`.
 - Generated third-party licenses and copyright notices included and checked in the npm package.
+- Reworked the Viewer as an evidence-cartography desk, distinguished synthetic static data from the local live Workbench, made GitHub Pages subpath assets portable, and added a real browser-to-`lwc serve` proposal-review test that proves formal Markdown remains unchanged.
+- Normalized CLI help around `lwc`, added a friendly missing-proposal error, and aligned default consumer installation and both binary versions with the package manifest.
 
 ### Compatibility
 

@@ -134,7 +134,7 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
   return <div ref={ref} className="graph-canvas" data-testid="graph-canvas" aria-label="Wiki relationship map" />;
 }
 
-function AppNavigation({ view, onView, drafts, changes }: { view: WorkbenchView; onView: (view: WorkbenchView) => void; drafts: number; changes: number }) {
+function AppNavigation({ view, onView, drafts, changes, live }: { view: WorkbenchView; onView: (view: WorkbenchView) => void; drafts: number; changes: number; live: boolean }) {
   return <nav className="app-nav" aria-label="Workspace views">
     <button className={view === "map" ? "active" : ""} onClick={() => onView("map")} aria-current={view === "map" ? "page" : undefined}>
       {mapIcon}<span>Map</span>
@@ -143,10 +143,10 @@ function AppNavigation({ view, onView, drafts, changes }: { view: WorkbenchView;
       {healthIcon}<span>Health</span>
     </button>
     <button className={view === "drafts" ? "active" : ""} onClick={() => onView("drafts")} aria-current={view === "drafts" ? "page" : undefined}>
-      {draftsIcon}<span>Drafts</span>{drafts > 0 && <b className="nav-count draft" aria-label={`${drafts} intakes need attention`}>{drafts}</b>}
+      {draftsIcon}<span>Drafts</span>{!live && <em className="local-badge">Local</em>}{drafts > 0 && <b className="nav-count draft" aria-label={`${drafts} intakes need attention`}>{drafts}</b>}
     </button>
     <button className={view === "changes" ? "active" : ""} onClick={() => onView("changes")} aria-current={view === "changes" ? "page" : undefined}>
-      {changesIcon}<span>Changes</span>{changes > 0 && <b className="nav-count" aria-label={`${changes} open proposals`}>{changes}</b>}
+      {changesIcon}<span>Changes</span>{!live && <em className="local-badge">Local</em>}{changes > 0 && <b className="nav-count" aria-label={`${changes} open proposals`}>{changes}</b>}
     </button>
   </nav>;
 }
@@ -622,7 +622,7 @@ export function App() {
   const live = new URLSearchParams(location.search).get("live") === "1";
 
   useEffect(() => {
-    const source = new URLSearchParams(location.search).get("graph") ?? "/graph.json";
+    const source = new URLSearchParams(location.search).get("graph") ?? new URL("./graph.json", document.baseURI).toString();
     let active = true;
     const load = async () => {
       try {
@@ -689,21 +689,24 @@ export function App() {
   const viewTitle = view === "map" ? "Knowledge map" : view === "health" ? "Vault health" : view === "drafts" ? "Draft intake" : "Changes inbox";
 
   return <main className="workbench-shell">
+    <a className="skip-link" href="#workspace-content">Skip to workspace</a>
     <aside className="sidebar">
       <div className="brand"><span className="brand-mark" aria-hidden="true"><i /><i /></span><div><strong>LLM Wiki Canvas</strong><small>Evidence cartography</small></div></div>
       <div className="vault-label"><span>Local survey / vault</span><strong>{graph.rootName}</strong></div>
-      <AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} />
+      <AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} live={live} />
       <div className="sidebar-note"><span className="status-dot" /><div><strong>{live ? "Watching source" : "Local evidence"}</strong><small>{live ? "Markdown refreshes this projection" : "Markdown remains the source of truth"}</small></div></div>
     </aside>
 
-    <section className="workbench">
+    <section className={`workbench ${live ? "is-live" : "is-demo"}`} id="workspace-content">
       <header className="topbar">
         <div className="mobile-brand"><span className="brand-mark" aria-hidden="true"><i /><i /></span><strong>{graph.rootName}</strong></div>
         <div className="breadcrumb"><span>{graph.rootName}</span><b>/</b><strong>{viewTitle}</strong></div>
         <div className="evidence-route" aria-label="Evidence workflow"><span>Source</span><i>→</i><span>Projection</span><i>→</i><strong>Human gate</strong></div>
         <div className="topbar-meta">{graph.okf && <span className="okf-version">OKF {graph.okf.version}</span>}<span className="status-dot" />{live ? "Live" : "Generated"} {graph.generatedAt.slice(0, 10)}</div>
       </header>
-      <div className="mobile-nav"><AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} /></div>
+      {!live && <section className="demo-disclosure" aria-label="Static demo notice"><div><strong>Sample Atlas · static demo</strong><span>8 synthetic pages. Your local files are not being read or uploaded.</span></div><code>pnpm lwc serve /path/to/vault</code><a href="https://github.com/chicogong/llm-wiki-canvas#readme">Run from source ↗</a></section>}
+      <h1 className="sr-only">{viewTitle}</h1>
+      <div className="mobile-nav"><AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} live={live} /></div>
       {view === "map" && <MapView graph={graph} selectedId={selectedId} onSelect={setSelectedId} />}
       {view === "health" && <HealthView graph={graph} onOpenPage={switchToPage} />}
       {view === "drafts" && <DraftsView inbox={drafts} error={draftsError} live={live} />}
