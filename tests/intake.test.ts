@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, readFile, symlink, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -10,6 +10,7 @@ import {
   readProposalInbox,
   readKnowledgeIntake,
   reviewKnowledgeProposal,
+  writeKnowledgeIntakeDraft,
 } from "../src/core/index.js";
 
 async function fixture() {
@@ -68,6 +69,39 @@ describe("governed source intake", () => {
     await expect(applyKnowledgeProposal(root, tampered, tampered.id)).rejects.toThrow("Proposal changed after review");
     await applyKnowledgeProposal(root, reviewed, reviewed.id, new Date("2026-08-11T03:00:00Z"));
     await expect(readFile(path.join(root, "concepts/Decision.md"), "utf8")).resolves.toContain("Keep Markdown as truth");
+  });
+
+  it("writes only the declared isolated draft through the governed helper", async () => {
+    const { root, source } = await fixture();
+    const created = await createKnowledgeIntake(root, source, "concepts/Decision.md", "DeepSeek Harness", new Date("2026-08-11T00:00:00Z"));
+    const written = await writeKnowledgeIntakeDraft(root, created.manifestPath, "# Decision\n\nKeep Markdown as truth.");
+    expect(written).toMatchObject({ intake: { id: created.intake.id }, bytes: 36 });
+    expect(written.contentHash).toMatch(/^[a-f0-9]{64}$/);
+    await expect(readFile(created.draftPath, "utf8")).resolves.toBe("# Decision\n\nKeep Markdown as truth.\n");
+    await expect(readFile(path.join(root, "concepts/Decision.md"), "utf8")).rejects.toThrow();
+
+    await expect(writeKnowledgeIntakeDraft(root, created.manifestPath, "\0unsafe")).rejects.toThrow("NUL");
+    await expect(writeKnowledgeIntakeDraft(root, created.manifestPath, "   ")).rejects.toThrow("empty");
+  });
+
+  it("rejects draft writes through a forged manifest location or symlink", async () => {
+    const first = await fixture();
+    const created = await createKnowledgeIntake(first.root, first.source, "Decision.md");
+    const external = path.join(await mkdtemp(path.join(tmpdir(), "lwc-draft-manifest-")), "intake.json");
+    await writeFile(external, `${JSON.stringify(created.intake)}\n`);
+    await expect(writeKnowledgeIntakeDraft(first.root, external, "# Decision\n")).rejects.toThrow("must stay under this Vault");
+
+    const second = await fixture();
+    const linked = await createKnowledgeIntake(second.root, second.source, "concepts/Decision.md");
+    const externalDirectory = await mkdtemp(path.join(tmpdir(), "lwc-draft-target-"));
+    await mkdir(path.dirname(linked.draftPath), { recursive: true });
+    const original = await readFile(linked.draftPath, "utf8");
+    await rm(linked.draftPath);
+    const externalDraft = path.join(externalDirectory, "Decision.md");
+    await writeFile(externalDraft, original);
+    await symlink(externalDraft, linked.draftPath);
+    await expect(writeKnowledgeIntakeDraft(second.root, linked.manifestPath, "# Escaped\n")).rejects.toThrow("symbolic link");
+    await expect(readFile(externalDraft, "utf8")).resolves.toBe(original);
   });
 
   it("blocks proposal creation when the original source changes", async () => {

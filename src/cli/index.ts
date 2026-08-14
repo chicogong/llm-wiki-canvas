@@ -31,6 +31,7 @@ import {
   reportToMarkdown,
   readKnowledgeIntake,
   reviewKnowledgeProposal,
+  writeKnowledgeIntakeDraft,
   selectFocusedGraph,
   summarizeCanvasLayout,
   summarizeExcalidrawLayout,
@@ -291,10 +292,16 @@ intake.command("create")
   .requiredOption("--target <path>", "intended Markdown path inside the wiki")
   .option("--generator <name>", "Agent, model, or author preparing the draft")
   .option("--created-at <iso>", "fixed ISO timestamp for reproducible fixtures")
+  .option("--format <format>", "output format: text or json", "text")
   .description("Copy a source snapshot and create an isolated placeholder draft")
   .action(async (root, options) => {
+    if (!["text", "json"].includes(options.format)) throw new Error(`Invalid --format value: ${options.format}`);
     const createdAt = options.createdAt ? generatedAt(options.createdAt) : new Date();
     const created = await createKnowledgeIntake(root, options.source, options.target, options.generator, createdAt);
+    if (options.format === "json") {
+      process.stdout.write(`${JSON.stringify(created, null, 2)}\n`);
+      return;
+    }
     console.log(`Intake ${created.intake.id} → ${created.manifestPath}`);
     console.log(`Source snapshot → ${created.sourceSnapshotPath}`);
     console.log(`Draft target → ${created.draftPath}`);
@@ -303,9 +310,33 @@ intake.command("create")
 
 intake.command("show")
   .argument("<intake>", "intake manifest JSON file")
+  .option("--format <format>", "output format: markdown or json", "markdown")
   .description("Show source provenance, draft target, generator, and lifecycle state")
-  .action(async (intakeFile) => {
-    process.stdout.write(intakeToMarkdown(await readKnowledgeIntake(intakeFile)));
+  .action(async (intakeFile, options) => {
+    if (!["markdown", "json"].includes(options.format)) throw new Error(`Invalid --format value: ${options.format}`);
+    const value = await readKnowledgeIntake(intakeFile);
+    process.stdout.write(options.format === "json" ? `${JSON.stringify(value, null, 2)}\n` : intakeToMarkdown(value));
+  });
+
+intake.command("draft")
+  .argument("<intake>", "intake manifest JSON file")
+  .argument("[root]", "wiki root", ".")
+  .option("--stdin", "read the complete Markdown draft from stdin", false)
+  .option("--format <format>", "output format: text or json", "text")
+  .description("Replace only an intake's declared isolated draft; never writes formal Markdown")
+  .action(async (intakeFile, root, options) => {
+    if (!options.stdin) throw new Error("Intake draft content must be supplied with --stdin");
+    if (!["text", "json"].includes(options.format)) throw new Error(`Invalid --format value: ${options.format}`);
+    const chunks: Buffer[] = [];
+    for await (const chunk of process.stdin) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    const value = await writeKnowledgeIntakeDraft(root, intakeFile, Buffer.concat(chunks).toString("utf8"));
+    if (options.format === "json") {
+      process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
+    } else {
+      console.log(`Draft ${value.intake.draft.path} updated for ${value.intake.id}`);
+      console.log(`Content SHA-256: ${value.contentHash}`);
+      console.log("Formal Markdown is unchanged");
+    }
   });
 
 intake.command("propose")
@@ -313,13 +344,19 @@ intake.command("propose")
   .argument("[root]", "wiki root", ".")
   .option("--summary <text>", "short reason for the generated knowledge", "Source-grounded knowledge intake")
   .option("--proposed-at <iso>", "fixed ISO timestamp for reproducible fixtures")
+  .option("--format <format>", "output format: text or json", "text")
   .description("Validate source and draft integrity, then create a proposal without changing the wiki")
   .action(async (intakeFile, root, options) => {
+    if (!["text", "json"].includes(options.format)) throw new Error(`Invalid --format value: ${options.format}`);
     const proposedAt = options.proposedAt ? generatedAt(options.proposedAt) : new Date();
     const value = await proposeKnowledgeIntake(root, intakeFile, options.summary, proposedAt);
     const proposalFile = path.join(root, value.intake.proposal?.file ?? "");
     await writeJson(proposalFile, value.proposal);
     await writeJson(intakeFile, value.intake);
+    if (options.format === "json") {
+      process.stdout.write(`${JSON.stringify({ ...value, proposalFile }, null, 2)}\n`);
+      return;
+    }
     console.log(`Intake ${value.intake.id} → proposal ${value.proposal.id}`);
     console.log(`Proposal → ${proposalFile}`);
     console.log(`Formal Markdown is unchanged; review with: lwc proposal show ${proposalFile}`);
@@ -347,9 +384,12 @@ proposal.command("create")
 
 proposal.command("show")
   .argument("<proposal>", "proposal JSON file")
+  .option("--format <format>", "output format: markdown or json", "markdown")
   .description("Render proposal metadata, hashes, and a review diff")
-  .action(async (proposalFile) => {
-    process.stdout.write(proposalToMarkdown(await readProposal(proposalFile)));
+  .action(async (proposalFile, options) => {
+    if (!["markdown", "json"].includes(options.format)) throw new Error(`Invalid --format value: ${options.format}`);
+    const value = await readProposal(proposalFile);
+    process.stdout.write(options.format === "json" ? `${JSON.stringify(value, null, 2)}\n` : proposalToMarkdown(value));
   });
 
 proposal.command("review")

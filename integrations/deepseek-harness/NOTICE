@@ -1,0 +1,8 @@
+LLM Wiki Canvas DeepSeek Harness Integration
+Copyright 2026 Haoran Gong
+
+This product includes software developed for the LLM Wiki Canvas project.
+
+Runtime dependencies:
+- @deepseek-ai/dsh-tools, MIT, https://github.com/deepseek-ai/deepseek-harness
+- llm-wiki-canvas, Apache-2.0, https://github.com/chicogong/llm-wiki-canvas

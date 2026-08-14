@@ -110,7 +110,7 @@ LLM Wiki Canvas 有意只做很小的一层：编译并检查已经存在的 Mar
 | **QMD** | 本地 BM25、向量与重排检索 | Agent 需要高质量本地搜索 | 组合使用：QMD 检索，`lwc` 可视化并检查结构 |
 | **LLM Wiki** | LLM 自动摄取并维护桌面 Wiki | 希望把文档自动综合成 Wiki 页面 | 自动生成和聊天选它；需要 JSON Canvas 时可再用 `lwc` 处理 Markdown |
 | **WeKnora** | 完整 RAG、Agent、Wiki、文档解析和团队平台 | 需要多格式、检索基础设施、集成或 RBAC | 需要平台时选它；它与本项目不是同一轻量层 |
-| **DeepSeek Harness** | 插件优先的 Agent 运行时 | 需要能自动发现项目 Skill 的 Agent Host | 搭配使用：Harness 自动发现 `.agents/skills/llm-wiki-canvas` 并调用有限 CLI，无需原生插件 |
+| **DeepSeek Harness** | 插件优先的 Agent 运行时 | 需要能自动发现 Skill 或通过受控工具维护知识收件箱 | 默认自动发现 Skill；可选实验知识管理员插件把写入限制在 Intake 草稿和 Proposal |
 
 完整能力矩阵、选择建议和组合方式见[对比与决策指南](docs/comparison.zh-CN.md)。能力快照于 2026-08-14 根据各项目官方资料核对。
 
@@ -190,7 +190,7 @@ Obsidian、QMD、Agent Skill 和 CI 的具体用法见[使用指南](docs/usage.
 | Claude Code | `CLAUDE.md` + `.claude/skills/llm-wiki-canvas/` 适配入口 |
 | 腾讯 WorkBuddy | 选择仓库为工作区，并用 `@` 引用 `AGENTS.md` 和共享 Skill |
 
-准确设置、兼容边界、权限建议和可直接复制的任务见[与 AI Agent 配合](docs/ai-agents.zh-CN.md)。本地文件权限加 `lwc` 已经足够，这条工作流不需要 MCP Server 或原生 Harness 插件。
+准确设置、兼容边界、权限建议和可直接复制的任务见[与 AI Agent 配合](docs/ai-agents.zh-CN.md)。本地文件权限加 `lwc` 已经足够；若希望 Harness 只拥有最窄的知识管理写入面，可使用[实验知识管理员插件](docs/deepseek-harness.zh-CN.md)。
 
 先运行 `lwc init .` 预览缺失的跨 Agent 入口；没有 `--write` 就不会写文件，已有有效文件继续由工作区拥有，一个冲突会阻止全部写入。随后运行 `lwc agents . --strict` 校验结果。`ready` 表示仓库契约内部一致，`manual` 表示需要显式附加上下文，`incomplete` 会让 strict 模式失败。结果见自动生成的[英文兼容矩阵](docs/agent-compatibility.md)和[中文说明](docs/agent-compatibility.zh-CN.md)。这些检查不会假装执行过闭源宿主程序。
 

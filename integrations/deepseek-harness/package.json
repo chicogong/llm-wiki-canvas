@@ -1,0 +1,40 @@
+{
+  "name": "@chicogong/dsh-llm-wiki-canvas",
+  "version": "0.1.0-experimental.1",
+  "description": "Governed LLM Wiki Canvas knowledge manager tools for DeepSeek Harness.",
+  "type": "module",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "lib",
+    "cordis.patch.yml",
+    "NOTICE",
+    "README.md",
+    "README.zh-CN.md"
+  ],
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "pack:check": "npm pack --dry-run"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "dependencies": {
+    "@deepseek-ai/dsh-tools": "0.1.0-rc.6",
+    "llm-wiki-canvas": "^0.1.0"
+  },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chicogong/llm-wiki-canvas.git",
+    "directory": "integrations/deepseek-harness"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "Apache-2.0"
+}
