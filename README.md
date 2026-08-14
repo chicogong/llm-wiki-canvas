@@ -100,7 +100,7 @@ LLM Wiki Canvas occupies a deliberately small layer. It compiles and checks an e
 | **QMD** | Local BM25, vector, and reranked document retrieval | Agents need high-quality local search | Use together: QMD retrieves; `lwc` visualizes and checks structure |
 | **LLM Wiki** | LLM-driven ingest into a maintained desktop wiki | You want documents automatically synthesized into wiki pages | Use instead for generation/chat, or run `lwc` over its Markdown when JSON Canvas matters |
 | **WeKnora** | Full RAG, Agent, Wiki, ingestion, and team knowledge platform | You need broad formats, retrieval infrastructure, integrations, or RBAC | Use instead when a platform is required; it is not the same lightweight layer |
-| **DeepSeek Harness** | Plugin-first Agent runtime | You want an Agent host that discovers project Skills | Use together: Harness discovers `.agents/skills/llm-wiki-canvas` and calls the bounded CLI; no native plugin is required |
+| **DeepSeek Harness** | Plugin-first Agent runtime | You want Skill discovery or a governed knowledge-inbox workflow | Use native Skill discovery by default; the optional experimental knowledge-manager plugin limits writes to Intake drafts and Proposals |
 
 Read [the complete comparison and decision guide](docs/comparison.md). The feature snapshot was verified against official project documentation on 2026-08-14.
 
@@ -180,7 +180,7 @@ The repository now includes one shared Agent contract plus native entry points w
 | Claude Code | `CLAUDE.md` + `.claude/skills/llm-wiki-canvas/` adapter |
 | Tencent WorkBuddy | Select the repository as workspace and `@`-reference `AGENTS.md` and the shared Skill |
 
-See [Using AI agents](docs/ai-agents.md) for exact setup, compatibility limits, permissions, and copy-ready tasks. Local file access plus `lwc` is sufficient; no MCP server or native Harness plugin is required for this workflow.
+See [Using AI agents](docs/ai-agents.md) for exact setup, compatibility limits, permissions, and copy-ready tasks. Local file access plus `lwc` is sufficient; use the [experimental knowledge-manager plugin](docs/deepseek-harness.md) when Harness should have a deliberately narrower mutation surface.
 
 Run `lwc init .` first to preview missing cross-Agent entry points. Nothing is written without `--write`; existing valid files remain workspace-owned, and one conflict blocks all writes. Then use `lwc agents . --strict` to verify the result. `ready` means the repository contract is internally consistent, `manual` means explicit context attachment is required, and `incomplete` fails strict mode. See the generated [compatibility matrix](docs/agent-compatibility.md). These checks do not pretend to execute proprietary host binaries.
 

@@ -20,8 +20,8 @@ export { readProposalInbox } from "./inbox.js";
 export type { ProposalInbox, ProposalInboxChange, ProposalInboxIssue, ProposalInboxItem, ProposalTopology, ProposalTopologyLink } from "./inbox.js";
 export { readDraftInbox } from "./drafts.js";
 export type { DraftInbox, DraftInboxIssue, DraftInboxItem, DraftInboxState, EvidenceState } from "./drafts.js";
-export { createKnowledgeIntake, intakeToMarkdown, parseKnowledgeIntake, proposeKnowledgeIntake, readKnowledgeIntake } from "./intake.js";
-export type { CreatedKnowledgeIntake, IntakeStatus, KnowledgeIntake, ProposedKnowledgeIntake } from "./intake.js";
+export { createKnowledgeIntake, intakeToMarkdown, parseKnowledgeIntake, proposeKnowledgeIntake, readKnowledgeIntake, writeKnowledgeIntakeDraft } from "./intake.js";
+export type { CreatedKnowledgeIntake, IntakeStatus, KnowledgeIntake, ProposedKnowledgeIntake, WrittenKnowledgeIntakeDraft } from "./intake.js";
 export {
   applyKnowledgeProposal,
   createKnowledgeProposal,

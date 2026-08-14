@@ -98,11 +98,11 @@ lwc context . --focus "Human Review" --depth 1 --max-pages 8 --max-words 2000 --
 lwc proposal show .lwc/proposals/<proposal>.json
 ```
 
-本仓库暂不发布原生 Harness 插件。Harness 当前仍是 Developer Preview，插件 API 处于候选阶段；复用 Skill 以及 Harness 自身的 shell/filesystem 权限边界更小、更稳。Skill 被发现只能证明契约兼容，不能证明模型已经完成真实任务。[DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) · [插件架构](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/architecture.md)
+仓库同时提供实验性的独立插件包 `integrations/deepseek-harness`。它不是万能终端，而是一名受控“知识管理员”：只暴露状态、有限上下文、创建 Intake、写入该 Intake 的隔离草稿、创建 Proposal、展示 Proposal 六个工具。正式 Markdown、`review`、`reject` 和 `apply` 始终留给人。完整安装、威胁模型和回滚方式见[DeepSeek Harness 知识管理员](deepseek-harness.zh-CN.md)。[DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) · [插件架构](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/architecture.md)
 
 2026-08-14 的核对快照是：官方仓库 `47f9438` 仍明确标注 Developer Preview，GitHub 尚无正式 Release；npm 的 `@deepseek-ai/dsh` 已到 `0.1.0-rc.6`，而仓库清单仍是 `rc.5`。这正是“热度可以利用，运行时依赖不能抢跑”的信号。
 
-若真实用户验证证明 Skill + CLI 存在明显摩擦，再单独孵化只读插件。第一版只允许 `lwc_context` 和 `lwc_proposal_show`；根目录必须来自 Harness 工作区，Proposal 只能位于 `.lwc/proposals`，并限制输出大小、传递取消信号。不得暴露任意路径、任意命令、`review`、`reject`、`apply`、`serve`、API Key 或安装期脚本。插件包独立版本、独立 CI、独立发布审批，不与核心 CLI 的稳定性绑定。
+插件仍按独立实验包管理：根目录只取 Harness 会话工作区，输入只接受受限相对路径，输出有上限，取消信号会传给 CLI；包没有安装期脚本。由于 Harness 仍处于 RC 漂移期，当前交付只代表代码与本地运行契约通过，不代表插件已发布到 npm，也不代表模型真实任务已经成功。
 
 ### TRAE
 

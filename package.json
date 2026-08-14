@@ -25,6 +25,7 @@
     "test:package": "node scripts/package-smoke.mjs",
     "test:site": "node scripts/check-static-site.mjs",
     "test:hosts": "node scripts/host-runtime-fixture.mjs --host fixture",
+    "test:harness": "pnpm build && node --test integrations/deepseek-harness/tests/*.test.js",
     "test:host:codex": "node scripts/host-runtime-fixture.mjs --host codex --output .lwc/host-runtime/codex.json",
     "test:host:claude": "node scripts/host-runtime-fixture.mjs --host claude-code --output .lwc/host-runtime/claude-code.json",
     "test:release-matrix": "pnpm audit:secrets && pnpm test && pnpm build && pnpm validate:skill && pnpm test:hosts && pnpm test:package",
@@ -44,7 +45,7 @@
     "agents:matrix": "tsx src/cli/index.ts agents . --strict --title llm-wiki-canvas -o docs/agent-compatibility.md",
     "proposal:demo": "tsx src/cli/index.ts proposal create examples/atlas-wiki --from examples/proposal-draft --summary 'Demonstrate reviewed knowledge changes' --created-at 2026-08-10T00:00:00.000Z -o .lwc/atlas-demo-proposal.json && tsx src/cli/index.ts proposal show .lwc/atlas-demo-proposal.json",
     "validate:skill": "node scripts/validate-skill.mjs",
-    "check": "pnpm test && pnpm demo:build && pnpm demo:build:zh && pnpm okf:build && pnpm report:demo && pnpm context:demo && pnpm okf:demo && pnpm agents:matrix && pnpm proposal:demo && pnpm generated:check && pnpm build && pnpm validate:skill && pnpm test:hosts",
+    "check": "pnpm test && pnpm demo:build && pnpm demo:build:zh && pnpm okf:build && pnpm report:demo && pnpm context:demo && pnpm okf:demo && pnpm agents:matrix && pnpm proposal:demo && pnpm generated:check && pnpm build && pnpm validate:skill && node --test integrations/deepseek-harness/tests/*.test.js && pnpm test:hosts",
     "verify": "pnpm audit:secrets && pnpm audit:deps && pnpm licenses:check && pnpm release:metadata && pnpm check && pnpm test:package && pnpm test:site && pnpm test:e2e:prod && pnpm test:e2e:live",
     "release:check": "pnpm verify && pnpm licenses:check && pnpm release:metadata && pnpm pack --dry-run",
     "prepack": "pnpm build && pnpm validate:skill"

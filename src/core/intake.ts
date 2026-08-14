@@ -44,6 +44,13 @@ export interface ProposedKnowledgeIntake {
   proposal: KnowledgeProposal;
 }
 
+export interface WrittenKnowledgeIntakeDraft {
+  intake: KnowledgeIntake;
+  draftPath: string;
+  contentHash: string;
+  bytes: number;
+}
+
 const hash = (value: string | Uint8Array) => createHash("sha256").update(value).digest("hex");
 const unix = (value: string) => value.split(path.sep).join("/");
 const SHA256 = /^[a-f0-9]{64}$/;
@@ -77,6 +84,19 @@ async function assertLocalStateDirectories(root: string): Promise<void> {
     });
     if (info?.isSymbolicLink()) throw new Error(`Intake local state must not cross a symbolic link: ${unix(relative)}`);
     if (info && !info.isDirectory()) throw new Error(`Intake local state path is not a directory: ${unix(relative)}`);
+  }
+}
+
+async function assertNoSymlinkSegments(root: string, relative: string, label: string): Promise<void> {
+  let current = path.resolve(root);
+  for (const part of unix(relative).split("/")) {
+    current = path.join(current, part);
+    const info = await lstat(current).catch((error: NodeJS.ErrnoException) => {
+      if (error.code === "ENOENT") return undefined;
+      throw error;
+    });
+    if (!info) break;
+    if (info.isSymbolicLink()) throw new Error(`${label} must not cross a symbolic link: ${relative}`);
   }
 }
 
@@ -137,6 +157,27 @@ export async function readKnowledgeIntake(manifestPath: string): Promise<Knowled
     if (error instanceof SyntaxError) throw new Error(`Intake is not valid JSON: ${manifestPath}`);
     throw error;
   }
+}
+
+export async function writeKnowledgeIntakeDraft(root: string, manifestPath: string, content: string): Promise<WrittenKnowledgeIntakeDraft> {
+  const absoluteRoot = path.resolve(root);
+  await assertLocalStateDirectories(absoluteRoot);
+  const intake = await readKnowledgeIntake(manifestPath);
+  if (intake.status !== "draft") throw new Error(`Only a draft intake can be edited; current status is ${intake.status}`);
+  if (intake.rootName !== path.basename(absoluteRoot)) throw new Error(`Intake root mismatch: expected ${intake.rootName}`);
+  const expectedManifest = path.join(absoluteRoot, ".lwc", "drafts", intake.id, "intake.json");
+  if (path.resolve(manifestPath) !== expectedManifest) throw new Error(`Intake manifest must stay under this Vault's .lwc/drafts directory: ${intake.id}`);
+  if (content.includes("\0")) throw new Error("Intake draft must not contain NUL bytes");
+  const bytes = Buffer.byteLength(content, "utf8");
+  if (bytes === 0 || !content.trim()) throw new Error("Intake draft must not be empty");
+  if (bytes > 512_000) throw new Error(`Intake draft exceeds 512000 bytes: ${bytes}`);
+  const draftRelative = unix(path.join(".lwc", "drafts", intake.id, intake.draft.path));
+  await assertNoSymlinkSegments(absoluteRoot, draftRelative, "Intake draft");
+  const draftPath = path.join(absoluteRoot, ...draftRelative.split("/"));
+  await regularFile(draftPath, "Intake draft");
+  const normalized = content.endsWith("\n") ? content : `${content}\n`;
+  await writeFile(draftPath, normalized, "utf8");
+  return { intake, draftPath, contentHash: hash(normalized), bytes: Buffer.byteLength(normalized, "utf8") };
 }
 
 async function findDuplicate(root: string, sourceHash: string, target: string): Promise<string | undefined> {
