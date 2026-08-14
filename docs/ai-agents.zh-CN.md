@@ -102,7 +102,7 @@ lwc proposal show .lwc/proposals/<proposal>.json
 
 2026-08-14 的核对快照是：官方仓库 `47f9438` 仍明确标注 Developer Preview，GitHub 尚无正式 Release；npm 的 `@deepseek-ai/dsh` 已到 `0.1.0-rc.6`，而仓库清单仍是 `rc.5`。这正是“热度可以利用，运行时依赖不能抢跑”的信号。
 
-插件仍按独立实验包管理：根目录只取 Harness 会话工作区，输入只接受受限相对路径，输出有上限，取消信号会传给 CLI；包没有安装期脚本。由于 Harness 仍处于 RC 漂移期，当前交付只代表代码与本地运行契约通过，不代表插件已发布到 npm，也不代表模型真实任务已经成功。
+插件已经以独立实验包 `dsh-llm-wiki-canvas@0.1.0-experimental.1` 发布：根目录只取 Harness 会话工作区，输入只接受受限相对路径，输出有上限，取消信号会传给 CLI；包没有安装期脚本。发布与确定性工具调用证明包和本地运行契约通过，但仍不代表模型已经完成真实知识任务。
 
 ### TRAE
 

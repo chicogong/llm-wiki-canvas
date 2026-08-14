@@ -2,7 +2,12 @@
 
 [English](usage.md) · [简体中文](usage.zh-CN.md)
 
-LLM Wiki Canvas currently runs from a source checkout. The commands below match the v0.1 repository and do not assume that a newer npm package has been published.
+LLM Wiki Canvas 0.2.0 is published on npm. Install `llm-wiki-canvas` for ordinary use; use the source checkout below when developing or reproducing the full demo and test suite.
+
+```bash
+npm install --global llm-wiki-canvas@0.2.0
+lwc --version
+```
 
 ## 1. Verify the demo
 
