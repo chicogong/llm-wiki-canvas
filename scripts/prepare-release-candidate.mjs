@@ -25,9 +25,12 @@ try {
   mkdirSync(output, { recursive: true });
   const target = path.join(output, path.basename(packs[0]));
   cpSync(packs[0], target);
-  const tarHash = createHash("sha256").update(gunzipSync(readFileSync(target))).digest("hex");
+  const tarBytes = gunzipSync(readFileSync(target));
+  const tarTarget = target.replace(/\.tgz$/, ".tar");
+  const tarHash = createHash("sha256").update(tarBytes).digest("hex");
+  writeFileSync(tarTarget, tarBytes);
   writeFileSync(path.join(output, "SHA256SUMS"), `${hashes[0]}  ${path.basename(target)}\n`);
-  writeFileSync(path.join(output, "TAR-SHA256SUMS"), `${tarHash}  ${path.basename(target, ".tgz")}.tar\n`);
+  writeFileSync(path.join(output, "TAR-SHA256SUMS"), `${tarHash}  ${path.basename(tarTarget)}\n`);
   console.log(`Release candidate ready: ${path.relative(root, target)}\nTGZ SHA-256: ${hashes[0]}\nUncompressed tar SHA-256: ${tarHash}`);
 } finally {
   rmSync(scratch, { recursive: true, force: true });

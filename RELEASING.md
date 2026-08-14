@@ -14,7 +14,7 @@ Publishing is an explicit maintainer action. CI proves that a commit is a releas
 6. Confirm GitHub CI passed full verification plus package smoke on Linux/macOS and the supported Node.js 22/24 LTS matrix.
 7. Inspect `git status --short`, the full diff, and the secret scan. Do not include `.lwc/`, host reports, logs, screenshots with private UI, credentials, or packed archives.
 8. Use pnpm 10.34.5 as the canonical packer. Pack the same clean commit twice, require identical SHA-256 digests, inspect the extracted file allowlist, then install that exact tarball with the default npm and pnpm consumer commands. Do not compare digests produced by different package managers or rebuild between verification and publication.
-9. Run the manual **Build release candidate** workflow. It verifies the selected commit, packs it twice, compares the bytes, and uploads one tarball plus `SHA256SUMS` and `TAR-SHA256SUMS` for 14 days. The first digest identifies the exact compressed artifact to publish; the second identifies the uncompressed tar payload across gzip implementations. It cannot publish npm, create a tag, or create a GitHub Release.
+9. Run the manual **Build release candidate** workflow. It verifies the selected commit, packs it twice, compares the bytes, and uploads the `.tgz`, an audit-only decompressed `.tar`, `SHA256SUMS`, and `TAR-SHA256SUMS` for 14 days. The first digest identifies the exact compressed artifact to publish; the second identifies the uncompressed tar payload across gzip implementations and can be checked directly against the included `.tar`. Only the `.tgz` is a publication candidate. The workflow cannot publish npm, create a tag, or create a GitHub Release.
 
 ## Publish / 正式发布
 
