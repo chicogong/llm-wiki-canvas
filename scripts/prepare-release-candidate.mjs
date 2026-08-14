@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { gunzipSync } from "node:zlib";
 
 const root = process.cwd();
 const scratch = mkdtempSync(path.join(tmpdir(), "lwc-release-candidate-"));
@@ -24,8 +25,13 @@ try {
   mkdirSync(output, { recursive: true });
   const target = path.join(output, path.basename(packs[0]));
   cpSync(packs[0], target);
+  const tarBytes = gunzipSync(readFileSync(target));
+  const tarTarget = target.replace(/\.tgz$/, ".tar");
+  const tarHash = createHash("sha256").update(tarBytes).digest("hex");
+  writeFileSync(tarTarget, tarBytes);
   writeFileSync(path.join(output, "SHA256SUMS"), `${hashes[0]}  ${path.basename(target)}\n`);
-  console.log(`Release candidate ready: ${path.relative(root, target)}\nSHA-256: ${hashes[0]}`);
+  writeFileSync(path.join(output, "TAR-SHA256SUMS"), `${tarHash}  ${path.basename(tarTarget)}\n`);
+  console.log(`Release candidate ready: ${path.relative(root, target)}\nTGZ SHA-256: ${hashes[0]}\nUncompressed tar SHA-256: ${tarHash}`);
 } finally {
   rmSync(scratch, { recursive: true, force: true });
 }
