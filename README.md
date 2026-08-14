@@ -3,6 +3,7 @@
 [English](README.md) · [简体中文](README.zh-CN.md)
 
 [![CI](https://github.com/chicogong/llm-wiki-canvas/actions/workflows/ci.yml/badge.svg)](https://github.com/chicogong/llm-wiki-canvas/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/llm-wiki-canvas.svg)](https://www.npmjs.com/package/llm-wiki-canvas)
 [![License](https://img.shields.io/badge/license-Apache--2.0-163A5F.svg)](LICENSE)
 
 **A local-first visual compiler for Agent-managed Markdown knowledge bases.**
@@ -10,6 +11,8 @@
 LLM Wiki Canvas turns Markdown, frontmatter, and WikiLinks into a deterministic relationship graph plus editable Obsidian Canvas and Excalidraw files. Codex, Claude Code, Qoder, TRAE, and Tencent WorkBuddy keep working with ordinary files; people get a visual map, diagnostics, and reviewable generated artifacts.
 
 It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
+
+[Explore the synthetic Atlas](https://chicogong.github.io/llm-wiki-canvas/) · [Install from npm](#quick-start) · [Read the usage guide](docs/usage.md)
 
 ![LLM Wiki Canvas Atlas viewer](docs/assets/atlas-viewer.png)
 
@@ -31,7 +34,18 @@ It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
 - **Relationship impact is visible before review.** The Change blueprint marks affected pages, added or removed links, and target-hash conflicts before anything is applied.
 - **Generated views are reproducible.** Stable node and edge IDs make graph fixtures and Git diffs meaningful.
 
-## Try the synthetic working example
+## Quick start
+
+Requires Node.js 22 or 24. Install the public package; do not install the unrelated Salesforce package named `lwc`.
+
+```bash
+npm install --global llm-wiki-canvas
+lwc serve /path/to/vault
+```
+
+Then open <http://127.0.0.1:4173>. The server binds to loopback by default, reads ordinary Markdown, and does not upload your Vault.
+
+To try the checked-in synthetic example from source:
 
 The checked-in **Agent Knowledge Atlas** is a small, synthetic, inspectable wiki about LLM Wiki, visual knowledge, source provenance, and human review. It is a product fixture, not evidence from a real user Vault.
 
@@ -86,6 +100,7 @@ LLM Wiki Canvas occupies a deliberately small layer. It compiles and checks an e
 | **QMD** | Local BM25, vector, and reranked document retrieval | Agents need high-quality local search | Use together: QMD retrieves; `lwc` visualizes and checks structure |
 | **LLM Wiki** | LLM-driven ingest into a maintained desktop wiki | You want documents automatically synthesized into wiki pages | Use instead for generation/chat, or run `lwc` over its Markdown when JSON Canvas matters |
 | **WeKnora** | Full RAG, Agent, Wiki, ingestion, and team knowledge platform | You need broad formats, retrieval infrastructure, integrations, or RBAC | Use instead when a platform is required; it is not the same lightweight layer |
+| **DeepSeek Harness** | Plugin-first Agent runtime | You want an Agent host that discovers project Skills | Use together: Harness discovers `.agents/skills/llm-wiki-canvas` and calls the bounded CLI; no native plugin is required |
 
 Read [the complete comparison and decision guide](docs/comparison.md). The feature snapshot was verified against official project documentation on 2026-08-14.
 
@@ -108,7 +123,7 @@ Run `pnpm report:demo` to reproduce the full structural snapshot, including conn
 
 ## Use it on your own vault
 
-The npm package is still an unpublished `0.1.0` release candidate. Until the first public release, use the source checkout below. Do not install the unrelated unscoped `lwc` package.
+The npm package name is `llm-wiki-canvas`. The short `lwc` name is a command only; the unrelated unscoped npm package `lwc` belongs to Salesforce.
 
 During development:
 
@@ -159,12 +174,13 @@ The repository now includes one shared Agent contract plus native entry points w
 | Agent | Ready-to-use repository files |
 | --- | --- |
 | Codex | `AGENTS.md` + `.agents/skills/llm-wiki-canvas/` |
+| DeepSeek Harness | Automatic discovery of `.agents/skills/llm-wiki-canvas/` |
 | TRAE | `AGENTS.md` + the same `.agents/skills/` Skill |
 | Qoder | `AGENTS.md` + `.qoder/skills/llm-wiki-canvas/` adapter |
 | Claude Code | `CLAUDE.md` + `.claude/skills/llm-wiki-canvas/` adapter |
 | Tencent WorkBuddy | Select the repository as workspace and `@`-reference `AGENTS.md` and the shared Skill |
 
-See [Using AI agents](docs/ai-agents.md) for exact setup, compatibility limits, permissions, and copy-ready tasks. Local file access plus `lwc` is sufficient; no MCP server is required for this workflow.
+See [Using AI agents](docs/ai-agents.md) for exact setup, compatibility limits, permissions, and copy-ready tasks. Local file access plus `lwc` is sufficient; no MCP server or native Harness plugin is required for this workflow.
 
 Run `lwc init .` first to preview missing cross-Agent entry points. Nothing is written without `--write`; existing valid files remain workspace-owned, and one conflict blocks all writes. Then use `lwc agents . --strict` to verify the result. `ready` means the repository contract is internally consistent, `manual` means explicit context attachment is required, and `incomplete` fails strict mode. See the generated [compatibility matrix](docs/agent-compatibility.md). These checks do not pretend to execute proprietary host binaries.
 

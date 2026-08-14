@@ -2,11 +2,11 @@
 
 [English](ai-agents.md) · [简体中文](ai-agents.zh-CN.md)
 
-LLM Wiki Canvas is not another chat shell. It gives Codex, Claude Code, Qoder, TRAE, and Tencent WorkBuddy one local knowledge contract: agents edit Markdown and run `lwc`; people review the result through Git diffs, the relationship Viewer, and Obsidian Canvas.
+LLM Wiki Canvas is not another chat shell. It gives Codex, Claude Code, DeepSeek Harness, Qoder, TRAE, and Tencent WorkBuddy one local knowledge contract: agents edit Markdown and run `lwc`; people review the result through Git diffs, the relationship Viewer, and Obsidian Canvas.
 
 ```mermaid
 flowchart LR
-  A["Codex / Claude Code / Qoder / TRAE / WorkBuddy"] --> R["Repository rules + Agent Skill"]
+  A["Codex / Claude / DeepSeek Harness / Qoder / TRAE / WorkBuddy"] --> R["Repository rules + Agent Skill"]
   R --> P["Proposal review gate"]
   P --> M["Markdown source of truth"]
   A --> C["lwc scan / lint / build"]
@@ -29,6 +29,7 @@ For a new repository, run `lwc init .` to preview the shared rules, canonical Sk
 | Tool | Repository guidance | Project Skill | Repository status | How to use it |
 | --- | --- | --- | --- | --- |
 | **Codex** | `AGENTS.md` | `.agents/skills/<name>/SKILL.md` | Native | Open the repository and ask it to use the `llm-wiki-canvas` Skill |
+| **DeepSeek Harness** | Repository context | `.agents/skills/<name>/SKILL.md` | Native discovery | Start Harness at the project root; it discovers the shared Skill without a plugin |
 | **TRAE** | `AGENTS.md` / Rules | `.agents/skills/<name>/SKILL.md` | Native | Open the repository in IDE or SOLO and describe the wiki task |
 | **Qoder** | Automatically recognizes `AGENTS.md` | `.qoder/skills/<name>/SKILL.md` | Thin adapter included | Restart Qoder, then rely on automatic activation or select the Skill from `/` |
 | **Claude Code** | `CLAUDE.md` imports `AGENTS.md` | `.claude/skills/<name>/SKILL.md` | Thin adapter included | Run `claude` in the repository; rely on automatic activation or run `/llm-wiki-canvas` |
@@ -87,6 +88,17 @@ Use the llm-wiki-canvas Skill to inspect examples/atlas-wiki and its source chai
 ```
 
 Official Codex guidance uses `AGENTS.md` for repository instructions and `.agents/skills` for project Skills. Skills package reusable workflows; MCP is intended for access to external systems. [Codex customization](https://learn.chatgpt.com/docs/customization/overview)
+
+### DeepSeek Harness
+
+DeepSeek Harness automatically scans `<projectRoot>/.agents/skills`, so `lwc init . --write` already creates the integration it needs. Start Harness at the project root and let it invoke bounded, read-only CLI commands such as:
+
+```bash
+lwc context . --focus "Human Review" --depth 1 --max-pages 8 --max-words 2000 --format json
+lwc proposal show .lwc/proposals/<proposal>.json
+```
+
+The repository does not ship a native Harness plugin. Harness is currently a Developer Preview with a release-candidate plugin API; reusing the Skill and its own shell/filesystem permission boundary is smaller and safer. Skill discovery proves contract compatibility, not that a model completed a task. [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) · [Plugin architecture](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/architecture.md)
 
 ### TRAE
 

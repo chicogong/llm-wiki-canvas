@@ -24,13 +24,14 @@ async function fixture(): Promise<string> {
 }
 
 describe("Agent compatibility contract", () => {
-  it("reports four ready hosts and one explicit manual integration", async () => {
+  it("reports five ready hosts and one explicit manual integration", async () => {
     const root = await fixture();
     const report = await inspectAgentCompatibility(root);
-    expect(report.summary).toEqual({ ready: 4, manual: 1, incomplete: 0 });
+    expect(report.summary).toEqual({ ready: 5, manual: 1, incomplete: 0 });
     expect(report.hosts.map((host) => [host.id, host.status])).toEqual([
       ["codex", "ready"],
       ["claude-code", "ready"],
+      ["deepseek-harness", "ready"],
       ["qoder", "ready"],
       ["trae", "ready"],
       ["workbuddy", "manual"],
@@ -42,7 +43,7 @@ describe("Agent compatibility contract", () => {
     const root = await fixture();
     await writeFile(path.join(root, ".qoder/skills/llm-wiki-canvas/SKILL.md"), "Use a copied workflow instead.\n");
     const report = await inspectAgentCompatibility(root);
-    expect(report.summary).toEqual({ ready: 3, manual: 1, incomplete: 1 });
+    expect(report.summary).toEqual({ ready: 4, manual: 1, incomplete: 1 });
     expect(report.hosts.find((host) => host.id === "qoder")).toMatchObject({ status: "incomplete", checks: expect.arrayContaining([expect.objectContaining({ id: "qoder-skill", status: "fail" })]) });
     expect(report.hosts.find((host) => host.id === "claude-code")?.status).toBe("ready");
     const markdown = agentCompatibilityToMarkdown(report);
@@ -57,7 +58,8 @@ describe("Agent compatibility contract", () => {
     const first = agentCompatibilityToMarkdown(report);
     const second = agentCompatibilityToMarkdown(report);
     expect(first).toBe(second);
-    expect(first).toContain("4 ready · 1 manual · 0 incomplete");
+    expect(first).toContain("5 ready · 1 manual · 0 incomplete");
+    expect(first).toContain("| DeepSeek Harness | **ready** | Automatic .agents/skills discovery |");
     expect(first).toContain("does not claim that a proprietary host binary was executed");
     expect(first).toContain("| Tencent WorkBuddy | **manual** |");
     expect(first).not.toContain(root);

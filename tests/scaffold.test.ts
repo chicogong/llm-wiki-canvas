@@ -33,7 +33,7 @@ describe("safe Agent scaffolding", () => {
     const result = await applyAgentScaffold(root, hosts, templates);
     expect(result).toMatchObject({ mode: "written", summary: { create: 7, preserve: 0, conflict: 0, manual: 1 } });
     const report = await inspectAgentCompatibility(root);
-    expect(report.summary).toEqual({ ready: 4, manual: 1, incomplete: 0 });
+    expect(report.summary).toEqual({ ready: 5, manual: 1, incomplete: 0 });
     expect(await readFile(path.join(root, ".agents/skills/llm-wiki-canvas/SKILL.md"), "utf8")).toBe(templates.skill);
 
     const second = await planAgentScaffold(root, hosts, templates);

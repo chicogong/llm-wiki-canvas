@@ -2,11 +2,11 @@
 
 [English](ai-agents.md) · [简体中文](ai-agents.zh-CN.md)
 
-LLM Wiki Canvas 不是另一个聊天壳。它给 Codex、Claude Code、Qoder、TRAE 和腾讯 WorkBuddy 提供同一套本地知识契约：Agent 读写 Markdown、执行 `lwc`，人通过 Git diff、关系 Viewer 和 Obsidian Canvas 审查结果。
+LLM Wiki Canvas 不是另一个聊天壳。它给 Codex、Claude Code、DeepSeek Harness、Qoder、TRAE 和腾讯 WorkBuddy 提供同一套本地知识契约：Agent 读写 Markdown、执行 `lwc`，人通过 Git diff、关系 Viewer 和 Obsidian Canvas 审查结果。
 
 ```mermaid
 flowchart LR
-  A["Codex / Claude Code / Qoder / TRAE / WorkBuddy"] --> R["仓库规则 + Agent Skill"]
+  A["Codex / Claude / DeepSeek Harness / Qoder / TRAE / WorkBuddy"] --> R["仓库规则 + Agent Skill"]
   R --> P["Proposal 人工审查门"]
   P --> M["Markdown 事实源"]
   A --> C["lwc scan / lint / build"]
@@ -29,6 +29,7 @@ flowchart LR
 | 工具 | 仓库规则 | 项目 Skill | 本仓库状态 | 使用方式 |
 | --- | --- | --- | --- | --- |
 | **Codex** | `AGENTS.md` | `.agents/skills/<name>/SKILL.md` | 原生 | 打开仓库，要求使用 `llm-wiki-canvas` Skill |
+| **DeepSeek Harness** | 仓库上下文 | `.agents/skills/<name>/SKILL.md` | 原生发现 | 在项目根目录启动 Harness；无需插件即可发现共享 Skill |
 | **TRAE** | `AGENTS.md` / Rules | `.agents/skills/<name>/SKILL.md` | 原生 | IDE 或 SOLO 中打开仓库，直接描述知识库任务 |
 | **Qoder** | 自动识别 `AGENTS.md` | `.qoder/skills/<name>/SKILL.md` | 薄适配已提交 | 重启 Qoder 后自动触发，或从 `/` 菜单选择 Skill |
 | **Claude Code** | `CLAUDE.md`，其中导入 `AGENTS.md` | `.claude/skills/<name>/SKILL.md` | 薄适配已提交 | 在仓库运行 `claude`，自动触发或执行 `/llm-wiki-canvas` |
@@ -87,6 +88,17 @@ flowchart LR
 ```
 
 Codex 官方将 `AGENTS.md` 用作仓库指导，并把 `.agents/skills` 用作项目 Skills；Skills 适合可复用工作流，MCP 更适合外部系统接入。[Codex customization](https://learn.chatgpt.com/docs/customization/overview)
+
+### DeepSeek Harness
+
+DeepSeek Harness 会自动扫描 `<projectRoot>/.agents/skills`，所以 `lwc init . --write` 已经能创建它需要的集成。请在项目根目录启动 Harness，并优先让它调用有限、只读的 CLI：
+
+```bash
+lwc context . --focus "Human Review" --depth 1 --max-pages 8 --max-words 2000 --format json
+lwc proposal show .lwc/proposals/<proposal>.json
+```
+
+本仓库暂不发布原生 Harness 插件。Harness 当前仍是 Developer Preview，插件 API 处于候选阶段；复用 Skill 以及 Harness 自身的 shell/filesystem 权限边界更小、更稳。Skill 被发现只能证明契约兼容，不能证明模型已经完成真实任务。[DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) · [插件架构](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/architecture.md)
 
 ### TRAE
 
