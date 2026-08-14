@@ -11,8 +11,9 @@ Publishing is an explicit maintainer action. CI proves that a commit is a releas
 3. Choose the SemVer change and update `package.json`; before the first stable release, call out breaking changes explicitly.
 4. Run `pnpm install --frozen-lockfile` and `pnpm release:check`.
 5. Run `pnpm release:check` and inspect its pack manifest: only the CLI build, Viewer build, canonical Skill, `NOTICE`, `LICENSE`, generated `THIRD_PARTY_LICENSES.txt`, and package metadata should ship. The check also freezes the 0.1.0 changelog and unpublished release notes.
-6. Confirm GitHub CI passed full verification plus package smoke on Linux/macOS and Node.js 20/22.
+6. Confirm GitHub CI passed full verification plus package smoke on Linux/macOS and the supported Node.js 22/24 LTS matrix.
 7. Inspect `git status --short`, the full diff, and the secret scan. Do not include `.lwc/`, host reports, logs, screenshots with private UI, credentials, or packed archives.
+8. Use pnpm 10.34.5 as the canonical packer. Pack the same clean commit twice, require identical SHA-256 digests, inspect the extracted file allowlist, then install that exact tarball with the default npm and pnpm consumer commands. Do not compare digests produced by different package managers or rebuild between verification and publication.
 
 ## Publish / 正式发布
 

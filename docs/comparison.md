@@ -2,7 +2,7 @@
 
 [English](comparison.md) · [简体中文](comparison.zh-CN.md)
 
-Last verified: **2026-08-10**
+Last verified: **2026-08-14**
 
 This guide compares current product boundaries, not project popularity. Features change quickly; follow the linked official documentation for the latest detail.
 
@@ -11,7 +11,7 @@ Legend: **Yes** = a current first-class capability; **Partial** = narrower, opti
 ## Short answer
 
 - Choose **LLM Wiki Canvas** when the Markdown already exists and you want deterministic visualization, structural linting, editable JSON Canvas, and a repository-native Agent workflow.
-- Choose **Obsidian** for daily human authoring, browsing, plugins, and personal knowledge management.
+- Choose **Obsidian** for daily human authoring, browsing, plugins, and broad app-backed CLI automation.
 - Choose **QMD** when local retrieval quality for Agents is the main problem.
 - Choose **LLM Wiki** when an LLM should ingest source documents and continuously generate and maintain a personal Wiki.
 - Choose **WeKnora** when you need a complete knowledge platform: broad ingestion, RAG, Agent execution, services, integrations, access control, and operations.
@@ -20,7 +20,7 @@ Legend: **Yes** = a current first-class capability; **Partial** = narrower, opti
 
 | Capability | LLM Wiki Canvas | Obsidian | QMD | LLM Wiki | WeKnora |
 | --- | --- | --- | --- | --- | --- |
-| Primary interface | CLI + local Viewer | Desktop/mobile editor | CLI + library/MCP | Cross-platform desktop app | Web/API/CLI/MCP platform |
+| Primary interface | Headless CLI + local Viewer | Desktop/mobile editor + official CLI | CLI + library/MCP | Cross-platform desktop app | Web/API/CLI/MCP platform |
 | Existing Markdown remains primary input | **Yes** | **Yes** | **Yes**, indexed as documents | **Yes**, in a raw/wiki/schema workflow | **Partial**, managed knowledge sources and generated Wiki |
 | Requires an LLM for core graph/lint | **No** | **No** | **Partial**, keyword search does not; semantic/rerank uses local models | **Yes** for ingest and generation | **Yes** for Agent/Wiki/RAG flows |
 | Automatic Wiki synthesis | **No** | **No** in core | **No** | **Yes** | **Yes**, Wiki Mode |
@@ -31,10 +31,10 @@ Legend: **Yes** = a current first-class capability; **Partial** = narrower, opti
 | Deterministic structural lint | **Yes** | **Partial** | **No** | **Partial**, includes Lint/health workflows with a different contract | Managed validation rather than this file-level contract |
 | Editable JSON Canvas generation | **Yes** | **Yes**, native Canvas authoring | **No** | **No** first-class exporter | **No** first-class exporter |
 | Stable IDs and reproducible graph fixture | **Yes** | Not its primary contract | Index is rebuildable | App-managed | Service-managed indexes |
-| Agent integration | Repo Skill + CLI | Files and plugin ecosystem | CLI + MCP | Local API + Agent Skill | API + CLI + MCP + Skills |
+| Agent integration | Repo Skill + headless CLI | Official CLI, files, and plugin ecosystem | CLI + MCP | Local API + Agent Skill | API + CLI + MCP + Skills |
 | Built-in chat | **No** | **No** in core | **No** general chat UI | **Yes** | **Yes** |
 | Team RBAC and service operations | **No** | **No** platform RBAC | **No** | Personal/local focus | **Yes** |
-| Typical operating weight | Node CLI + static Viewer | Installed application | Node CLI + downloaded local models for semantic modes | Desktop app + configured model provider | Docker/service deployment and configured infrastructure |
+| Typical operating weight | Node CLI + static Viewer; no app process required | Installed application; the official CLI requires the app to be running | Node CLI + downloaded local models for semantic modes | Desktop app + configured model provider | Docker/service deployment and configured infrastructure |
 
 ## The important boundary
 
@@ -57,6 +57,8 @@ Choose Obsidian when the main job is writing, navigating, tagging, embedding med
 
 Recommended combination: edit in Obsidian, lint in CI, and regenerate a curated `.canvas` without losing manual node positions.
 
+Obsidian's official CLI now covers broad app-backed automation, including reading, searching, writing, tasks, tags, unresolved links, plugin development, and screenshots. It requires a current Obsidian installation, explicit CLI activation, and a running Obsidian app. Obsidian also documents Headless Sync as a separate server-oriented sync product. LLM Wiki Canvas should not duplicate those generic commands. Its narrower role is a repository-native compiler and review boundary: deterministic graph/Canvas artifacts, exact structural diagnostics, bounded source-hashed Agent context, and proposals that remain unapplied until human review.
+
 ### Choose QMD instead
 
 Choose QMD when the problem is finding relevant passages across many local documents. QMD provides BM25, vector search, query expansion, and local LLM reranking. LLM Wiki Canvas only filters graph metadata and does not claim semantic retrieval.
@@ -78,7 +80,7 @@ Do not adopt LLM Wiki Canvas as a substitute for those operational capabilities.
 ## Sources
 
 - [LLM Wiki Canvas README](../README.md)
-- [Obsidian: About Obsidian](https://obsidian.md/help/obsidian) and [how Obsidian stores data](https://obsidian.md/help/Files%2Band%2Bfolders/How%2BObsidian%2Bstores%2Bdata)
+- [Obsidian: About Obsidian](https://obsidian.md/help/obsidian), [how Obsidian stores data](https://obsidian.md/help/Files%2Band%2Bfolders/How%2BObsidian%2Bstores%2Bdata), and [official Obsidian CLI](https://obsidian.md/cli)
 - [QMD official repository](https://github.com/tobi/qmd)
 - [LLM Wiki official repository](https://github.com/nashsu/llm_wiki)
 - [WeKnora official repository](https://github.com/Tencent/WeKnora)

@@ -85,7 +85,7 @@ LLM Wiki Canvas 有意只做很小的一层：编译并检查已经存在的 Mar
 | **LLM Wiki** | LLM 自动摄取并维护桌面 Wiki | 希望把文档自动综合成 Wiki 页面 | 自动生成和聊天选它；需要 JSON Canvas 时可再用 `lwc` 处理 Markdown |
 | **WeKnora** | 完整 RAG、Agent、Wiki、文档解析和团队平台 | 需要多格式、检索基础设施、集成或 RBAC | 需要平台时选它；它与本项目不是同一轻量层 |
 
-完整能力矩阵、选择建议和组合方式见[对比与决策指南](docs/comparison.zh-CN.md)。能力快照于 2026-08-10 根据各项目官方资料核对。
+完整能力矩阵、选择建议和组合方式见[对比与决策指南](docs/comparison.zh-CN.md)。能力快照于 2026-08-14 根据各项目官方资料核对。
 
 ## 收益对比
 
@@ -231,7 +231,7 @@ Markdown 是长期保存的知识；关系图、Canvas 和 Viewer 数据都是�
 pnpm verify
 ```
 
-它包括敏感信息扫描、依赖审计、单元测试、可复现示例构建、TypeScript 与生产构建、Skill 校验、确定性 Host fixture、真实 npm 打包安装冒烟测试，以及桌面端和移动端的生产 Viewer 测试。CI 还会在 Linux/macOS 与 Node.js 20/22 上重复包验证。
+它包括敏感信息扫描、依赖审计、单元测试、可复现示例构建、TypeScript 与生产构建、Skill 校验、确定性 Host fixture、真实 npm 打包安装冒烟测试，以及桌面端和移动端的生产 Viewer 测试。CI 还会在 Linux/macOS 与受支持的 Node.js 22/24 LTS 矩阵上重复包验证。
 
 ## 后续方向
 

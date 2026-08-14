@@ -70,7 +70,7 @@ The daily loop is deliberately small:
 | **0.3 Spatial views** | Generate useful diagrams without locking users in | JSON Canvas remains canonical output; optional Excalidraw export uses its open file format; Mermaid/Markmap are derived views; rebuild never overwrites hand-edited positions silently | Shipped — 0.3.1–0.3.3 |
 | **0.4 Source intake** | Turn selected local material into reviewable wiki drafts | Start with Markdown/text; preserve source path/hash; generated pages stay in `.lwc/drafts`; human-approved proposal required | Shipped — 0.4.1–0.4.3 |
 | **0.5 Agent compatibility** | Verify that multiple coding Agents share one knowledge contract | Deterministic repository checks; safe scaffolding; public matrix; static contract evidence separated from real host execution | Shipped — 0.5.1–0.5.3 |
-| **0.6 Open-source readiness** | Make cloning, testing, packaging, and contributing reproducible | Bilingual quick starts; synthetic fixtures; release and schema policy; Linux/macOS Node 20/22 package CI | Shipped |
+| **0.6 Open-source readiness** | Make cloning, testing, packaging, and contributing reproducible | Bilingual quick starts; synthetic fixtures; release and schema policy; Linux/macOS Node 22/24 package CI | Shipped |
 | **0.7 Bounded Agent context** | Give any Agent a finite evidence pack instead of the whole Vault | Exact focus; depth/direction/type filters; page/word budgets; raw Markdown hashes; Markdown/JSON output | Shipped |
 
 ## Execution plan / 执行计划
@@ -133,7 +133,7 @@ Acceptance requires a public compatibility matrix with reproducible commands. A 
 - Contribution templates route feature requests into Map, Health, Changes, Canvas, or Intake.
 - A changelog documents graph, proposal, Canvas, and export schema compatibility.
 
-These gates are implemented by `pnpm verify`, the Linux/macOS Node 20/22 package matrix, [release instructions](RELEASING.md), and the [schema compatibility policy](docs/schema-compatibility.md). Publishing a version remains an explicit maintainer action.
+These gates are implemented by `pnpm verify`, the Linux/macOS Node 22/24 package matrix, [release instructions](RELEASING.md), and the [schema compatibility policy](docs/schema-compatibility.md). Publishing a version remains an explicit maintainer action.
 
 ### Completed — 0.7 Bounded Agent context / 已完成：有限 Agent 上下文
 

@@ -67,7 +67,7 @@
     "vite": "^7.1.1",
     "vitest": "^3.2.4"
   },
-  "engines": {"node": ">=20"},
+  "engines": {"node": ">=22"},
   "packageManager": "pnpm@10.34.5",
   "publishConfig": {"access": "public"},
   "license": "Apache-2.0"
