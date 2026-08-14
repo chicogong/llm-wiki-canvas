@@ -1,5 +1,5 @@
 {
-  "name": "@chicogong/dsh-llm-wiki-canvas",
+  "name": "dsh-llm-wiki-canvas",
   "version": "0.1.0-experimental.1",
   "description": "Governed LLM Wiki Canvas knowledge manager tools for DeepSeek Harness.",
   "type": "module",

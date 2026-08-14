@@ -44,4 +44,4 @@
   disabled: true
 - insert:
     - id: lwc-knowledge-manager
-      name: '@chicogong/dsh-llm-wiki-canvas'
+      name: 'dsh-llm-wiki-canvas'

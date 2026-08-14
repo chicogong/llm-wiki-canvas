@@ -1,4 +1,4 @@
-# @chicogong/dsh-llm-wiki-canvas
+# dsh-llm-wiki-canvas
 
 DeepSeek Harness 的受控 LLM Wiki Canvas 知识管理员。安装、工具边界、人工接管和回滚见仓库文档：[DeepSeek Harness 知识管理员](../../docs/deepseek-harness.zh-CN.md)。
 
