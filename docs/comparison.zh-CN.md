@@ -2,7 +2,7 @@
 
 [English](comparison.md) · [简体中文](comparison.zh-CN.md)
 
-最后核对：**2026-08-10**
+最后核对：**2026-08-14**
 
 这里比较的是当前产品边界，不是项目热度。各项目变化很快，最新细节应以文末官方资料为准。
 
@@ -11,7 +11,7 @@
 ## 一句话怎么选
 
 - Markdown 已经存在，需要确定性可视化、结构检查、可编辑 JSON Canvas 和仓库级 Agent 工作流：选 **LLM Wiki Canvas**。
-- 主要由人日常写作、浏览、安装插件和管理个人知识：选 **Obsidian**。
+- 主要由人日常写作、浏览、安装插件和进行广泛的应用内 CLI 自动化：选 **Obsidian**。
 - Agent 最需要的是高质量本地检索：选 **QMD**。
 - 希望 LLM 摄取来源文件并持续自动生成、维护个人 Wiki：选 **LLM Wiki**。
 - 需要完整知识平台，包括多格式解析、RAG、Agent、服务、集成、权限和运维：选 **WeKnora**。
@@ -20,7 +20,7 @@
 
 | 能力 | LLM Wiki Canvas | Obsidian | QMD | LLM Wiki | WeKnora |
 | --- | --- | --- | --- | --- | --- |
-| 主要界面 | CLI + 本地 Viewer | 桌面/移动编辑器 | CLI + 库/MCP | 跨平台桌面应用 | Web/API/CLI/MCP 平台 |
+| 主要界面 | 无头 CLI + 本地 Viewer | 桌面/移动编辑器 + 官方 CLI | CLI + 库/MCP | 跨平台桌面应用 | Web/API/CLI/MCP 平台 |
 | 已有 Markdown 作为主要输入 | **是** | **是** | **是**，作为文档索引 | **是**，raw/wiki/schema 工作流 | **部分**，托管知识源和生成 Wiki |
 | 核心关系图/检查需要 LLM | **否** | **否** | **部分**，关键词不需要，语义/重排使用本地模型 | **是**，用于摄取和生成 | **是**，用于 Agent/Wiki/RAG |
 | 自动综合生成 Wiki | **否** | 核心能力中**否** | **否** | **是** | **是**，Wiki Mode |
@@ -31,10 +31,10 @@
 | 确定性结构检查 | **是** | **部分** | **否** | **部分**，提供不同契约的 Lint/健康工作流 | 偏托管验证，不是同一文件契约 |
 | 可编辑 JSON Canvas 生成 | **是** | **是**，原生编辑 Canvas | **否** | 没有一等导出器 | 没有一等导出器 |
 | 稳定 ID 和可复现图 fixture | **是** | 不是主要契约 | 索引可重建 | 由应用管理 | 由服务管理索引 |
-| Agent 集成 | 仓库 Skill + CLI | 文件和插件生态 | CLI + MCP | 本地 API + Agent Skill | API + CLI + MCP + Skills |
+| Agent 集成 | 仓库 Skill + 无头 CLI | 官方 CLI、文件和插件生态 | CLI + MCP | 本地 API + Agent Skill | API + CLI + MCP + Skills |
 | 内置聊天 | **否** | 核心能力中**否** | 没有通用聊天 UI | **是** | **是** |
 | 团队 RBAC 和服务运维 | **否** | 不是平台 RBAC | **否** | 偏个人本地 | **是** |
-| 典型运行成本 | Node CLI + 静态 Viewer | 安装桌面应用 | Node CLI；语义模式下载本地模型 | 桌面应用 + 模型提供方 | Docker/服务部署 + 基础设施配置 |
+| 典型运行成本 | Node CLI + 静态 Viewer；无需应用进程 | 安装桌面应用；官方 CLI 需要 Obsidian 正在运行 | Node CLI；语义模式下载本地模型 | 桌面应用 + 模型提供方 | Docker/服务部署 + 基础设施配置 |
 
 ## 最重要的产品边界
 
@@ -57,6 +57,8 @@ Markdown Wiki
 
 推荐组合：在 Obsidian 编辑，在 CI 中执行 lint，重新生成精选 `.canvas` 时保留人工位置。
 
+Obsidian 官方 CLI 已覆盖广泛的应用内自动化，包括读、搜、写、任务、标签、未解析链接、插件开发和截图。它要求安装当前版本的 Obsidian、明确启用 CLI，并保持 Obsidian 应用运行。Obsidian 还把 Headless Sync 作为独立的服务器同步产品。LLM Wiki Canvas 不应复制这些通用命令；它更窄的价值是仓库原生编译与审查边界：确定性的图谱/Canvas 产物、精确结构诊断、带来源哈希且范围受限的 Agent 上下文，以及必须经过人工审查才可应用的提案。
+
 ### 应该选 QMD
 
 主要问题是从大量本地文档找到相关段落时，选择 QMD。QMD 提供 BM25、向量搜索、查询扩展和本地 LLM 重排。LLM Wiki Canvas 只过滤图谱元数据，不宣称语义检索。
@@ -78,7 +80,7 @@ Markdown Wiki
 ## 官方资料
 
 - [LLM Wiki Canvas README](../README.zh-CN.md)
-- [Obsidian 官方介绍](https://obsidian.md/help/obsidian)与[数据存储方式](https://obsidian.md/help/Files%2Band%2Bfolders/How%2BObsidian%2Bstores%2Bdata)
+- [Obsidian 官方介绍](https://obsidian.md/help/obsidian)、[数据存储方式](https://obsidian.md/help/Files%2Band%2Bfolders/How%2BObsidian%2Bstores%2Bdata)与[官方 Obsidian CLI](https://obsidian.md/cli)
 - [QMD 官方仓库](https://github.com/tobi/qmd)
 - [LLM Wiki 官方仓库](https://github.com/nashsu/llm_wiki)
 - [WeKnora 官方仓库](https://github.com/Tencent/WeKnora)

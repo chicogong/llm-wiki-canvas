@@ -30,7 +30,7 @@ No unreleased changes. Version `0.1.0` is frozen as a release candidate and has 
 - Deterministic cross-Agent contract verification through `lwc agents`, including Markdown/JSON output, strict CI failure, safe regular-file checks, Codex/Claude Code/Qoder/TRAE adapters, an honest manual WorkBuddy state, and a generated public compatibility matrix.
 - Dry-run-first cross-Agent scaffolding through `lwc init`, with host selection, packaged canonical Skill resources, preservation of valid workspace-owned rules, all-or-nothing conflict blocking, exclusive file creation, and packaged CLI regression coverage.
 - An opt-in synthetic host runtime fixture that distinguishes deterministic reference evidence, real host execution, authentication blocks, unavailable binaries, and semantic failures without touching formal Markdown or storing sessions.
-- Linux and macOS package CI across Node.js 20 and 22, plus repeatable release checks and a documented schema compatibility policy.
+- Linux and macOS package CI across supported Node.js 22 and 24 LTS releases, plus repeatable release checks and a documented schema compatibility policy.
 - Bounded, read-only Agent context export through `lwc context`, with exact focus resolution, relationship depth/direction/type filters, page and word budgets, source hashes, truncation evidence, symlink refusal, Markdown/JSON output, and a copy-ready Workbench handoff.
 - Open Knowledge Format v0.2 consumption through `lwc okf check`, arbitrary concept types, trust/provenance/freshness fields, bundle-root links, descriptive Attested Computation contracts, a no-execution boundary, and a responsive Workbench Trust Inspector.
 

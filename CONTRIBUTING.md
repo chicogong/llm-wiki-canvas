@@ -4,7 +4,7 @@ Thanks for helping improve LLM Wiki Canvas.
 
 ## Development
 
-1. Use Node.js 20 or newer and pnpm 10.34.5.
+1. Use a supported Node.js LTS release (22 or 24) and pnpm 10.34.5.
 2. Run `pnpm install`.
 3. Run `pnpm demo:build` and `pnpm dev` for local development.
 4. Run `pnpm verify` before opening a pull request.

@@ -85,7 +85,7 @@ LLM Wiki Canvas occupies a deliberately small layer. It compiles and checks an e
 | **LLM Wiki** | LLM-driven ingest into a maintained desktop wiki | You want documents automatically synthesized into wiki pages | Use instead for generation/chat, or run `lwc` over its Markdown when JSON Canvas matters |
 | **WeKnora** | Full RAG, Agent, Wiki, ingestion, and team knowledge platform | You need broad formats, retrieval infrastructure, integrations, or RBAC | Use instead when a platform is required; it is not the same lightweight layer |
 
-Read [the complete comparison and decision guide](docs/comparison.md). The feature snapshot was verified against official project documentation on 2026-08-10.
+Read [the complete comparison and decision guide](docs/comparison.md). The feature snapshot was verified against official project documentation on 2026-08-14.
 
 ## Benefit comparison
 
@@ -231,7 +231,7 @@ Run the complete release-style verification:
 pnpm verify
 ```
 
-It performs secret scanning, dependency auditing, unit tests, a reproducible demo build, TypeScript and production builds, Skill validation, a deterministic host fixture, a packed npm install smoke test, and production Viewer tests on desktop and mobile. CI also repeats package smoke on Linux/macOS with Node.js 20/22.
+It performs secret scanning, dependency auditing, unit tests, a reproducible demo build, TypeScript and production builds, Skill validation, a deterministic host fixture, a packed npm install smoke test, and production Viewer tests on desktop and mobile. CI also repeats package smoke on Linux/macOS with the supported Node.js 22/24 LTS matrix.
 
 ## Direction
 
