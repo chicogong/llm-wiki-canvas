@@ -100,6 +100,10 @@ lwc proposal show .lwc/proposals/<proposal>.json
 
 本仓库暂不发布原生 Harness 插件。Harness 当前仍是 Developer Preview，插件 API 处于候选阶段；复用 Skill 以及 Harness 自身的 shell/filesystem 权限边界更小、更稳。Skill 被发现只能证明契约兼容，不能证明模型已经完成真实任务。[DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) · [插件架构](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/architecture.md)
 
+2026-08-14 的核对快照是：官方仓库 `47f9438` 仍明确标注 Developer Preview，GitHub 尚无正式 Release；npm 的 `@deepseek-ai/dsh` 已到 `0.1.0-rc.6`，而仓库清单仍是 `rc.5`。这正是“热度可以利用，运行时依赖不能抢跑”的信号。
+
+若真实用户验证证明 Skill + CLI 存在明显摩擦，再单独孵化只读插件。第一版只允许 `lwc_context` 和 `lwc_proposal_show`；根目录必须来自 Harness 工作区，Proposal 只能位于 `.lwc/proposals`，并限制输出大小、传递取消信号。不得暴露任意路径、任意命令、`review`、`reject`、`apply`、`serve`、API Key 或安装期脚本。插件包独立版本、独立 CI、独立发布审批，不与核心 CLI 的稳定性绑定。
+
 ### TRAE
 
 在 TRAE IDE 或 SOLO 中打开仓库。当前仓库的 `AGENTS.md` 和 `.agents/skills/llm-wiki-canvas` 可以直接使用，无需复制。TRAE 的更新记录已经列出项目级 Skills、`.agents/skills` 加载和嵌套 `AGENTS.md` 支持。[TRAE changelog](https://www.trae.ai/changelog)

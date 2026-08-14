@@ -125,12 +125,38 @@ test("@smoke filters the map and opens a relationship", async ({ page }, testInf
   await expect(page.getByText("1 of 8")).toBeVisible();
   await page.getByRole("button", { name: /Human Review/ }).first().click();
   await expect(page.getByRole("heading", { name: "Human Review" })).toBeVisible();
+  const evidenceRoute = page.getByLabel("Evidence route");
+  await expect(evidenceRoute).toContainText("Source");
+  await expect(evidenceRoute).toContainText("Structure");
+  await expect(evidenceRoute).toContainText("Decision");
+  await expect(evidenceRoute).toContainText("Human controlled");
   await expect(page.getByLabel("Agent context command")).toContainText("lwc context <vault>");
   await expect(page.getByLabel("Agent context command")).toContainText("--max-words 2000");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByLabel("Agent context command").getByRole("button", { name: "Copy" }).click();
   await expect(page.getByLabel("Agent context command").getByRole("button", { name: "Copied" })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("map-context.png"), fullPage: true });
+  expect(errors).toEqual([]);
+});
+
+test("@smoke opens the Chinese technology radar and searches its mock knowledge", async ({ page }, testInfo) => {
+  const errors: string[] = [];
+  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/?lang=zh-CN");
+  await page.waitForLoadState("networkidle");
+  await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
+  await expect(page.getByText("智能体工程热点雷达").first()).toBeVisible();
+  await expect(page.getByText("9 个模拟页面 · 来源可核对 · 不读取本地文件")).toBeVisible();
+  const search = page.getByRole("searchbox", { name: "搜索页面" });
+  await search.fill("DeepSeek");
+  await expect(page.getByText("2 / 9")).toBeVisible();
+  await page.getByRole("button", { name: /DeepSeek Harness/ }).first().click();
+  await expect(page.getByLabel("证据路径")).toContainText("来源");
+  await expect(page.getByLabel("证据路径")).toContainText("由人决定");
+  await expect(page.getByRole("link", { name: "EN" })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("agent-trends-zh.png"), fullPage: true });
   expect(errors).toEqual([]);
 });
 
@@ -197,6 +223,8 @@ test("@smoke health view reports only compiled graph facts", async ({ page }) =>
   await expect(page.getByRole("heading", { name: "Knowledge you can trust." })).toBeVisible();
   await expect(page.getByText("No structural issues found")).toBeVisible();
   await expect(page.getByText("0 errors · 0 warnings")).toBeVisible();
+  await expect(page.getByText("✓ all targets resolve")).toBeVisible();
+  await expect(page.getByText("✓ every page connected")).toBeVisible();
   await page.getByRole("button", { name: /Agent Knowledge Atlas/ }).click();
   await expect(page.getByTestId("map-view")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Agent Knowledge Atlas" })).toBeVisible();

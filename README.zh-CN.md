@@ -12,9 +12,9 @@ LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性�
 
 项目不内置 LLM、向量数据库、聊天界面、云服务或 MCP Server。
 
-[体验合成 Atlas](https://realtime-ai.chat/llm-wiki-canvas/) · [从 npm 安装](#快速开始) · [阅读使用指南](docs/usage.zh-CN.md)
+[体验中文热点雷达](https://realtime-ai.chat/llm-wiki-canvas/?lang=zh-CN) · [从 npm 安装](#快速开始) · [阅读使用指南](docs/usage.zh-CN.md)
 
-![LLM Wiki Canvas Atlas Viewer](docs/assets/atlas-viewer.png)
+![LLM Wiki Canvas 中文智能体工程热点雷达](docs/assets/agent-trends-zh.png)
 
 ## 你能得到什么
 
@@ -60,6 +60,15 @@ pnpm dev
 
 浏览器打开 <http://127.0.0.1:4173>。
 
+中文页面使用另一份可复现的模拟知识库，内容是 2026-08-14 核对的 Agent Harness、Agent Skills、MCP 与 DeepSeek Harness 公开快照。它用于演示中文搜索和证据关系，不代表实时新闻服务，也不代表生产集成已经完成。
+
+```bash
+pnpm demo:build:zh
+pnpm dev
+```
+
+浏览器打开 <http://127.0.0.1:4173/?lang=zh-CN>；右上角可以随时切回英文 Atlas。
+
 静态 Viewer 只读取仓库内置的示例图。Drafts 和 Changes 需要本机回环地址上的 `lwc serve`；两种模式都不会上传 Vault。
 
 示例构建结果可以直接验证：
@@ -83,6 +92,7 @@ examples/atlas-wiki/
 └── Atlas.excalidraw         # 可编辑的 Excalidraw 场景
 
 public/graph.json            # 确定性的 Viewer 输入
+public/agent-trends-zh.json  # 中文热点雷达的确定性 Viewer 输入
 ```
 
 更完整的操作步骤见 [Examples](examples/README.md)。

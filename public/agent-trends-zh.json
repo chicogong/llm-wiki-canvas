@@ -1,0 +1,382 @@
+{
+  "schemaVersion": 1,
+  "rootName": "agent-trends-zh",
+  "generatedAt": "2026-08-14T00:00:00.000Z",
+  "nodes": [
+    {
+      "id": "node-7a608439aaa0",
+      "path": "concepts/Agent Harness.md",
+      "title": "Agent Harness",
+      "kind": "concept",
+      "type": "concept",
+      "tags": [
+        "智能体",
+        "运行时",
+        "插件"
+      ],
+      "summary": "负责把模型、工具、权限、会话和插件组合成可运行智能体的工程层。",
+      "headings": [],
+      "wordCount": 117,
+      "modifiedAt": "2026-08-14T00:00:00.000Z",
+      "metadata": {
+        "title": "Agent Harness",
+        "type": "concept",
+        "tags": [
+          "智能体",
+          "运行时",
+          "插件"
+        ],
+        "summary": "负责把模型、工具、权限、会话和插件组合成可运行智能体的工程层。"
+      }
+    },
+    {
+      "id": "node-d343348324b7",
+      "path": "concepts/Agent Skills.md",
+      "title": "Agent Skills",
+      "kind": "concept",
+      "type": "concept",
+      "tags": [
+        "智能体",
+        "工作流",
+        "开放格式"
+      ],
+      "summary": "用 SKILL.md、脚本和参考资料封装可复用工作流的轻量开放格式。",
+      "headings": [],
+      "wordCount": 118,
+      "modifiedAt": "2026-08-14T00:00:00.000Z",
+      "metadata": {
+        "title": "Agent Skills",
+        "type": "concept",
+        "tags": [
+          "智能体",
+          "工作流",
+          "开放格式"
+        ],
+        "summary": "用 SKILL.md、脚本和参考资料封装可复用工作流的轻量开放格式。"
+      }
+    },
+    {
+      "id": "node-6c6a8f453ded",
+      "path": "concepts/MCP.md",
+      "title": "MCP",
+      "kind": "concept",
+      "type": "concept",
+      "tags": [
+        "智能体",
+        "协议",
+        "工具"
+      ],
+      "summary": "连接 AI 应用与外部数据、工具和工作流的开放协议。",
+      "headings": [],
+      "wordCount": 112,
+      "modifiedAt": "2026-08-14T00:00:00.000Z",
+      "metadata": {
+        "title": "MCP",
+        "type": "concept",
+        "tags": [
+          "智能体",
+          "协议",
+          "工具"
+        ],
+        "summary": "连接 AI 应用与外部数据、工具和工作流的开放协议。"
+      }
+    },
+    {
+      "id": "node-d0f6381266c1",
+      "path": "concepts/证据边界.md",
+      "title": "证据边界",
+      "kind": "concept",
+      "type": "concept",
+      "tags": [
+        "安全",
+        "来源",
+        "人工审查"
+      ],
+      "summary": "把公开热度、代码兼容、运行验证和正式发布分开记录。",
+      "headings": [],
+      "wordCount": 116,
+      "modifiedAt": "2026-08-14T00:00:00.000Z",
+      "metadata": {
+        "title": "证据边界",
+        "type": "concept",
+        "tags": [
+          "安全",
+          "来源",
+          "人工审查"
+        ],
+        "summary": "把公开热度、代码兼容、运行验证和正式发布分开记录。"
+      }
+    },
+    {
+      "id": "node-7e9bc61916a1",
+      "path": "decisions/LWC 与 DeepSeek Harness.md",
+      "title": "LWC 与 DeepSeek Harness",
+      "kind": "note",
+      "type": "note",
+      "tags": [
+        "LWC",
+        "DeepSeek Harness",
+        "决策"
+      ],
+      "summary": "先复用 Harness 自动发现的 Agent Skill；原生插件保持只读、实验性并单独验证。",
+      "headings": [],
+      "wordCount": 143,
+      "modifiedAt": "2026-08-14T00:00:00.000Z",
+      "metadata": {
+        "title": "LWC 与 DeepSeek Harness",
+        "type": "note",
+        "tags": [
+          "LWC",
+          "DeepSeek Harness",
+          "决策"
+        ],
+        "summary": "先复用 Harness 自动发现的 Agent Skill；原生插件保持只读、实验性并单独验证。"
+      }
+    },
+    {
+      "id": "node-e540cdd1328b",
+      "path": "index.md",
+      "title": "智能体工程热点雷达",
+      "kind": "index",
+      "type": "index",
+      "tags": [
+        "智能体",
+        "开源",
+        "技术雷达"
+      ],
+      "summary": "一份可核对来源、区分热度与成熟度的中文模拟知识库。",
+      "headings": [],
+      "wordCount": 127,
+      "modifiedAt": "2026-08-14T00:00:00.000Z",
+      "metadata": {
+        "title": "智能体工程热点雷达",
+        "type": "index",
+        "tags": [
+          "智能体",
+          "开源",
+          "技术雷达"
+        ],
+        "summary": "一份可核对来源、区分热度与成熟度的中文模拟知识库。"
+      }
+    },
+    {
+      "id": "node-9f4f1c189f3e",
+      "path": "sources/Agent Skills 规范.md",
+      "title": "Agent Skills 官方概览",
+      "kind": "source",
+      "type": "source",
+      "tags": [
+        "Agent Skills",
+        "官方来源",
+        "开放格式"
+      ],
+      "summary": "Agent Skills 官方概览将 Skill 定义为以 SKILL.md 为核心、可携带脚本和资料的轻量开放格式。",
+      "headings": [],
+      "wordCount": 99,
+      "modifiedAt": "2026-08-14T00:00:00.000Z",
+      "source": "https://agentskills.io/home",
+      "metadata": {
+        "title": "Agent Skills 官方概览",
+        "type": "source",
+        "tags": [
+          "Agent Skills",
+          "官方来源",
+          "开放格式"
+        ],
+        "source": "https://agentskills.io/home",
+        "summary": "Agent Skills 官方概览将 Skill 定义为以 SKILL.md 为核心、可携带脚本和资料的轻量开放格式。"
+      }
+    },
+    {
+      "id": "node-6eb5194be1e7",
+      "path": "sources/DeepSeek Harness.md",
+      "title": "DeepSeek Harness 官方仓库",
+      "kind": "source",
+      "type": "source",
+      "tags": [
+        "DeepSeek",
+        "Harness",
+        "官方来源"
+      ],
+      "summary": "2026-08-14 核对的官方仓库快照：插件优先、Developer Preview、接口仍可能破坏性变化。",
+      "headings": [],
+      "wordCount": 108,
+      "modifiedAt": "2026-08-14T00:00:00.000Z",
+      "source": "https://github.com/deepseek-ai/deepseek-harness",
+      "metadata": {
+        "title": "DeepSeek Harness 官方仓库",
+        "type": "source",
+        "tags": [
+          "DeepSeek",
+          "Harness",
+          "官方来源"
+        ],
+        "source": "https://github.com/deepseek-ai/deepseek-harness",
+        "summary": "2026-08-14 核对的官方仓库快照：插件优先、Developer Preview、接口仍可能破坏性变化。"
+      }
+    },
+    {
+      "id": "node-28079dd4aabc",
+      "path": "sources/MCP 官方介绍.md",
+      "title": "MCP 官方介绍",
+      "kind": "source",
+      "type": "source",
+      "tags": [
+        "MCP",
+        "官方来源",
+        "开放协议"
+      ],
+      "summary": "MCP 官方文档将其定义为连接 AI 应用与外部数据、工具和工作流的开放标准。",
+      "headings": [],
+      "wordCount": 106,
+      "modifiedAt": "2026-08-14T00:00:00.000Z",
+      "source": "https://modelcontextprotocol.io/introduction",
+      "metadata": {
+        "title": "MCP 官方介绍",
+        "type": "source",
+        "tags": [
+          "MCP",
+          "官方来源",
+          "开放协议"
+        ],
+        "source": "https://modelcontextprotocol.io/introduction",
+        "summary": "MCP 官方文档将其定义为连接 AI 应用与外部数据、工具和工作流的开放标准。"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-7acff4ebd184",
+      "source": "node-7a608439aaa0",
+      "target": "node-6eb5194be1e7",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-97baafcde59e",
+      "source": "node-7a608439aaa0",
+      "target": "node-d343348324b7",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-e29de0be6458",
+      "source": "node-7a608439aaa0",
+      "target": "node-6c6a8f453ded",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-ab2532f1db9e",
+      "source": "node-d343348324b7",
+      "target": "node-9f4f1c189f3e",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-7d224e108a59",
+      "source": "node-d343348324b7",
+      "target": "node-7e9bc61916a1",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-5e495cd3ed3f",
+      "source": "node-6c6a8f453ded",
+      "target": "node-28079dd4aabc",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-0c9847003c5d",
+      "source": "node-6c6a8f453ded",
+      "target": "node-d0f6381266c1",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-0a47060cadee",
+      "source": "node-d0f6381266c1",
+      "target": "node-7e9bc61916a1",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-7141c146863c",
+      "source": "node-7e9bc61916a1",
+      "target": "node-d343348324b7",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-06585132ce33",
+      "source": "node-7e9bc61916a1",
+      "target": "node-6eb5194be1e7",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-8030f948925a",
+      "source": "node-e540cdd1328b",
+      "target": "node-6eb5194be1e7",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-761c9168b493",
+      "source": "node-e540cdd1328b",
+      "target": "node-7a608439aaa0",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-ef995967c732",
+      "source": "node-e540cdd1328b",
+      "target": "node-d343348324b7",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-030264f40296",
+      "source": "node-e540cdd1328b",
+      "target": "node-6c6a8f453ded",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-0ff7afe2701d",
+      "source": "node-e540cdd1328b",
+      "target": "node-d0f6381266c1",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-432eef3b1831",
+      "source": "node-e540cdd1328b",
+      "target": "node-7e9bc61916a1",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-7cd6abfe205d",
+      "source": "node-9f4f1c189f3e",
+      "target": "node-d343348324b7",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-fe27c1eaedc0",
+      "source": "node-6eb5194be1e7",
+      "target": "node-7a608439aaa0",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-bc6f27782d9d",
+      "source": "node-6eb5194be1e7",
+      "target": "node-d0f6381266c1",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-42bfd5aa73f7",
+      "source": "node-28079dd4aabc",
+      "target": "node-6c6a8f453ded",
+      "kind": "wikilink"
+    },
+    {
+      "id": "edge-eaaed56f26bb",
+      "source": "node-28079dd4aabc",
+      "target": "node-d0f6381266c1",
+      "kind": "wikilink"
+    }
+  ],
+  "diagnostics": [],
+  "stats": {
+    "files": 9,
+    "links": 21,
+    "brokenLinks": 0,
+    "orphanNodes": 0
+  }
+}

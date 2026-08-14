@@ -1,0 +1,243 @@
+{
+  "nodes": [
+    {
+      "id": "node-d343348324b7",
+      "type": "file",
+      "file": "concepts/Agent Skills.md",
+      "x": 0,
+      "y": 0,
+      "width": 360,
+      "height": 220,
+      "color": "5"
+    },
+    {
+      "id": "node-e540cdd1328b",
+      "type": "file",
+      "file": "index.md",
+      "x": 0,
+      "y": -520,
+      "width": 360,
+      "height": 220,
+      "color": "4"
+    },
+    {
+      "id": "node-7a608439aaa0",
+      "type": "file",
+      "file": "concepts/Agent Harness.md",
+      "x": 368,
+      "y": -368,
+      "width": 360,
+      "height": 220,
+      "color": "5"
+    },
+    {
+      "id": "node-6c6a8f453ded",
+      "type": "file",
+      "file": "concepts/MCP.md",
+      "x": 520,
+      "y": 0,
+      "width": 360,
+      "height": 220,
+      "color": "5"
+    },
+    {
+      "id": "node-d0f6381266c1",
+      "type": "file",
+      "file": "concepts/证据边界.md",
+      "x": 368,
+      "y": 368,
+      "width": 360,
+      "height": 220,
+      "color": "5"
+    },
+    {
+      "id": "node-7e9bc61916a1",
+      "type": "file",
+      "file": "decisions/LWC 与 DeepSeek Harness.md",
+      "x": 0,
+      "y": 520,
+      "width": 360,
+      "height": 220,
+      "color": "2"
+    },
+    {
+      "id": "node-6eb5194be1e7",
+      "type": "file",
+      "file": "sources/DeepSeek Harness.md",
+      "x": -368,
+      "y": 368,
+      "width": 360,
+      "height": 220,
+      "color": "6"
+    },
+    {
+      "id": "node-28079dd4aabc",
+      "type": "file",
+      "file": "sources/MCP 官方介绍.md",
+      "x": -520,
+      "y": 0,
+      "width": 360,
+      "height": 220,
+      "color": "6"
+    },
+    {
+      "id": "node-9f4f1c189f3e",
+      "type": "file",
+      "file": "sources/Agent Skills 规范.md",
+      "x": -368,
+      "y": -368,
+      "width": 360,
+      "height": 220,
+      "color": "6"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-7acff4ebd184",
+      "fromNode": "node-7a608439aaa0",
+      "toNode": "node-6eb5194be1e7",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-97baafcde59e",
+      "fromNode": "node-7a608439aaa0",
+      "toNode": "node-d343348324b7",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-e29de0be6458",
+      "fromNode": "node-7a608439aaa0",
+      "toNode": "node-6c6a8f453ded",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-ab2532f1db9e",
+      "fromNode": "node-d343348324b7",
+      "toNode": "node-9f4f1c189f3e",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-7d224e108a59",
+      "fromNode": "node-d343348324b7",
+      "toNode": "node-7e9bc61916a1",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-5e495cd3ed3f",
+      "fromNode": "node-6c6a8f453ded",
+      "toNode": "node-28079dd4aabc",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-0c9847003c5d",
+      "fromNode": "node-6c6a8f453ded",
+      "toNode": "node-d0f6381266c1",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-0a47060cadee",
+      "fromNode": "node-d0f6381266c1",
+      "toNode": "node-7e9bc61916a1",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-7141c146863c",
+      "fromNode": "node-7e9bc61916a1",
+      "toNode": "node-d343348324b7",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-06585132ce33",
+      "fromNode": "node-7e9bc61916a1",
+      "toNode": "node-6eb5194be1e7",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-8030f948925a",
+      "fromNode": "node-e540cdd1328b",
+      "toNode": "node-6eb5194be1e7",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-761c9168b493",
+      "fromNode": "node-e540cdd1328b",
+      "toNode": "node-7a608439aaa0",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-ef995967c732",
+      "fromNode": "node-e540cdd1328b",
+      "toNode": "node-d343348324b7",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-030264f40296",
+      "fromNode": "node-e540cdd1328b",
+      "toNode": "node-6c6a8f453ded",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-0ff7afe2701d",
+      "fromNode": "node-e540cdd1328b",
+      "toNode": "node-d0f6381266c1",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-432eef3b1831",
+      "fromNode": "node-e540cdd1328b",
+      "toNode": "node-7e9bc61916a1",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-7cd6abfe205d",
+      "fromNode": "node-9f4f1c189f3e",
+      "toNode": "node-d343348324b7",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-fe27c1eaedc0",
+      "fromNode": "node-6eb5194be1e7",
+      "toNode": "node-7a608439aaa0",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-bc6f27782d9d",
+      "fromNode": "node-6eb5194be1e7",
+      "toNode": "node-d0f6381266c1",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-42bfd5aa73f7",
+      "fromNode": "node-28079dd4aabc",
+      "toNode": "node-6c6a8f453ded",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "edge-eaaed56f26bb",
+      "fromNode": "node-28079dd4aabc",
+      "toNode": "node-d0f6381266c1",
+      "fromEnd": "none",
+      "toEnd": "arrow"
+    }
+  ]
+}
