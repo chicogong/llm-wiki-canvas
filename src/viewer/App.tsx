@@ -49,6 +49,10 @@ async function copyText(value: string): Promise<boolean> {
   try { return document.execCommand("copy"); } finally { field.remove(); }
 }
 
+function graphFitPadding(width: number): number {
+  return width < 600 ? 28 : 72;
+}
+
 function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
   graph: WikiGraph;
   visibleIds: Set<string>;
@@ -60,6 +64,22 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
 
   useEffect(() => {
     if (!ref.current) return;
+    const css = getComputedStyle(document.documentElement);
+    const token = (name: string) => css.getPropertyValue(name).trim();
+    const theme = {
+      ink: token("--ink"),
+      paper: token("--surface"),
+      line: token("--line-strong"),
+      relation: token("--relation"),
+      index: token("--kind-index"),
+      concept: token("--kind-concept"),
+      source: token("--kind-source"),
+      note: token("--kind-note"),
+      selected: token("--focus"),
+      verified: token("--verified"),
+      warning: token("--warning"),
+      danger: token("--danger"),
+    };
     const cy = cytoscape({
       container: ref.current,
       elements: [
@@ -74,26 +94,26 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
         ...graph.edges.map((edge) => ({ data: { id: edge.id, source: edge.source, target: edge.target, kind: edge.kind } })),
       ],
       style: [
-        { selector: "node", style: { "background-color": "#dce9e3", "border-color": "#8aa99a", "border-width": 1.5, label: "data(label)", color: "#24322b", "font-family": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", "font-size": "11px", "font-weight": 600, "text-wrap": "wrap", "text-max-width": "126px", "text-valign": "bottom", "text-margin-y": 11, "text-background-color": "#fbfcfb", "text-background-opacity": 0.94, "text-background-padding": "4px", width: 27, height: 27 } },
-        { selector: "node[kind = 'index']", style: { "background-color": "#2f64c7", "border-color": "#234f9f", shape: "ellipse", width: 44, height: 44, "font-size": "12px", "text-max-width": "154px" } },
-        { selector: "node[kind = 'concept']", style: { "background-color": "#4dad81", "border-color": "#2c8460", shape: "ellipse", width: 34, height: 34 } },
-        { selector: "node[kind = 'source']", style: { "background-color": "#f0b56f", "border-color": "#c47a2f", shape: "ellipse", width: 32, height: 32 } },
-        { selector: "node[kind = 'note']", style: { "background-color": "#e8eef1", "border-color": "#80939b", shape: "ellipse" } },
-        { selector: "node[trust = 'machine-confirmed']", style: { "border-color": "#2f64c7", "border-width": 2.5 } },
-        { selector: "node[trust = 'human-reviewed']", style: { "border-color": "#167753", "border-width": 3 } },
-        { selector: "node[lifecycle = 'deprecated']", style: { "border-color": "#b86c26", "border-style": "dashed", "border-width": 3 } },
-        { selector: "node[stale = 'yes']", style: { "border-color": "#c44b4b", "border-style": "dashed", "border-width": 3 } },
-        { selector: "edge", style: { width: 1, "line-color": "#cad5d0", "target-arrow-color": "#aebdb6", "target-arrow-shape": "triangle", "arrow-scale": 0.55, "curve-style": "bezier", opacity: 0.8 } },
-        { selector: "edge.context", style: { width: 2.2, "line-color": "#2f64c7", "target-arrow-color": "#2f64c7", opacity: 0.95, "z-index": 20 } },
-        { selector: "node.context", style: { "border-color": "#2f64c7", "border-width": 2.5 } },
-        { selector: ":selected", style: { "border-color": "#2f64c7", "border-width": 3, "underlay-color": "#2f64c7", "underlay-opacity": 0.1, "underlay-padding": 10 } },
+        { selector: "node", style: { "background-color": theme.note, "border-color": theme.line, "border-width": 1.5, label: "data(label)", color: theme.ink, "font-family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", "font-size": "11px", "font-weight": 600, "text-wrap": "wrap", "text-max-width": "126px", "text-valign": "bottom", "text-margin-y": 11, "text-background-color": theme.paper, "text-background-opacity": 0.96, "text-background-padding": "4px", width: 27, height: 27 } },
+        { selector: "node[kind = 'index']", style: { "background-color": theme.index, "border-color": theme.index, shape: "ellipse", width: 44, height: 44, "font-size": "12px", "text-max-width": "154px" } },
+        { selector: "node[kind = 'concept']", style: { "background-color": theme.concept, "border-color": theme.concept, shape: "ellipse", width: 34, height: 34 } },
+        { selector: "node[kind = 'source']", style: { "background-color": theme.source, "border-color": theme.source, shape: "ellipse", width: 32, height: 32 } },
+        { selector: "node[kind = 'note']", style: { "background-color": theme.note, "border-color": theme.line, shape: "ellipse" } },
+        { selector: "node[trust = 'machine-confirmed']", style: { "border-color": theme.selected, "border-width": 2.5 } },
+        { selector: "node[trust = 'human-reviewed']", style: { "border-color": theme.verified, "border-width": 3 } },
+        { selector: "node[lifecycle = 'deprecated']", style: { "border-color": theme.warning, "border-style": "dashed", "border-width": 3 } },
+        { selector: "node[stale = 'yes']", style: { "border-color": theme.danger, "border-style": "dashed", "border-width": 3 } },
+        { selector: "edge", style: { width: 1, "line-color": theme.relation, "target-arrow-color": theme.line, "target-arrow-shape": "triangle", "arrow-scale": 0.55, "curve-style": "bezier", opacity: 0.82 } },
+        { selector: "edge.context", style: { width: 2.2, "line-color": theme.selected, "target-arrow-color": theme.selected, opacity: 0.95, "z-index": 20 } },
+        { selector: "node.context", style: { "border-color": theme.selected, "border-width": 2.5 } },
+        { selector: ":selected", style: { "border-color": theme.selected, "border-width": 3, "underlay-color": theme.selected, "underlay-opacity": 0.1, "underlay-padding": 10 } },
         { selector: ".muted", style: { opacity: 0.08 } },
       ],
       layout: {
         name: "concentric",
         animate: false,
         fit: true,
-        padding: 76,
+        padding: graphFitPadding(ref.current.clientWidth),
         avoidOverlap: true,
         nodeDimensionsIncludeLabels: true,
         minNodeSpacing: 76,
@@ -116,7 +136,7 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
     if (!cy) return;
     cy.nodes().forEach((node) => { node.style("display", visibleIds.has(node.id()) ? "element" : "none"); });
     cy.edges().forEach((edge) => { edge.style("display", visibleIds.has(edge.source().id()) && visibleIds.has(edge.target().id()) ? "element" : "none"); });
-    cy.fit(cy.elements(":visible"), 72);
+    cy.fit(cy.elements(":visible"), graphFitPadding(ref.current?.clientWidth ?? 1000));
   }, [visibleIds]);
 
   useEffect(() => {
@@ -188,7 +208,12 @@ function Inspector({ graph, selected, onSelect }: { graph: WikiGraph; selected?:
   useEffect(() => setContextCopied(false), [selected?.id]);
 
   return <aside className="inspector" aria-live="polite">
-    <div className="panel-heading"><span>Page details</span>{selected && <span className={`kind-badge ${selected.kind}`}>{KIND_LABEL[selected.kind]}</span>}</div>
+    <ol className="evidence-spine" aria-label="Evidence route">
+      <li className={selected ? "complete" : "current"}><span>Source</span><small>{selected ? selected.path : "Select a page"}</small></li>
+      <li className={selected ? "current" : "pending"}><span>Structure</span><small>{selected ? `${relations.length} direct relationship${relations.length === 1 ? "" : "s"}` : "Waiting for selection"}</small></li>
+      <li className="pending"><span>Decision</span><small>Human controlled</small></li>
+    </ol>
+    <div className="panel-heading"><span>Evidence sheet</span>{selected && <span className={`kind-badge ${selected.kind}`}>{KIND_LABEL[selected.kind]}</span>}</div>
     {selected ? <>
       <div className="page-title"><span className={`page-mark ${selected.kind}`} /><h2>{selected.title}</h2></div>
       <p className="summary">{selected.summary || "This page does not have a summary yet."}</p>
@@ -204,11 +229,6 @@ function Inspector({ graph, selected, onSelect }: { graph: WikiGraph; selected?:
         <pre>{JSON.stringify(extensions, null, 2)}</pre>
       </details>}
       {selected.trust && <TrustInspector node={selected} />}
-      <section className="context-handoff" aria-label="Agent context command">
-        <div><span><p className="section-kicker">Agent handoff</p><h3>Bound the evidence</h3></span><button type="button" onClick={() => void copyText(contextCommand).then(setContextCopied)}>{contextCopied ? "Copied" : "Copy"}</button></div>
-        <p>Export this page and its direct relationships with explicit page and word limits.</p>
-        <code>{contextCommand}</code>
-      </section>
       <section className="relations">
         <h3>Connections <span>{relations.length}</span></h3>
         {relations.length ? relations.map(({ node, direction, kind }, index) => <button key={`${node.id}-${index}`} onClick={() => onSelect(node.id)}>
@@ -216,6 +236,11 @@ function Inspector({ graph, selected, onSelect }: { graph: WikiGraph; selected?:
           <span><strong>{node.title}</strong><small>{direction === "out" ? "Links to" : "Linked from"} · {kind}</small></span>
           <span className="relation-arrow">→</span>
         </button>) : <p className="empty-copy">No direct connections.</p>}
+      </section>
+      <section className="context-handoff" aria-label="Agent context command">
+        <div><div><p className="section-kicker">Bounded export</p><h3>Hand this evidence to an Agent</h3></div><button type="button" onClick={() => void copyText(contextCommand).then(setContextCopied)}>{contextCopied ? "Copied" : "Copy command"}</button></div>
+        <p>Export this page and its direct relationships with explicit page and word limits.</p>
+        <code>{contextCommand}</code>
       </section>
     </> : <p className="empty-copy">Select a node to inspect its evidence and direct relationships.</p>}
   </aside>;
@@ -352,8 +377,8 @@ function HealthView({ graph, onOpenPage }: { graph: WikiGraph; onOpenPage: (id: 
     <section className="metric-grid" aria-label="Vault health metrics">
       <article><span>Pages</span><strong>{graph.stats.files}</strong><small>{healthyPages} connected</small></article>
       <article><span>Relationships</span><strong>{graph.stats.links}</strong><small>resolved links</small></article>
-      <article className={graph.stats.brokenLinks ? "attention" : ""}><span>Broken links</span><strong>{graph.stats.brokenLinks}</strong><small>{graph.stats.brokenLinks ? "needs review" : "all targets resolve"}</small></article>
-      <article className={graph.stats.orphanNodes ? "attention" : ""}><span>Orphan pages</span><strong>{graph.stats.orphanNodes}</strong><small>{graph.stats.orphanNodes ? "not connected" : "every page connected"}</small></article>
+      <article className={graph.stats.brokenLinks ? "attention" : "verified"}><span>Broken links</span><strong>{graph.stats.brokenLinks}</strong><small>{graph.stats.brokenLinks ? "needs review" : "✓ all targets resolve"}</small></article>
+      <article className={graph.stats.orphanNodes ? "attention" : "verified"}><span>Orphan pages</span><strong>{graph.stats.orphanNodes}</strong><small>{graph.stats.orphanNodes ? "not connected" : "✓ every page connected"}</small></article>
     </section>
     <div className="health-columns">
       <section className="health-card diagnostics-card">

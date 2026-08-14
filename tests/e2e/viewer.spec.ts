@@ -125,6 +125,11 @@ test("@smoke filters the map and opens a relationship", async ({ page }, testInf
   await expect(page.getByText("1 of 8")).toBeVisible();
   await page.getByRole("button", { name: /Human Review/ }).first().click();
   await expect(page.getByRole("heading", { name: "Human Review" })).toBeVisible();
+  const evidenceRoute = page.getByLabel("Evidence route");
+  await expect(evidenceRoute).toContainText("Source");
+  await expect(evidenceRoute).toContainText("Structure");
+  await expect(evidenceRoute).toContainText("Decision");
+  await expect(evidenceRoute).toContainText("Human controlled");
   await expect(page.getByLabel("Agent context command")).toContainText("lwc context <vault>");
   await expect(page.getByLabel("Agent context command")).toContainText("--max-words 2000");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -197,6 +202,8 @@ test("@smoke health view reports only compiled graph facts", async ({ page }) =>
   await expect(page.getByRole("heading", { name: "Knowledge you can trust." })).toBeVisible();
   await expect(page.getByText("No structural issues found")).toBeVisible();
   await expect(page.getByText("0 errors · 0 warnings")).toBeVisible();
+  await expect(page.getByText("✓ all targets resolve")).toBeVisible();
+  await expect(page.getByText("✓ every page connected")).toBeVisible();
   await page.getByRole("button", { name: /Agent Knowledge Atlas/ }).click();
   await expect(page.getByTestId("map-view")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Agent Knowledge Atlas" })).toBeVisible();
