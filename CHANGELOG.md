@@ -4,7 +4,7 @@ All notable changes will be documented here. This project follows Semantic Versi
 
 ## [Unreleased]
 
-No unreleased changes. Version `0.2.0` is the current release candidate.
+No unreleased changes. Version `0.2.0` was published to npm, GitHub Releases, and GitHub Pages on 2026-08-14.
 
 ## [0.2.0] - 2026-08-14
 

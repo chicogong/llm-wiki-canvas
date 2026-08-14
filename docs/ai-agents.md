@@ -102,7 +102,7 @@ The repository also ships an experimental, independently packaged integration un
 
 The 2026-08-14 verification snapshot found the official repository at `47f9438`, still explicitly labeled Developer Preview and without a formal GitHub Release. npm had `@deepseek-ai/dsh@0.1.0-rc.6` while the repository manifest still declared `rc.5`. That is a useful signal to join the ecosystem through its stable filesystem contract without coupling the core package to a moving runtime API.
 
-The integration remains an independently versioned experimental package. It derives the root from the Harness session workspace, accepts only constrained relative paths, caps output, propagates cancellation, and has no install lifecycle script. Because Harness is still moving through release candidates, this delivery proves repository and local runtime contracts only; it is neither an npm publication nor evidence that a model completed a real task.
+The independently versioned integration is published as `dsh-llm-wiki-canvas@0.1.0-experimental.1`. It derives the root from the Harness session workspace, accepts only constrained relative paths, caps output, propagates cancellation, and has no install lifecycle script. Publication plus deterministic tool invocation prove the package and local runtime contracts; they are still not evidence that a model completed a real knowledge task.
 
 ### TRAE
 

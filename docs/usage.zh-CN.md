@@ -2,7 +2,12 @@
 
 [English](usage.md) · [简体中文](usage.zh-CN.md)
 
-LLM Wiki Canvas 当前从源码仓库运行。下面命令对应当前 v0.1，不假设未来 npm 包已经发布。
+LLM Wiki Canvas 0.2.0 已发布到 npm。日常使用直接安装 `llm-wiki-canvas`；开发产品或复现完整 Demo 与测试时再使用下面的源码流程。
+
+```bash
+npm install --global llm-wiki-canvas@0.2.0
+lwc --version
+```
 
 ## 1. 验证自带示例
 
