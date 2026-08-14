@@ -22,6 +22,8 @@ For a new cross-Agent repository, run `lwc init <workspace>` and inspect the dry
 
 For maintainers working in the upstream LLM Wiki Canvas source repository, use its synthetic `examples/host-fixture` and opt-in host commands. Keep deterministic reference results, successful host-runtime evidence, blocked authentication, unavailable commands, and semantic failures distinct. Never commit `.lwc/host-runtime`, host transcripts, credentials, or sessions, and never describe blocked or unavailable hosts as passing.
 
+DeepSeek Harness discovers this Skill from `<projectRoot>/.agents/skills` without a native plugin. Keep that integration read-only by default: prefer `lwc context . --format json` for bounded evidence and `lwc proposal show <relative-proposal>` for review. Do not expose arbitrary commands or absolute paths, and never let an Agent run proposal review, reject, or apply without explicit human direction. Treat Skill discovery as repository-contract evidence, not proof that a model completed a task.
+
 If the repository package is not installed globally, run `pnpm exec tsx <repo>/src/cli/index.ts` in place of `lwc`.
 
 ## Query and Explain

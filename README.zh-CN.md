@@ -3,6 +3,7 @@
 [English](README.md) · [简体中文](README.zh-CN.md)
 
 [![CI](https://github.com/chicogong/llm-wiki-canvas/actions/workflows/ci.yml/badge.svg)](https://github.com/chicogong/llm-wiki-canvas/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/llm-wiki-canvas.svg)](https://www.npmjs.com/package/llm-wiki-canvas)
 [![License](https://img.shields.io/badge/license-Apache--2.0-163A5F.svg)](LICENSE)
 
 **面向 Agent 管理的 Markdown 知识库的本地优先可视化编译器。**
@@ -10,6 +11,8 @@
 LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性的关系图，以及可继续编辑的 Obsidian Canvas 和 Excalidraw 文件。Codex、Claude Code、Qoder、TRAE 和腾讯 WorkBuddy 仍然操作普通文件；人可以查看全局关系、定位知识库问题并审查生成产物。
 
 项目不内置 LLM、向量数据库、聊天界面、云服务或 MCP Server。
+
+[体验合成 Atlas](https://chicogong.github.io/llm-wiki-canvas/) · [从 npm 安装](#快速开始) · [阅读使用指南](docs/usage.zh-CN.md)
 
 ![LLM Wiki Canvas Atlas Viewer](docs/assets/atlas-viewer.png)
 
@@ -31,7 +34,18 @@ LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性�
 - **审核前即可看到关系影响。** Change blueprint 会标出受影响页面、新增或删除的链接，以及目标哈希冲突，且不会写入正式知识。
 - **生成视图可复现。** 稳定的节点和边 ID，让图谱 fixture 与 Git diff 有实际意义。
 
-## 运行可复现的合成示例
+## 快速开始
+
+需要 Node.js 22 或 24。安装公开包；不要安装 Salesforce 的同名 `lwc` npm 包。
+
+```bash
+npm install --global llm-wiki-canvas
+lwc serve /path/to/vault
+```
+
+然后打开 <http://127.0.0.1:4173>。服务默认只监听 loopback，读取普通 Markdown，不会上传 Vault。
+
+如需从源码运行仓库内的合成示例：
 
 仓库自带 **Agent Knowledge Atlas**：一个规模不大、可以逐页检查的合成知识库，内容涉及 LLM Wiki、可视化知识、来源追溯和人工审查。它是产品测试夹具，不是真实用户 Vault 的使用证据。
 
@@ -86,6 +100,7 @@ LLM Wiki Canvas 有意只做很小的一层：编译并检查已经存在的 Mar
 | **QMD** | 本地 BM25、向量与重排检索 | Agent 需要高质量本地搜索 | 组合使用：QMD 检索，`lwc` 可视化并检查结构 |
 | **LLM Wiki** | LLM 自动摄取并维护桌面 Wiki | 希望把文档自动综合成 Wiki 页面 | 自动生成和聊天选它；需要 JSON Canvas 时可再用 `lwc` 处理 Markdown |
 | **WeKnora** | 完整 RAG、Agent、Wiki、文档解析和团队平台 | 需要多格式、检索基础设施、集成或 RBAC | 需要平台时选它；它与本项目不是同一轻量层 |
+| **DeepSeek Harness** | 插件优先的 Agent 运行时 | 需要能自动发现项目 Skill 的 Agent Host | 搭配使用：Harness 自动发现 `.agents/skills/llm-wiki-canvas` 并调用有限 CLI，无需原生插件 |
 
 完整能力矩阵、选择建议和组合方式见[对比与决策指南](docs/comparison.zh-CN.md)。能力快照于 2026-08-14 根据各项目官方资料核对。
 
@@ -108,7 +123,7 @@ LLM Wiki Canvas 有意只做很小的一层：编译并检查已经存在的 Mar
 
 ## 用在自己的 Vault
 
-npm 包目前仍是尚未公开发布的 `0.1.0` 候选版。首次正式发布前请使用下面的源码方式；不要安装同名但无关的非 scoped `lwc` 包。
+npm 包名是 `llm-wiki-canvas`。短名 `lwc` 只作为命令使用；无 scope 的 npm 包 `lwc` 属于 Salesforce，与本项目无关。
 
 开发环境可以直接执行：
 
@@ -159,12 +174,13 @@ Obsidian、QMD、Agent Skill 和 CI 的具体用法见[使用指南](docs/usage.
 | Agent | 已经可以使用的仓库文件 |
 | --- | --- |
 | Codex | `AGENTS.md` + `.agents/skills/llm-wiki-canvas/` |
+| DeepSeek Harness | 自动发现 `.agents/skills/llm-wiki-canvas/` |
 | TRAE | `AGENTS.md` + 同一个 `.agents/skills/` Skill |
 | Qoder | `AGENTS.md` + `.qoder/skills/llm-wiki-canvas/` 适配入口 |
 | Claude Code | `CLAUDE.md` + `.claude/skills/llm-wiki-canvas/` 适配入口 |
 | 腾讯 WorkBuddy | 选择仓库为工作区，并用 `@` 引用 `AGENTS.md` 和共享 Skill |
 
-准确设置、兼容边界、权限建议和可直接复制的任务见[与 AI Agent 配合](docs/ai-agents.zh-CN.md)。本地文件权限加 `lwc` 已经足够，这条工作流不需要 MCP Server。
+准确设置、兼容边界、权限建议和可直接复制的任务见[与 AI Agent 配合](docs/ai-agents.zh-CN.md)。本地文件权限加 `lwc` 已经足够，这条工作流不需要 MCP Server 或原生 Harness 插件。
 
 先运行 `lwc init .` 预览缺失的跨 Agent 入口；没有 `--write` 就不会写文件，已有有效文件继续由工作区拥有，一个冲突会阻止全部写入。随后运行 `lwc agents . --strict` 校验结果。`ready` 表示仓库契约内部一致，`manual` 表示需要显式附加上下文，`incomplete` 会让 strict 模式失败。结果见自动生成的[英文兼容矩阵](docs/agent-compatibility.md)和[中文说明](docs/agent-compatibility.zh-CN.md)。这些检查不会假装执行过闭源宿主程序。
 

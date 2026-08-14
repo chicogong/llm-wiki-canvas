@@ -1,7 +1,7 @@
 import { lstat, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
-export type AgentHostId = "codex" | "claude-code" | "qoder" | "trae" | "workbuddy";
+export type AgentHostId = "codex" | "claude-code" | "deepseek-harness" | "qoder" | "trae" | "workbuddy";
 export type AgentHostStatus = "ready" | "manual" | "incomplete";
 export type CompatibilityCheckStatus = "pass" | "manual" | "fail";
 
@@ -93,6 +93,7 @@ export async function inspectAgentCompatibility(root: string): Promise<AgentComp
   const hosts: AgentHostCompatibility[] = [
     host("codex", "Codex", "AGENTS.md + project Skill", [rules, skill]),
     host("claude-code", "Claude Code", "CLAUDE.md + project Skill adapter", [rules, skill, claudeRules, claudeSkill]),
+    host("deepseek-harness", "DeepSeek Harness", "Automatic .agents/skills discovery", [rules, skill]),
     host("qoder", "Qoder", "AGENTS.md + project Skill adapter", [rules, skill, qoderSkill]),
     host("trae", "TRAE", "AGENTS.md + shared project Skill", [rules, skill]),
     host("workbuddy", "Tencent WorkBuddy", "Explicit workspace references", [rules, skill, manualContext], true),

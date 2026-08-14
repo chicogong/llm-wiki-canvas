@@ -1,5 +1,5 @@
 {
-  "name": "@chicogong/llm-wiki-canvas",
+  "name": "llm-wiki-canvas",
   "version": "0.1.0",
   "description": "A local-first visual knowledge workspace for coding agents and Obsidian.",
   "keywords": ["llm-wiki", "obsidian", "json-canvas", "knowledge-graph", "local-first", "agent-skill"],
@@ -8,8 +8,8 @@
   "repository": {"type": "git", "url": "git+https://github.com/chicogong/llm-wiki-canvas.git"},
   "type": "module",
   "bin": {
-    "llm-wiki-canvas": "./dist/index.js",
-    "lwc": "./dist/index.js"
+    "llm-wiki-canvas": "dist/index.js",
+    "lwc": "dist/index.js"
   },
   "files": ["dist", "viewer-dist", ".agents/skills/llm-wiki-canvas", "NOTICE", "THIRD_PARTY_LICENSES.txt"],
   "scripts": {

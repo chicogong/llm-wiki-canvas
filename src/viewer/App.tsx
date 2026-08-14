@@ -74,19 +74,19 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
         ...graph.edges.map((edge) => ({ data: { id: edge.id, source: edge.source, target: edge.target, kind: edge.kind } })),
       ],
       style: [
-        { selector: "node", style: { "background-color": "#fbfaf6", "border-color": "#7890a2", "border-width": 1.5, label: "data(label)", color: "#102a43", "font-family": "ui-monospace, 'SFMono-Regular', Consolas, monospace", "font-size": "10px", "font-weight": 600, "text-wrap": "wrap", "text-max-width": "116px", "text-valign": "bottom", "text-margin-y": 11, "text-background-color": "#f3f0e8", "text-background-opacity": 0.94, "text-background-padding": "4px", width: 24, height: 24 } },
-        { selector: "node[kind = 'index']", style: { "background-color": "#102a43", "border-color": "#102a43", shape: "round-rectangle", width: 42, height: 42, color: "#102a43", "font-size": "11px", "text-max-width": "148px" } },
-        { selector: "node[kind = 'concept']", style: { "background-color": "#84a9c5", "border-color": "#2f5d8c", shape: "diamond", width: 31, height: 31 } },
-        { selector: "node[kind = 'source']", style: { "background-color": "#e2a665", "border-color": "#9a5b2c", shape: "round-rectangle", width: 32, height: 25 } },
-        { selector: "node[kind = 'note']", style: { "background-color": "#fbfaf6", "border-color": "#6f8290", shape: "ellipse" } },
-        { selector: "node[trust = 'machine-confirmed']", style: { "border-color": "#2f5d8c", "border-width": 2.5 } },
-        { selector: "node[trust = 'human-reviewed']", style: { "border-color": "#2f756b", "border-width": 3 } },
-        { selector: "node[lifecycle = 'deprecated']", style: { "border-color": "#9a5b2c", "border-style": "dashed", "border-width": 3 } },
-        { selector: "node[stale = 'yes']", style: { "border-color": "#c4553d", "border-style": "dashed", "border-width": 3 } },
-        { selector: "edge", style: { width: 1.1, "line-color": "#9aabb6", "target-arrow-color": "#7890a2", "target-arrow-shape": "triangle", "arrow-scale": 0.55, "curve-style": "bezier", opacity: 0.72 } },
-        { selector: "edge.context", style: { width: 2.2, "line-color": "#c4553d", "target-arrow-color": "#c4553d", opacity: 0.98, "z-index": 20 } },
-        { selector: "node.context", style: { "border-color": "#c4553d", "border-width": 2.5 } },
-        { selector: ":selected", style: { "border-color": "#c4553d", "border-width": 3, "underlay-color": "#c4553d", "underlay-opacity": 0.12, "underlay-padding": 10 } },
+        { selector: "node", style: { "background-color": "#dce9e3", "border-color": "#8aa99a", "border-width": 1.5, label: "data(label)", color: "#24322b", "font-family": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", "font-size": "11px", "font-weight": 600, "text-wrap": "wrap", "text-max-width": "126px", "text-valign": "bottom", "text-margin-y": 11, "text-background-color": "#fbfcfb", "text-background-opacity": 0.94, "text-background-padding": "4px", width: 27, height: 27 } },
+        { selector: "node[kind = 'index']", style: { "background-color": "#2f64c7", "border-color": "#234f9f", shape: "ellipse", width: 44, height: 44, "font-size": "12px", "text-max-width": "154px" } },
+        { selector: "node[kind = 'concept']", style: { "background-color": "#4dad81", "border-color": "#2c8460", shape: "ellipse", width: 34, height: 34 } },
+        { selector: "node[kind = 'source']", style: { "background-color": "#f0b56f", "border-color": "#c47a2f", shape: "ellipse", width: 32, height: 32 } },
+        { selector: "node[kind = 'note']", style: { "background-color": "#e8eef1", "border-color": "#80939b", shape: "ellipse" } },
+        { selector: "node[trust = 'machine-confirmed']", style: { "border-color": "#2f64c7", "border-width": 2.5 } },
+        { selector: "node[trust = 'human-reviewed']", style: { "border-color": "#167753", "border-width": 3 } },
+        { selector: "node[lifecycle = 'deprecated']", style: { "border-color": "#b86c26", "border-style": "dashed", "border-width": 3 } },
+        { selector: "node[stale = 'yes']", style: { "border-color": "#c44b4b", "border-style": "dashed", "border-width": 3 } },
+        { selector: "edge", style: { width: 1, "line-color": "#cad5d0", "target-arrow-color": "#aebdb6", "target-arrow-shape": "triangle", "arrow-scale": 0.55, "curve-style": "bezier", opacity: 0.8 } },
+        { selector: "edge.context", style: { width: 2.2, "line-color": "#2f64c7", "target-arrow-color": "#2f64c7", opacity: 0.95, "z-index": 20 } },
+        { selector: "node.context", style: { "border-color": "#2f64c7", "border-width": 2.5 } },
+        { selector: ":selected", style: { "border-color": "#2f64c7", "border-width": 3, "underlay-color": "#2f64c7", "underlay-opacity": 0.1, "underlay-padding": 10 } },
         { selector: ".muted", style: { opacity: 0.08 } },
       ],
       layout: {
@@ -114,8 +114,9 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy) return;
-    cy.nodes().forEach((node) => { node.toggleClass("muted", !visibleIds.has(node.id())); });
-    cy.edges().forEach((edge) => { edge.toggleClass("muted", !visibleIds.has(edge.source().id()) || !visibleIds.has(edge.target().id())); });
+    cy.nodes().forEach((node) => { node.style("display", visibleIds.has(node.id()) ? "element" : "none"); });
+    cy.edges().forEach((edge) => { edge.style("display", visibleIds.has(edge.source().id()) && visibleIds.has(edge.target().id()) ? "element" : "none"); });
+    cy.fit(cy.elements(":visible"), 72);
   }, [visibleIds]);
 
   useEffect(() => {
@@ -131,7 +132,21 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
     node.neighborhood("node").addClass("context");
   }, [selectedId]);
 
-  return <div ref={ref} className="graph-canvas" data-testid="graph-canvas" aria-label="Wiki relationship map" />;
+  const fit = () => cyRef.current?.fit(cyRef.current.elements(":visible"), 72);
+  const zoom = (factor: number) => {
+    const cy = cyRef.current;
+    if (!cy) return;
+    cy.zoom({ level: Math.max(cy.minZoom(), Math.min(cy.maxZoom(), cy.zoom() * factor)), renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } });
+  };
+
+  return <div className="graph-stage">
+    <div ref={ref} className="graph-canvas" data-testid="graph-canvas" aria-label="Wiki relationship map" role="img" />
+    <div className="graph-controls" aria-label="Map controls">
+      <button type="button" onClick={() => zoom(1.2)} aria-label="Zoom in">+</button>
+      <button type="button" onClick={() => zoom(0.84)} aria-label="Zoom out">−</button>
+      <button type="button" onClick={fit} aria-label="Fit map">Fit</button>
+    </div>
+  </div>;
 }
 
 function AppNavigation({ view, onView, drafts, changes, live }: { view: WorkbenchView; onView: (view: WorkbenchView) => void; drafts: number; changes: number; live: boolean }) {
@@ -142,12 +157,12 @@ function AppNavigation({ view, onView, drafts, changes, live }: { view: Workbenc
     <button className={view === "health" ? "active" : ""} onClick={() => onView("health")} aria-current={view === "health" ? "page" : undefined}>
       {healthIcon}<span>Health</span>
     </button>
-    <button className={view === "drafts" ? "active" : ""} onClick={() => onView("drafts")} aria-current={view === "drafts" ? "page" : undefined}>
+    {live && <button className={view === "drafts" ? "active" : ""} onClick={() => onView("drafts")} aria-current={view === "drafts" ? "page" : undefined}>
       {draftsIcon}<span>Drafts</span>{!live && <em className="local-badge">Local</em>}{drafts > 0 && <b className="nav-count draft" aria-label={`${drafts} intakes need attention`}>{drafts}</b>}
-    </button>
-    <button className={view === "changes" ? "active" : ""} onClick={() => onView("changes")} aria-current={view === "changes" ? "page" : undefined}>
+    </button>}
+    {live && <button className={view === "changes" ? "active" : ""} onClick={() => onView("changes")} aria-current={view === "changes" ? "page" : undefined}>
       {changesIcon}<span>Changes</span>{!live && <em className="local-badge">Local</em>}{changes > 0 && <b className="nav-count" aria-label={`${changes} open proposals`}>{changes}</b>}
-    </button>
+    </button>}
   </nav>;
 }
 
@@ -227,7 +242,7 @@ const TRUST_LABEL = {
 function readableDate(value?: string): string {
   if (!value) return "Not declared";
   const date = new Date(value);
-  return Number.isNaN(date.valueOf()) ? value : date.toISOString().slice(0, 10);
+  return Number.isNaN(date.valueOf()) ? value : new Intl.DateTimeFormat("sv-SE", { year: "numeric", month: "2-digit", day: "2-digit", timeZone: "UTC" }).format(date);
 }
 
 function TrustInspector({ node }: { node: WikiNode }) {
@@ -278,6 +293,19 @@ function MapView({ graph, selectedId, onSelect }: { graph: WikiGraph; selectedId
     return (kind === "all" || node.kind === kind) && text.includes(query.trim().toLowerCase());
   }).map((node) => node.id)), [graph, kind, query]);
   const selected = graph.nodes.find((node) => node.id === selectedId);
+  const visibleNodes = graph.nodes.filter((node) => visibleIds.has(node.id));
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const focusSearch = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", focusSearch);
+    return () => window.removeEventListener("keydown", focusSearch);
+  }, []);
 
   return <div className="map-view" data-testid="map-view">
     <section className="map-panel">
@@ -285,23 +313,22 @@ function MapView({ graph, selectedId, onSelect }: { graph: WikiGraph; selectedId
         <label className="search-field">
           <Icon><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></Icon>
           <span className="sr-only">Search pages</span>
-          <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search title, tag, or path" />
+          <input ref={searchRef} name="wiki-search" autoComplete="off" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search title, tag, or path…" />
           <kbd>⌘ K</kbd>
         </label>
         <div className="kind-tabs" role="group" aria-label="Filter by page type">
           {KINDS.map((item) => <button key={item.value} className={kind === item.value ? "active" : ""} onClick={() => setKind(item.value)}>{item.label}</button>)}
         </div>
         <span className="visible-count" aria-live="polite"><b>{visibleIds.size}</b> of {graph.nodes.length}</span>
+        <label className="page-jump"><span className="sr-only">Open page</span><select value={selectedId ?? ""} onChange={(event) => onSelect(event.target.value)}><option value="" disabled>Browse pages…</option>{visibleNodes.map((node) => <option value={node.id} key={node.id}>{node.title}</option>)}</select></label>
       </div>
       <OkfFindings graph={graph} />
       <div className="canvas-frame">
-        <div className="survey-coordinate coordinate-north" aria-hidden="true">N 00°</div>
-        <div className="survey-coordinate coordinate-east" aria-hidden="true">E 90°</div>
         <GraphStage graph={graph} visibleIds={visibleIds} selectedId={selectedId} onSelect={onSelect} />
         <div className="legend" aria-label="Map legend">
           {KINDS.slice(1).map((item) => <span key={item.value}><i className={`dot ${item.value}`} />{item.label}</span>)}
         </div>
-        <div className="canvas-help">Scroll to zoom · drag to pan</div>
+        <div className="canvas-help">Drag to pan · scroll or use controls to zoom</div>
       </div>
     </section>
     <Inspector graph={graph} selected={selected} onSelect={onSelect} />
@@ -691,7 +718,7 @@ export function App() {
   return <main className="workbench-shell">
     <a className="skip-link" href="#workspace-content">Skip to workspace</a>
     <aside className="sidebar">
-      <div className="brand"><span className="brand-mark" aria-hidden="true"><i /><i /></span><div><strong>LLM Wiki Canvas</strong><small>Evidence cartography</small></div></div>
+      <div className="brand"><span className="brand-mark" aria-hidden="true"><i /><i /></span><div><strong>LLM Wiki Canvas</strong><small>Local knowledge workbench</small></div></div>
       <div className="vault-label"><span>Local survey / vault</span><strong>{graph.rootName}</strong></div>
       <AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} live={live} />
       <div className="sidebar-note"><span className="status-dot" /><div><strong>{live ? "Watching source" : "Local evidence"}</strong><small>{live ? "Markdown refreshes this projection" : "Markdown remains the source of truth"}</small></div></div>
@@ -701,10 +728,10 @@ export function App() {
       <header className="topbar">
         <div className="mobile-brand"><span className="brand-mark" aria-hidden="true"><i /><i /></span><strong>{graph.rootName}</strong></div>
         <div className="breadcrumb"><span>{graph.rootName}</span><b>/</b><strong>{viewTitle}</strong></div>
-        <div className="evidence-route" aria-label="Evidence workflow"><span>Source</span><i>→</i><span>Projection</span><i>→</i><strong>Human gate</strong></div>
+        <div className="evidence-route" aria-label="Evidence workflow"><span>Markdown</span><i /> <span>Map</span><i /> <strong>Review</strong></div>
         <div className="topbar-meta">{graph.okf && <span className="okf-version">OKF {graph.okf.version}</span>}<span className="status-dot" />{live ? "Live" : "Generated"} {graph.generatedAt.slice(0, 10)}</div>
       </header>
-      {!live && <section className="demo-disclosure" aria-label="Static demo notice"><div><strong>Sample Atlas · static demo</strong><span>8 synthetic pages. Your local files are not being read or uploaded.</span></div><code>pnpm lwc serve /path/to/vault</code><a href="https://github.com/chicogong/llm-wiki-canvas#readme">Run from source ↗</a></section>}
+      {!live && <section className="demo-disclosure" aria-label="Static demo notice"><div><strong>Explore a synthetic Atlas</strong><span>8 sample pages · no local files read · nothing uploaded</span></div><code>npm i -g llm-wiki-canvas</code><a href="https://github.com/chicogong/llm-wiki-canvas#quick-start">Quick start ↗</a></section>}
       <h1 className="sr-only">{viewTitle}</h1>
       <div className="mobile-nav"><AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} live={live} /></div>
       {view === "map" && <MapView graph={graph} selectedId={selectedId} onSelect={setSelectedId} />}

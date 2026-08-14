@@ -52,7 +52,7 @@ try {
   mkdirSync(okfWiki, { recursive: true });
   writeFileSync(path.join(consumer, "package.json"), '{"name":"lwc-package-smoke","private":true}\n');
   run("npm", ["install", "--no-audit", "--no-fund", tarball], { cwd: consumer });
-  const installedPackage = path.join(consumer, "node_modules", "@chicogong", "llm-wiki-canvas");
+  const installedPackage = path.join(consumer, "node_modules", "llm-wiki-canvas");
   const installedManifest = JSON.parse(readFileSync(path.join(installedPackage, "package.json"), "utf8"));
   if (installedManifest.version !== "0.1.0") throw new Error(`packed release-candidate version drifted: ${installedManifest.version}`);
   const thirdPartyNotices = readFileSync(path.join(installedPackage, "THIRD_PARTY_LICENSES.txt"), "utf8");
@@ -89,7 +89,7 @@ try {
   const agentReportFile = path.join(consumer, "agents.json");
   run(lwc, ["agents", agentWorkspace, "--strict", "--format", "json", "-o", agentReportFile], { cwd: consumer });
   const agentReport = JSON.parse(readFileSync(agentReportFile, "utf8"));
-  if (agentReport.summary.ready !== 4 || agentReport.summary.manual !== 1 || agentReport.summary.incomplete !== 0 || JSON.stringify(agentReport).includes(agentWorkspace)) {
+  if (agentReport.summary.ready !== 5 || agentReport.summary.manual !== 1 || agentReport.summary.incomplete !== 0 || JSON.stringify(agentReport).includes(agentWorkspace)) {
     throw new Error("packaged CLI Agent compatibility report is incomplete or leaks an absolute workspace path");
   }
   writeFileSync(path.join(agentWorkspace, ".qoder", "skills", "llm-wiki-canvas", "SKILL.md"), "Stale copied workflow.\n");

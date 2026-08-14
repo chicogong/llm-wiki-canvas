@@ -4,12 +4,13 @@ This matrix verifies repository integration files and the shared review contract
 
 - Canonical rules: `AGENTS.md`
 - Canonical Skill: `.agents/skills/llm-wiki-canvas/SKILL.md`
-- Result: **4 ready · 1 manual · 0 incomplete**
+- Result: **5 ready · 1 manual · 0 incomplete**
 
 | Host | Status | Integration | Evidence |
 | --- | --- | --- | --- |
 | Codex | **ready** | AGENTS.md + project Skill | `AGENTS.md` pass<br>`.agents/skills/llm-wiki-canvas/SKILL.md` pass |
 | Claude Code | **ready** | CLAUDE.md + project Skill adapter | `AGENTS.md` pass<br>`.agents/skills/llm-wiki-canvas/SKILL.md` pass<br>`CLAUDE.md` pass<br>`.claude/skills/llm-wiki-canvas/SKILL.md` pass |
+| DeepSeek Harness | **ready** | Automatic .agents/skills discovery | `AGENTS.md` pass<br>`.agents/skills/llm-wiki-canvas/SKILL.md` pass |
 | Qoder | **ready** | AGENTS.md + project Skill adapter | `AGENTS.md` pass<br>`.agents/skills/llm-wiki-canvas/SKILL.md` pass<br>`.qoder/skills/llm-wiki-canvas/SKILL.md` pass |
 | TRAE | **ready** | AGENTS.md + shared project Skill | `AGENTS.md` pass<br>`.agents/skills/llm-wiki-canvas/SKILL.md` pass |
 | Tencent WorkBuddy | **manual** | Explicit workspace references | `AGENTS.md` pass<br>`.agents/skills/llm-wiki-canvas/SKILL.md` pass<br>`AGENTS.md + .agents/skills/llm-wiki-canvas/SKILL.md` manual |
