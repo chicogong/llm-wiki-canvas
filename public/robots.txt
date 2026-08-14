@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://chicogong.github.io/llm-wiki-canvas/sitemap.xml

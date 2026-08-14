@@ -51,7 +51,7 @@ try {
   mkdirSync(wiki, { recursive: true });
   mkdirSync(okfWiki, { recursive: true });
   writeFileSync(path.join(consumer, "package.json"), '{"name":"lwc-package-smoke","private":true}\n');
-  run("npm", ["install", "--ignore-scripts", "--no-audit", "--no-fund", tarball], { cwd: consumer });
+  run("npm", ["install", "--no-audit", "--no-fund", tarball], { cwd: consumer });
   const installedPackage = path.join(consumer, "node_modules", "@chicogong", "llm-wiki-canvas");
   const installedManifest = JSON.parse(readFileSync(path.join(installedPackage, "package.json"), "utf8"));
   if (installedManifest.version !== "0.1.0") throw new Error(`packed release-candidate version drifted: ${installedManifest.version}`);
@@ -60,6 +60,10 @@ try {
     throw new Error("packed npm artifact is missing complete third-party license notices");
   }
   const lwc = path.join(consumer, "node_modules", ".bin", "lwc");
+  const help = run(lwc, ["--help"], { cwd: consumer }).stdout;
+  if (!help.startsWith("Usage: lwc") || !help.includes("Also installed as: llm-wiki-canvas")) {
+    throw new Error("packaged CLI help does not present the short command clearly");
+  }
   writeFileSync(path.join(wiki, "index.md"), "# Package Smoke\n[[Missing]]\n");
   writeFileSync(path.join(okfWiki, "index.md"), "---\nokf_version: '0.2'\n---\n# OKF Package Smoke\n[Metric](/metric.md)\n");
   writeFileSync(path.join(okfWiki, "metric.md"), "---\ntype: Metric\ntitle: Metric\ndescription: A package-level OKF trust fixture.\ngenerated: { by: process:package-smoke, at: 2026-08-12T00:00:00Z }\nverified: { by: human:package-reviewer, at: 2026-08-12T01:00:00Z }\nstatus: stable\nstale_after: 2026-12-31\nsources:\n  - { resource: https://example.invalid/policy, id: policy }\n---\n# Metric\nPackage evidence.\n");
