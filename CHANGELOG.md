@@ -4,7 +4,28 @@ All notable changes will be documented here. This project follows Semantic Versi
 
 ## [Unreleased]
 
-No unreleased changes. Version `0.1.0` was published to npm and GitHub Pages on 2026-08-14.
+No unreleased changes. Version `0.2.0` is the current release candidate.
+
+## [0.2.0] - 2026-08-14
+
+### Added
+
+- A decision-oriented Viewer with Overview, Inbox, Explore, and Trust workspaces, clearer evidence states, and responsive English/Chinese navigation.
+- A deterministic Chinese Agent technology-radar demo with searchable mock knowledge and explicitly dated public-source snapshots.
+- A governed `intake draft --stdin` command plus JSON output for Intake and Proposal automation without writing formal Markdown.
+- An experimental DeepSeek Harness knowledge-manager bundle exposing six bounded LWC tools for status, context, Intake, isolated drafts, Proposal creation, and diff review.
+- Bilingual DeepSeek Harness setup, threat-model, human-handoff, and rollback documentation.
+
+### Security
+
+- Harness workspace roots come only from the session cwd; absolute paths, traversal, reserved targets, symlink escapes, oversized context, and oversized process output fail closed.
+- The knowledge-manager profile disables generic shell, filesystem editing/search, Web, workflow, Ralph, and subagent surfaces; human-only review, reject, and apply actions are never registered as tools.
+- Harness integration tests prove formal Markdown remains unchanged through source snapshot, isolated draft, Proposal, and diff creation.
+
+### Compatibility
+
+- Core graph, context, Intake, Proposal, Canvas, Excalidraw, OKF, and Agent compatibility schemas remain at version 1.
+- The optional Harness package requires `llm-wiki-canvas ^0.2.0` because earlier releases do not include the governed draft-write command.
 
 ## [0.1.0] - 2026-08-12
 

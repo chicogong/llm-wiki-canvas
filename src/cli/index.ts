@@ -128,7 +128,7 @@ function focusedOutput(title: string, format: "mermaid" | "excalidraw"): string 
 const program = new Command()
   .name("lwc")
   .description("Compile a local Markdown wiki into a graph and Obsidian JSON Canvas")
-  .version("0.1.0")
+  .version("0.2.0")
   .showHelpAfterError("Run 'lwc --help' for usage.")
   .addHelpText("after", "\nAlso installed as: llm-wiki-canvas");
 

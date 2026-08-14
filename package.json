@@ -1,6 +1,6 @@
 {
   "name": "llm-wiki-canvas",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A local-first visual knowledge workspace for coding agents and Obsidian.",
   "keywords": ["llm-wiki", "obsidian", "json-canvas", "knowledge-graph", "local-first", "agent-skill"],
   "homepage": "https://github.com/chicogong/llm-wiki-canvas#readme",
