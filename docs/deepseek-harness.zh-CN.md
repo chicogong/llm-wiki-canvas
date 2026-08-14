@@ -53,6 +53,6 @@ lwc proposal show .lwc/proposals/<proposal>.json
 
 ## 回滚
 
-从该 Harness profile 删除 `@chicogong/dsh-llm-wiki-canvas`，或直接弃用独立 profile。插件不会改正式 Markdown；未应用的 `.lwc/drafts` 与 `.lwc/proposals` 是本地工作状态，可在确认不再需要证据后清理。
+从该 Harness profile 删除 `dsh-llm-wiki-canvas`，或直接弃用独立 profile。插件不会改正式 Markdown；未应用的 `.lwc/drafts` 与 `.lwc/proposals` 是本地工作状态，可在确认不再需要证据后清理。
 
 当前状态：实验集成，面向 DeepSeek Harness `0.1.0-rc.6` 契约。Harness 官方仍标注 Developer Preview；正式 npm 发布和真实模型任务需要各自单独证据与审批。

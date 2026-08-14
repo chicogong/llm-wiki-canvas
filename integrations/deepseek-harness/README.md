@@ -1,4 +1,4 @@
-# @chicogong/dsh-llm-wiki-canvas
+# dsh-llm-wiki-canvas
 
 A governed LLM Wiki Canvas knowledge manager for DeepSeek Harness. See [the integration guide](../../docs/deepseek-harness.md) for setup, tool boundaries, human handoff, and rollback.
 
