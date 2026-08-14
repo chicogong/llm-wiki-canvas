@@ -12,7 +12,7 @@ LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性�
 
 项目不内置 LLM、向量数据库、聊天界面、云服务或 MCP Server。
 
-[体验合成 Atlas](https://chicogong.github.io/llm-wiki-canvas/) · [从 npm 安装](#快速开始) · [阅读使用指南](docs/usage.zh-CN.md)
+[体验合成 Atlas](https://realtime-ai.chat/llm-wiki-canvas/) · [从 npm 安装](#快速开始) · [阅读使用指南](docs/usage.zh-CN.md)
 
 ![LLM Wiki Canvas Atlas Viewer](docs/assets/atlas-viewer.png)
 
