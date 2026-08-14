@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 const output = path.resolve("viewer-dist");
-const required = ["index.html", "graph.json", "okf-graph.json"];
+const required = ["index.html", "graph.json", "agent-trends-zh.json", "okf-graph.json"];
 for (const file of required) {
   if (!existsSync(path.join(output, file))) throw new Error(`Static demo is missing ${file}`);
 }

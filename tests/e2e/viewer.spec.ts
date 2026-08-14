@@ -139,6 +139,27 @@ test("@smoke filters the map and opens a relationship", async ({ page }, testInf
   expect(errors).toEqual([]);
 });
 
+test("@smoke opens the Chinese technology radar and searches its mock knowledge", async ({ page }, testInfo) => {
+  const errors: string[] = [];
+  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/?lang=zh-CN");
+  await page.waitForLoadState("networkidle");
+  await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
+  await expect(page.getByText("智能体工程热点雷达").first()).toBeVisible();
+  await expect(page.getByText("9 个模拟页面 · 来源可核对 · 不读取本地文件")).toBeVisible();
+  const search = page.getByRole("searchbox", { name: "搜索页面" });
+  await search.fill("DeepSeek");
+  await expect(page.getByText("2 / 9")).toBeVisible();
+  await page.getByRole("button", { name: /DeepSeek Harness/ }).first().click();
+  await expect(page.getByLabel("证据路径")).toContainText("来源");
+  await expect(page.getByLabel("证据路径")).toContainText("由人决定");
+  await expect(page.getByRole("link", { name: "EN" })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("agent-trends-zh.png"), fullPage: true });
+  expect(errors).toEqual([]);
+});
+
 test("@smoke inspects OKF trust signals without offering execution", async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });

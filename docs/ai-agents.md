@@ -100,6 +100,10 @@ lwc proposal show .lwc/proposals/<proposal>.json
 
 The repository does not ship a native Harness plugin. Harness is currently a Developer Preview with a release-candidate plugin API; reusing the Skill and its own shell/filesystem permission boundary is smaller and safer. Skill discovery proves contract compatibility, not that a model completed a task. [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) · [Plugin architecture](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/architecture.md)
 
+The 2026-08-14 verification snapshot found the official repository at `47f9438`, still explicitly labeled Developer Preview and without a formal GitHub Release. npm had `@deepseek-ai/dsh@0.1.0-rc.6` while the repository manifest still declared `rc.5`. That is a useful signal to join the ecosystem through its stable filesystem contract without coupling the core package to a moving runtime API.
+
+If real-user evidence later shows meaningful friction in the Skill + CLI path, incubate a separate read-only plugin. Its first version may expose only `lwc_context` and `lwc_proposal_show`; derive the root from the Harness workspace, constrain proposals to `.lwc/proposals`, cap output, and propagate cancellation. Do not expose arbitrary paths or commands, `review`, `reject`, `apply`, `serve`, credentials, or install-time execution. Version, test, and approve that package independently from the core CLI.
+
 ### TRAE
 
 Open the repository in TRAE IDE or SOLO. This repository's `AGENTS.md` and `.agents/skills/llm-wiki-canvas` are ready without copying. TRAE's changelog documents project Skills, `.agents/skills` loading, and nested `AGENTS.md` support. [TRAE changelog](https://www.trae.ai/changelog)

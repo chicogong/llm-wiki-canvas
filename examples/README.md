@@ -80,6 +80,10 @@ The separate [`host-fixture`](host-fixture/) is the public cross-Agent execution
 
 [`okf-trust`](okf-trust/) is a synthetic Open Knowledge Format v0.2 bundle with human-reviewed, machine-confirmed, unverified, freshness, source, and Attested Computation examples. Run `pnpm okf:demo && pnpm okf:build`, then open <http://127.0.0.1:4173/?graph=/okf-graph.json>. LLM Wiki Canvas parses and displays the computation contract but never executes its command, executor, attester, or referenced Skill. See the [OKF guide](../docs/okf.md).
 
+### Chinese agent technology radar
+
+[`agent-trends-zh`](agent-trends-zh/) is a dated, synthetic Chinese knowledge base about Agent Harnesses, Agent Skills, MCP, and DeepSeek Harness. It links each public snapshot to a source note and keeps ecosystem attention separate from production maturity. Run `pnpm demo:build:zh && pnpm dev`, then open <http://127.0.0.1:4173/?lang=zh-CN>. The example demonstrates localization and search; it is not a live news feed or production-integration claim.
+
 ### Copy the pattern
 
 A minimal page looks like this:
@@ -185,6 +189,10 @@ pnpm lwc intake create examples/atlas-wiki \
 ### OKF 信任 Bundle
 
 [`okf-trust`](okf-trust/) 是一份合成 Open Knowledge Format v0.2 Bundle，覆盖人工复核、机器确认、未验证、时效、资料来源与 Attested Computation。运行 `pnpm okf:demo && pnpm okf:build`，再打开 <http://127.0.0.1:4173/?graph=/okf-graph.json>。LLM Wiki Canvas 会解析并展示计算契约，但绝不执行其中的命令、executor、attester 或引用的 Skill。详见 [OKF 指南](../docs/okf.zh-CN.md)。
+
+### 中文智能体工程热点雷达
+
+[`agent-trends-zh`](agent-trends-zh/) 是一份按日期固化的中文模拟知识库，覆盖 Agent Harness、Agent Skills、MCP 与 DeepSeek Harness。每个公开快照都链接到来源笔记，并把生态热度与生产成熟度分开。运行 `pnpm demo:build:zh && pnpm dev`，再打开 <http://127.0.0.1:4173/?lang=zh-CN>。它用于验证本地化与搜索，不是实时新闻服务，也不代表生产集成已经完成。
 
 ### 复制这种模式
 

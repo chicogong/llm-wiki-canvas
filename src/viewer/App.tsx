@@ -3,23 +3,15 @@ import cytoscape, { type Core } from "cytoscape";
 import type { DraftInbox, DraftInboxItem, DraftInboxState, EvidenceState, ProposalInbox, ProposalInboxItem, ProposalStatus } from "../core/index.js";
 import { latestVerification } from "../core/trust.js";
 import type { NodeKind, WikiGraph, WikiNode } from "../core/types";
+import { detectViewerLocale, localeHref, UI_COPY, type ViewerCopy } from "./i18n";
 
 type WorkbenchView = "map" | "health" | "drafts" | "changes";
 
-const KINDS: Array<{ value: "all" | NodeKind; label: string }> = [
-  { value: "all", label: "All" },
-  { value: "index", label: "Index" },
-  { value: "concept", label: "Concept" },
-  { value: "source", label: "Source" },
-  { value: "note", label: "Note" },
-];
+const KINDS: Array<"all" | NodeKind> = ["all", "index", "concept", "source", "note"];
 
-const KIND_LABEL: Record<NodeKind, string> = {
-  index: "Index",
-  concept: "Concept",
-  source: "Source",
-  note: "Note",
-};
+function kindLabel(copy: ViewerCopy, kind: "all" | NodeKind): string {
+  return copy.kinds[kind];
+}
 
 function Icon({ children }: { children: ReactNode }) {
   return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{children}</svg>;
@@ -53,11 +45,12 @@ function graphFitPadding(width: number): number {
   return width < 600 ? 28 : 72;
 }
 
-function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
+function GraphStage({ graph, visibleIds, selectedId, onSelect, copy }: {
   graph: WikiGraph;
   visibleIds: Set<string>;
   selectedId?: string;
   onSelect: (id: string) => void;
+  copy: ViewerCopy;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const cyRef = useRef<Core | null>(null);
@@ -152,7 +145,7 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
     node.neighborhood("node").addClass("context");
   }, [selectedId]);
 
-  const fit = () => cyRef.current?.fit(cyRef.current.elements(":visible"), 72);
+  const fit = () => cyRef.current?.fit(cyRef.current.elements(":visible"), graphFitPadding(ref.current?.clientWidth ?? 1000));
   const zoom = (factor: number) => {
     const cy = cyRef.current;
     if (!cy) return;
@@ -160,33 +153,33 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
   };
 
   return <div className="graph-stage">
-    <div ref={ref} className="graph-canvas" data-testid="graph-canvas" aria-label="Wiki relationship map" role="img" />
-    <div className="graph-controls" aria-label="Map controls">
-      <button type="button" onClick={() => zoom(1.2)} aria-label="Zoom in">+</button>
-      <button type="button" onClick={() => zoom(0.84)} aria-label="Zoom out">−</button>
-      <button type="button" onClick={fit} aria-label="Fit map">Fit</button>
+    <div ref={ref} className="graph-canvas" data-testid="graph-canvas" aria-label={copy.mapTitle} role="img" />
+    <div className="graph-controls" aria-label={copy.mapControls}>
+      <button type="button" onClick={() => zoom(1.2)} aria-label={copy.zoomIn}>+</button>
+      <button type="button" onClick={() => zoom(0.84)} aria-label={copy.zoomOut}>−</button>
+      <button type="button" onClick={fit} aria-label={copy.fitMap}>{copy.fit}</button>
     </div>
   </div>;
 }
 
-function AppNavigation({ view, onView, drafts, changes, live }: { view: WorkbenchView; onView: (view: WorkbenchView) => void; drafts: number; changes: number; live: boolean }) {
+function AppNavigation({ view, onView, drafts, changes, live, copy }: { view: WorkbenchView; onView: (view: WorkbenchView) => void; drafts: number; changes: number; live: boolean; copy: ViewerCopy }) {
   return <nav className="app-nav" aria-label="Workspace views">
     <button className={view === "map" ? "active" : ""} onClick={() => onView("map")} aria-current={view === "map" ? "page" : undefined}>
-      {mapIcon}<span>Map</span>
+      {mapIcon}<span>{copy.map}</span>
     </button>
     <button className={view === "health" ? "active" : ""} onClick={() => onView("health")} aria-current={view === "health" ? "page" : undefined}>
-      {healthIcon}<span>Health</span>
+      {healthIcon}<span>{copy.health}</span>
     </button>
     {live && <button className={view === "drafts" ? "active" : ""} onClick={() => onView("drafts")} aria-current={view === "drafts" ? "page" : undefined}>
-      {draftsIcon}<span>Drafts</span>{!live && <em className="local-badge">Local</em>}{drafts > 0 && <b className="nav-count draft" aria-label={`${drafts} intakes need attention`}>{drafts}</b>}
+      {draftsIcon}<span>{copy.drafts}</span>{!live && <em className="local-badge">Local</em>}{drafts > 0 && <b className="nav-count draft" aria-label={`${drafts} intakes need attention`}>{drafts}</b>}
     </button>}
     {live && <button className={view === "changes" ? "active" : ""} onClick={() => onView("changes")} aria-current={view === "changes" ? "page" : undefined}>
-      {changesIcon}<span>Changes</span>{!live && <em className="local-badge">Local</em>}{changes > 0 && <b className="nav-count" aria-label={`${changes} open proposals`}>{changes}</b>}
+      {changesIcon}<span>{copy.changes}</span>{!live && <em className="local-badge">Local</em>}{changes > 0 && <b className="nav-count" aria-label={`${changes} open proposals`}>{changes}</b>}
     </button>}
   </nav>;
 }
 
-function Inspector({ graph, selected, onSelect }: { graph: WikiGraph; selected?: WikiNode; onSelect: (id: string) => void }) {
+function Inspector({ graph, selected, onSelect, copy }: { graph: WikiGraph; selected?: WikiNode; onSelect: (id: string) => void; copy: ViewerCopy }) {
   const [contextCopied, setContextCopied] = useState(false);
   const relations = useMemo(() => {
     if (!selected) return [];
@@ -208,41 +201,41 @@ function Inspector({ graph, selected, onSelect }: { graph: WikiGraph; selected?:
   useEffect(() => setContextCopied(false), [selected?.id]);
 
   return <aside className="inspector" aria-live="polite">
-    <ol className="evidence-spine" aria-label="Evidence route">
-      <li className={selected ? "complete" : "current"}><span>Source</span><small>{selected ? selected.path : "Select a page"}</small></li>
-      <li className={selected ? "current" : "pending"}><span>Structure</span><small>{selected ? `${relations.length} direct relationship${relations.length === 1 ? "" : "s"}` : "Waiting for selection"}</small></li>
-      <li className="pending"><span>Decision</span><small>Human controlled</small></li>
+    <ol className="evidence-spine" aria-label={copy.evidenceRoute}>
+      <li className={selected ? "complete" : "current"}><span>{copy.source}</span><small>{selected ? selected.path : copy.selectPage}</small></li>
+      <li className={selected ? "current" : "pending"}><span>{copy.structure}</span><small>{selected ? copy.directRelations(relations.length) : copy.waitingSelection}</small></li>
+      <li className="pending"><span>{copy.decision}</span><small>{copy.humanControlled}</small></li>
     </ol>
-    <div className="panel-heading"><span>Evidence sheet</span>{selected && <span className={`kind-badge ${selected.kind}`}>{KIND_LABEL[selected.kind]}</span>}</div>
+    <div className="panel-heading"><span>{copy.evidenceSheet}</span>{selected && <span className={`kind-badge ${selected.kind}`}>{kindLabel(copy, selected.kind)}</span>}</div>
     {selected ? <>
       <div className="page-title"><span className={`page-mark ${selected.kind}`} /><h2>{selected.title}</h2></div>
-      <p className="summary">{selected.summary || "This page does not have a summary yet."}</p>
+      <p className="summary">{selected.summary || copy.noSummary}</p>
       <dl className="metadata">
-        <div><dt>Path</dt><dd>{selected.path}</dd></div>
-        {selected.type && <div><dt>Type</dt><dd>{selected.type}</dd></div>}
-        {selected.resource && <div><dt>Resource</dt><dd>{selected.resource}</dd></div>}
-        <div><dt>Words</dt><dd>{selected.wordCount}</dd></div>
-        <div><dt>Tags</dt><dd>{selected.tags.length ? selected.tags.map((tag) => <span className="tag" key={tag}>{tag}</span>) : "—"}</dd></div>
+        <div><dt>{copy.path}</dt><dd>{selected.path}</dd></div>
+        {selected.type && <div><dt>{copy.type}</dt><dd>{selected.type}</dd></div>}
+        {selected.resource && <div><dt>{copy.resource}</dt><dd>{selected.resource}</dd></div>}
+        <div><dt>{copy.words}</dt><dd>{selected.wordCount}</dd></div>
+        <div><dt>{copy.tags}</dt><dd>{selected.tags.length ? selected.tags.map((tag) => <span className="tag" key={tag}>{tag}</span>) : "—"}</dd></div>
       </dl>
       {Object.keys(extensions).length > 0 && <details className="metadata-extensions">
-        <summary>Additional metadata <span>{Object.keys(extensions).length}</span></summary>
+        <summary>{copy.additionalMetadata} <span>{Object.keys(extensions).length}</span></summary>
         <pre>{JSON.stringify(extensions, null, 2)}</pre>
       </details>}
       {selected.trust && <TrustInspector node={selected} />}
       <section className="relations">
-        <h3>Connections <span>{relations.length}</span></h3>
+        <h3>{copy.connections} <span>{relations.length}</span></h3>
         {relations.length ? relations.map(({ node, direction, kind }, index) => <button key={`${node.id}-${index}`} onClick={() => onSelect(node.id)}>
           <span className={`relation-mark ${node.kind}`} />
-          <span><strong>{node.title}</strong><small>{direction === "out" ? "Links to" : "Linked from"} · {kind}</small></span>
+          <span><strong>{node.title}</strong><small>{direction === "out" ? copy.linksTo : copy.linkedFrom} · {kind}</small></span>
           <span className="relation-arrow">→</span>
-        </button>) : <p className="empty-copy">No direct connections.</p>}
+        </button>) : <p className="empty-copy">{copy.noConnections}</p>}
       </section>
       <section className="context-handoff" aria-label="Agent context command">
-        <div><div><p className="section-kicker">Bounded export</p><h3>Hand this evidence to an Agent</h3></div><button type="button" onClick={() => void copyText(contextCommand).then(setContextCopied)}>{contextCopied ? "Copied" : "Copy command"}</button></div>
-        <p>Export this page and its direct relationships with explicit page and word limits.</p>
+        <div><div><p className="section-kicker">{copy.boundedExport}</p><h3>{copy.handToAgent}</h3></div><button type="button" onClick={() => void copyText(contextCommand).then(setContextCopied)}>{contextCopied ? copy.copied : copy.copyCommand}</button></div>
+        <p>{copy.exportDescription}</p>
         <code>{contextCommand}</code>
       </section>
-    </> : <p className="empty-copy">Select a node to inspect its evidence and direct relationships.</p>}
+    </> : <p className="empty-copy">{copy.selectNode}</p>}
   </aside>;
 }
 
@@ -310,7 +303,7 @@ function TrustInspector({ node }: { node: WikiNode }) {
   </section>;
 }
 
-function MapView({ graph, selectedId, onSelect }: { graph: WikiGraph; selectedId?: string; onSelect: (id: string) => void }) {
+function MapView({ graph, selectedId, onSelect, copy }: { graph: WikiGraph; selectedId?: string; onSelect: (id: string) => void; copy: ViewerCopy }) {
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<"all" | NodeKind>("all");
   const visibleIds = useMemo(() => new Set(graph.nodes.filter((node) => {
@@ -337,66 +330,66 @@ function MapView({ graph, selectedId, onSelect }: { graph: WikiGraph; selectedId
       <div className="map-toolbar">
         <label className="search-field">
           <Icon><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></Icon>
-          <span className="sr-only">Search pages</span>
-          <input ref={searchRef} name="wiki-search" autoComplete="off" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search title, tag, or path…" />
+          <span className="sr-only">{copy.searchLabel}</span>
+          <input ref={searchRef} name="wiki-search" autoComplete="off" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.searchPlaceholder} />
           <kbd>⌘ K</kbd>
         </label>
-        <div className="kind-tabs" role="group" aria-label="Filter by page type">
-          {KINDS.map((item) => <button key={item.value} className={kind === item.value ? "active" : ""} onClick={() => setKind(item.value)}>{item.label}</button>)}
+        <div className="kind-tabs" role="group" aria-label={copy.filterLabel}>
+          {KINDS.map((item) => <button key={item} className={kind === item ? "active" : ""} onClick={() => setKind(item)}>{kindLabel(copy, item)}</button>)}
         </div>
-        <span className="visible-count" aria-live="polite"><b>{visibleIds.size}</b> of {graph.nodes.length}</span>
-        <label className="page-jump"><span className="sr-only">Open page</span><select value={selectedId ?? ""} onChange={(event) => onSelect(event.target.value)}><option value="" disabled>Browse pages…</option>{visibleNodes.map((node) => <option value={node.id} key={node.id}>{node.title}</option>)}</select></label>
+        <span className="visible-count" aria-live="polite"><b>{visibleIds.size}</b> {copy.countConnector} {graph.nodes.length}</span>
+        <label className="page-jump"><span className="sr-only">{copy.openPage}</span><select value={selectedId ?? ""} onChange={(event) => onSelect(event.target.value)}><option value="" disabled>{copy.browsePages}</option>{visibleNodes.map((node) => <option value={node.id} key={node.id}>{node.title}</option>)}</select></label>
       </div>
       <OkfFindings graph={graph} />
       <div className="canvas-frame">
-        <GraphStage graph={graph} visibleIds={visibleIds} selectedId={selectedId} onSelect={onSelect} />
-        <div className="legend" aria-label="Map legend">
-          {KINDS.slice(1).map((item) => <span key={item.value}><i className={`dot ${item.value}`} />{item.label}</span>)}
+        <GraphStage graph={graph} visibleIds={visibleIds} selectedId={selectedId} onSelect={onSelect} copy={copy} />
+        <div className="legend" aria-label={copy.mapLegend}>
+          {KINDS.slice(1).map((item) => <span key={item}><i className={`dot ${item}`} />{kindLabel(copy, item)}</span>)}
         </div>
-        <div className="canvas-help">Drag to pan · scroll or use controls to zoom</div>
+        <div className="canvas-help">{copy.canvasHelp}</div>
       </div>
     </section>
-    <Inspector graph={graph} selected={selected} onSelect={onSelect} />
+    <Inspector graph={graph} selected={selected} onSelect={onSelect} copy={copy} />
   </div>;
 }
 
-function HealthView({ graph, onOpenPage }: { graph: WikiGraph; onOpenPage: (id: string) => void }) {
+function HealthView({ graph, onOpenPage, copy }: { graph: WikiGraph; onOpenPage: (id: string) => void; copy: ViewerCopy }) {
   const allDiagnostics = [...graph.diagnostics, ...(graph.okf?.issues ?? [])];
   const errors = allDiagnostics.filter((item) => item.level === "error").length;
   const warnings = allDiagnostics.filter((item) => item.level === "warning").length;
   const healthyPages = Math.max(0, graph.stats.files - graph.stats.orphanNodes);
-  const kindCounts = KINDS.slice(1).map((item) => ({ ...item, count: graph.nodes.filter((node) => node.kind === item.value).length }));
+  const kindCounts = KINDS.slice(1).map((item) => ({ value: item as NodeKind, label: kindLabel(copy, item), count: graph.nodes.filter((node) => node.kind === item).length }));
   const hubs = graph.nodes.map((node) => ({ node, connections: graph.edges.filter((edge) => edge.source === node.id || edge.target === node.id).length }))
     .sort((a, b) => b.connections - a.connections || a.node.title.localeCompare(b.node.title)).slice(0, 5);
 
   return <div className="health-view" data-testid="health-view">
     <section className="health-intro">
-      <div><p className="section-kicker">Vault health</p><h2>{errors === 0 ? "Knowledge you can trust." : "This vault needs attention."}</h2></div>
-      <p>Every number below comes from the current Markdown scan. No model judgment and no hidden index.</p>
+      <div><p className="section-kicker">{copy.vaultHealth}</p><h2>{errors === 0 ? copy.healthyTitle : copy.attentionTitle}</h2></div>
+      <p>{copy.healthDescription}</p>
     </section>
-    <section className="metric-grid" aria-label="Vault health metrics">
-      <article><span>Pages</span><strong>{graph.stats.files}</strong><small>{healthyPages} connected</small></article>
-      <article><span>Relationships</span><strong>{graph.stats.links}</strong><small>resolved links</small></article>
-      <article className={graph.stats.brokenLinks ? "attention" : "verified"}><span>Broken links</span><strong>{graph.stats.brokenLinks}</strong><small>{graph.stats.brokenLinks ? "needs review" : "✓ all targets resolve"}</small></article>
-      <article className={graph.stats.orphanNodes ? "attention" : "verified"}><span>Orphan pages</span><strong>{graph.stats.orphanNodes}</strong><small>{graph.stats.orphanNodes ? "not connected" : "✓ every page connected"}</small></article>
+    <section className="metric-grid" aria-label={copy.healthMetrics}>
+      <article><span>{copy.pages}</span><strong>{graph.stats.files}</strong><small>{healthyPages} {copy.connected}</small></article>
+      <article><span>{copy.relationships}</span><strong>{graph.stats.links}</strong><small>{copy.resolvedLinks}</small></article>
+      <article className={graph.stats.brokenLinks ? "attention" : "verified"}><span>{copy.brokenLinks}</span><strong>{graph.stats.brokenLinks}</strong><small>{graph.stats.brokenLinks ? copy.needsReview : copy.allResolve}</small></article>
+      <article className={graph.stats.orphanNodes ? "attention" : "verified"}><span>{copy.orphanPages}</span><strong>{graph.stats.orphanNodes}</strong><small>{graph.stats.orphanNodes ? copy.notConnected : copy.everyConnected}</small></article>
     </section>
     <div className="health-columns">
       <section className="health-card diagnostics-card">
-        <div className="card-title"><div><p className="section-kicker">Diagnostics</p><h3>Scan results</h3></div><span>{errors} errors · {warnings} warnings</span></div>
+        <div className="card-title"><div><p className="section-kicker">{copy.diagnostics}</p><h3>{copy.scanResults}</h3></div><span>{errors} {copy.errors} · {warnings} {copy.warnings}</span></div>
         {allDiagnostics.length ? <ul className="diagnostic-list">{allDiagnostics.map((item, index) => <li key={`${item.path}-${item.code}-${index}`}>
           <span className={`diagnostic-level ${item.level}`} />
           <div><strong>{item.message}</strong><small>{item.path} · {item.code}</small></div>
-        </li>)}</ul> : <div className="healthy-state"><span>✓</span><div><strong>No structural issues found</strong><p>All links resolve and every page participates in the graph.</p></div></div>}
+        </li>)}</ul> : <div className="healthy-state"><span>✓</span><div><strong>{copy.noIssues}</strong><p>{copy.allParticipate}</p></div></div>}
       </section>
       <section className="health-card">
-        <div className="card-title"><div><p className="section-kicker">Structure</p><h3>Page types</h3></div><span>{graph.nodes.length} total</span></div>
+        <div className="card-title"><div><p className="section-kicker">{copy.structure}</p><h3>{copy.pageTypes}</h3></div><span>{graph.nodes.length} {copy.total}</span></div>
         <div className="kind-breakdown">{kindCounts.map((item) => <div key={item.value}><span><i className={`dot ${item.value}`} />{item.label}</span><b>{item.count}</b><i className="bar"><i style={{ width: `${graph.nodes.length ? item.count / graph.nodes.length * 100 : 0}%` }} /></i></div>)}</div>
       </section>
       <section className="health-card hubs-card">
-        <div className="card-title"><div><p className="section-kicker">Navigation</p><h3>Most connected</h3></div><span>Top {hubs.length}</span></div>
+        <div className="card-title"><div><p className="section-kicker">{copy.navigation}</p><h3>{copy.mostConnected}</h3></div><span>{copy.top} {hubs.length}</span></div>
         <div className="hub-list">{hubs.map(({ node, connections }, index) => <button key={node.id} onClick={() => onOpenPage(node.id)}>
           <span className="hub-rank">{String(index + 1).padStart(2, "0")}</span>
-          <span><strong>{node.title}</strong><small>{KIND_LABEL[node.kind]} · {node.path}</small></span>
+          <span><strong>{node.title}</strong><small>{kindLabel(copy, node.kind)} · {node.path}</small></span>
           <b>{connections}</b>
         </button>)}</div>
       </section>
@@ -671,14 +664,22 @@ export function App() {
   const [draftsError, setDraftsError] = useState<string>();
   const [view, setView] = useState<WorkbenchView>("map");
   const [selectedId, setSelectedId] = useState<string>();
-  const live = new URLSearchParams(location.search).get("live") === "1";
+  const params = new URLSearchParams(location.search);
+  const live = params.get("live") === "1";
+  const locale = detectViewerLocale(location.search, navigator.languages);
+  const copy = UI_COPY[locale];
+  const graphSource = params.get("graph") ?? new URL(locale === "zh-CN" ? "./agent-trends-zh.json" : "./graph.json", document.baseURI).toString();
 
   useEffect(() => {
-    const source = new URLSearchParams(location.search).get("graph") ?? new URL("./graph.json", document.baseURI).toString();
+    document.documentElement.lang = locale;
+    document.title = locale === "zh-CN" ? "LLM Wiki Canvas — 中文知识工作台" : "LLM Wiki Canvas — Local Knowledge Workbench";
+  }, [locale]);
+
+  useEffect(() => {
     let active = true;
     const load = async () => {
       try {
-        const response = await fetch(source, { cache: "no-store" });
+        const response = await fetch(graphSource, { cache: "no-store" });
         if (!response.ok) throw new Error(`Unable to read graph: HTTP ${response.status}`);
         if (!response.headers.get("content-type")?.includes("application/json")) {
           throw new Error("Graph response is not JSON. Run pnpm demo:build or check the graph query parameter.");
@@ -730,37 +731,38 @@ export function App() {
     events?.addEventListener("proposals", () => { void loadInbox(); });
     events?.addEventListener("drafts", () => { void loadDrafts(); });
     return () => { active = false; events?.close(); };
-  }, [live]);
+  }, [graphSource, live]);
 
-  if (error) return <main className="status-screen"><div className="status-mark">!</div><p className="section-kicker">Graph unavailable</p><h1>The knowledge map could not open.</h1><p>{error}</p><code>pnpm demo:build</code></main>;
-  if (!graph) return <main className="status-screen"><div className="loading-mark" /><p className="section-kicker">Reading local knowledge</p><h1>Opening workspace…</h1></main>;
+  if (error) return <main className="status-screen"><div className="status-mark">!</div><p className="section-kicker">{copy.graphUnavailable}</p><h1>{copy.graphFailed}</h1><p>{error}</p><code>pnpm demo:build</code></main>;
+  if (!graph) return <main className="status-screen"><div className="loading-mark" /><p className="section-kicker">{copy.reading}</p><h1>{copy.opening}</h1></main>;
 
   const switchToPage = (id: string) => { setSelectedId(id); setView("map"); };
   const openChanges = inbox?.proposals.filter((proposal) => proposal.status === "proposed" || proposal.status === "reviewed").length ?? 0;
   const activeDrafts = drafts?.drafts.filter((draft) => draft.state !== "proposed").length ?? 0;
-  const viewTitle = view === "map" ? "Knowledge map" : view === "health" ? "Vault health" : view === "drafts" ? "Draft intake" : "Changes inbox";
+  const viewTitle = view === "map" ? copy.mapTitle : view === "health" ? copy.healthTitle : view === "drafts" ? copy.draftsTitle : copy.changesTitle;
 
   return <main className="workbench-shell">
-    <a className="skip-link" href="#workspace-content">Skip to workspace</a>
+    <a className="skip-link" href="#workspace-content">{copy.skip}</a>
     <aside className="sidebar">
-      <div className="brand"><span className="brand-mark" aria-hidden="true"><i /><i /></span><div><strong>LLM Wiki Canvas</strong><small>Local knowledge workbench</small></div></div>
-      <div className="vault-label"><span>Local survey / vault</span><strong>{graph.rootName}</strong></div>
-      <AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} live={live} />
-      <div className="sidebar-note"><span className="status-dot" /><div><strong>{live ? "Watching source" : "Local evidence"}</strong><small>{live ? "Markdown refreshes this projection" : "Markdown remains the source of truth"}</small></div></div>
+      <div className="brand"><span className="brand-mark" aria-hidden="true"><i /><i /></span><div><strong>LLM Wiki Canvas</strong><small>{copy.localWorkbench}</small></div></div>
+      <div className="vault-label"><span>{copy.vaultLabel}</span><strong>{graph.rootName}</strong></div>
+      <AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} live={live} copy={copy} />
+      <div className="sidebar-note"><span className="status-dot" /><div><strong>{live ? copy.watchingSource : copy.localEvidence}</strong><small>{live ? copy.liveProjection : copy.markdownTruth}</small></div></div>
     </aside>
 
     <section className={`workbench ${live ? "is-live" : "is-demo"}`} id="workspace-content">
       <header className="topbar">
         <div className="mobile-brand"><span className="brand-mark" aria-hidden="true"><i /><i /></span><strong>{graph.rootName}</strong></div>
         <div className="breadcrumb"><span>{graph.rootName}</span><b>/</b><strong>{viewTitle}</strong></div>
-        <div className="evidence-route" aria-label="Evidence workflow"><span>Markdown</span><i /> <span>Map</span><i /> <strong>Review</strong></div>
-        <div className="topbar-meta">{graph.okf && <span className="okf-version">OKF {graph.okf.version}</span>}<span className="status-dot" />{live ? "Live" : "Generated"} {graph.generatedAt.slice(0, 10)}</div>
+        <div className="evidence-route" aria-label={copy.evidenceWorkflow}><span>{copy.markdown}</span><i /> <span>{copy.map}</span><i /> <strong>{copy.review}</strong></div>
+        <a className="locale-switch" href={localeHref(locale)} hrefLang={locale === "en" ? "zh-CN" : "en"}>{copy.languageName}</a>
+        <div className="topbar-meta">{graph.okf && <span className="okf-version">OKF {graph.okf.version}</span>}<span className="status-dot" />{live ? copy.live : copy.generated} {graph.generatedAt.slice(0, 10)}</div>
       </header>
-      {!live && <section className="demo-disclosure" aria-label="Static demo notice"><div><strong>Explore a synthetic Atlas</strong><span>8 sample pages · no local files read · nothing uploaded</span></div><code>npm i -g llm-wiki-canvas</code><a href="https://github.com/chicogong/llm-wiki-canvas#quick-start">Quick start ↗</a></section>}
+      {!live && <section className="demo-disclosure" aria-label={copy.demoTitle}><div><strong>{copy.demoTitle}</strong><span>{copy.demoDescription}</span></div><code>npm i -g llm-wiki-canvas</code><a href={locale === "zh-CN" ? "https://github.com/chicogong/llm-wiki-canvas/blob/main/README.zh-CN.md#快速开始" : "https://github.com/chicogong/llm-wiki-canvas#quick-start"}>{copy.quickStart}</a></section>}
       <h1 className="sr-only">{viewTitle}</h1>
-      <div className="mobile-nav"><AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} live={live} /></div>
-      {view === "map" && <MapView graph={graph} selectedId={selectedId} onSelect={setSelectedId} />}
-      {view === "health" && <HealthView graph={graph} onOpenPage={switchToPage} />}
+      <div className="mobile-nav"><AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} live={live} copy={copy} /></div>
+      {view === "map" && <MapView graph={graph} selectedId={selectedId} onSelect={setSelectedId} copy={copy} />}
+      {view === "health" && <HealthView graph={graph} onOpenPage={switchToPage} copy={copy} />}
       {view === "drafts" && <DraftsView inbox={drafts} error={draftsError} live={live} />}
       {view === "changes" && <ChangesView inbox={inbox} error={inboxError} live={live} />}
     </section>
