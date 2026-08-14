@@ -87,6 +87,7 @@ async function readProposal(target: string): Promise<KnowledgeProposal> {
   try {
     return parseKnowledgeProposal(JSON.parse(await readFile(path.resolve(target), "utf8")));
   } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") throw new Error(`Proposal does not exist: ${target}`);
     if (error instanceof SyntaxError) throw new Error(`Proposal is not valid JSON: ${target}`);
     throw error;
   }
@@ -124,10 +125,11 @@ function focusedOutput(title: string, format: "mermaid" | "excalidraw"): string 
 }
 
 const program = new Command()
-  .name("llm-wiki-canvas")
-  .alias("lwc")
+  .name("lwc")
   .description("Compile a local Markdown wiki into a graph and Obsidian JSON Canvas")
-  .version("0.1.0");
+  .version("0.1.0")
+  .showHelpAfterError("Run 'lwc --help' for usage.")
+  .addHelpText("after", "\nAlso installed as: llm-wiki-canvas");
 
 program.command("scan")
   .argument("[root]", "wiki root", ".")
@@ -243,11 +245,14 @@ program.command("agents")
   .argument("[root]", "workspace root containing Agent integration files", ".")
   .option("-o, --output <file>", "write the compatibility report to a file instead of stdout")
   .option("--format <format>", "report format: markdown or json", "markdown")
+  .option("--title <name>", "stable display name for generated documentation")
   .option("--strict", "exit non-zero when a required host integration is incomplete", false)
   .description("Verify cross-Agent repository rules and Skill entry points")
   .action(async (root, options) => {
     if (!["markdown", "json"].includes(options.format)) throw new Error(`Invalid --format value: ${options.format}`);
-    const report = await inspectAgentCompatibility(root);
+    const inspected = await inspectAgentCompatibility(root);
+    if (options.title !== undefined && (!options.title.trim() || /[\r\n]/.test(options.title))) throw new Error("Invalid --title value");
+    const report = options.title ? { ...inspected, rootName: options.title.trim() } : inspected;
     const output = options.format === "json" ? `${JSON.stringify(report, null, 2)}\n` : agentCompatibilityToMarkdown(report);
     if (options.output) {
       await writeText(options.output, output);

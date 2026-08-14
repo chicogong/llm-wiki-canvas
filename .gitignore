@@ -11,6 +11,7 @@ coverage/
 .lwc/
 *.tsbuildinfo
 *.tgz
+release-candidate/
 *.log
 .env
 .env.*

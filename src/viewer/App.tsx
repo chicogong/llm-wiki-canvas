@@ -74,19 +74,19 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
         ...graph.edges.map((edge) => ({ data: { id: edge.id, source: edge.source, target: edge.target, kind: edge.kind } })),
       ],
       style: [
-        { selector: "node", style: { "background-color": "#ffffff", "border-color": "#9ca6a0", "border-width": 1.5, label: "data(label)", color: "#27322c", "font-family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", "font-size": "11px", "font-weight": 600, "text-wrap": "wrap", "text-max-width": "116px", "text-valign": "bottom", "text-margin-y": 10, "text-background-color": "#f8faf7", "text-background-opacity": 0.92, "text-background-padding": "3px", width: 24, height: 24 } },
-        { selector: "node[kind = 'index']", style: { "background-color": "#3159e8", "border-color": "#3159e8", shape: "round-rectangle", width: 42, height: 42, color: "#17201b", "font-size": "12px", "text-max-width": "148px" } },
-        { selector: "node[kind = 'concept']", style: { "background-color": "#a9b9ff", "border-color": "#5570da", shape: "diamond", width: 31, height: 31 } },
-        { selector: "node[kind = 'source']", style: { "background-color": "#f3c778", "border-color": "#bf7c18", shape: "round-rectangle", width: 32, height: 25 } },
-        { selector: "node[kind = 'note']", style: { "background-color": "#ffffff", "border-color": "#77847d", shape: "ellipse" } },
-        { selector: "node[trust = 'machine-confirmed']", style: { "border-color": "#6477d8", "border-width": 2.5 } },
-        { selector: "node[trust = 'human-reviewed']", style: { "border-color": "#2f8060", "border-width": 3 } },
-        { selector: "node[lifecycle = 'deprecated']", style: { "border-color": "#c47c16", "border-style": "dashed", "border-width": 3 } },
-        { selector: "node[stale = 'yes']", style: { "border-color": "#c94f43", "border-style": "dashed", "border-width": 3 } },
-        { selector: "edge", style: { width: 1.2, "line-color": "#b8c0bb", "target-arrow-color": "#9ca6a0", "target-arrow-shape": "triangle", "arrow-scale": 0.55, "curve-style": "bezier", opacity: 0.7 } },
-        { selector: "edge.context", style: { width: 2, "line-color": "#3159e8", "target-arrow-color": "#3159e8", opacity: 0.95, "z-index": 20 } },
-        { selector: "node.context", style: { "border-color": "#3159e8", "border-width": 2.5 } },
-        { selector: ":selected", style: { "border-color": "#173fc5", "border-width": 3, "underlay-color": "#3159e8", "underlay-opacity": 0.11, "underlay-padding": 9 } },
+        { selector: "node", style: { "background-color": "#fbfaf6", "border-color": "#7890a2", "border-width": 1.5, label: "data(label)", color: "#102a43", "font-family": "ui-monospace, 'SFMono-Regular', Consolas, monospace", "font-size": "10px", "font-weight": 600, "text-wrap": "wrap", "text-max-width": "116px", "text-valign": "bottom", "text-margin-y": 11, "text-background-color": "#f3f0e8", "text-background-opacity": 0.94, "text-background-padding": "4px", width: 24, height: 24 } },
+        { selector: "node[kind = 'index']", style: { "background-color": "#102a43", "border-color": "#102a43", shape: "round-rectangle", width: 42, height: 42, color: "#102a43", "font-size": "11px", "text-max-width": "148px" } },
+        { selector: "node[kind = 'concept']", style: { "background-color": "#84a9c5", "border-color": "#2f5d8c", shape: "diamond", width: 31, height: 31 } },
+        { selector: "node[kind = 'source']", style: { "background-color": "#e2a665", "border-color": "#9a5b2c", shape: "round-rectangle", width: 32, height: 25 } },
+        { selector: "node[kind = 'note']", style: { "background-color": "#fbfaf6", "border-color": "#6f8290", shape: "ellipse" } },
+        { selector: "node[trust = 'machine-confirmed']", style: { "border-color": "#2f5d8c", "border-width": 2.5 } },
+        { selector: "node[trust = 'human-reviewed']", style: { "border-color": "#2f756b", "border-width": 3 } },
+        { selector: "node[lifecycle = 'deprecated']", style: { "border-color": "#9a5b2c", "border-style": "dashed", "border-width": 3 } },
+        { selector: "node[stale = 'yes']", style: { "border-color": "#c4553d", "border-style": "dashed", "border-width": 3 } },
+        { selector: "edge", style: { width: 1.1, "line-color": "#9aabb6", "target-arrow-color": "#7890a2", "target-arrow-shape": "triangle", "arrow-scale": 0.55, "curve-style": "bezier", opacity: 0.72 } },
+        { selector: "edge.context", style: { width: 2.2, "line-color": "#c4553d", "target-arrow-color": "#c4553d", opacity: 0.98, "z-index": 20 } },
+        { selector: "node.context", style: { "border-color": "#c4553d", "border-width": 2.5 } },
+        { selector: ":selected", style: { "border-color": "#c4553d", "border-width": 3, "underlay-color": "#c4553d", "underlay-opacity": 0.12, "underlay-padding": 10 } },
         { selector: ".muted", style: { opacity: 0.08 } },
       ],
       layout: {
@@ -134,7 +134,7 @@ function GraphStage({ graph, visibleIds, selectedId, onSelect }: {
   return <div ref={ref} className="graph-canvas" data-testid="graph-canvas" aria-label="Wiki relationship map" />;
 }
 
-function AppNavigation({ view, onView, drafts, changes }: { view: WorkbenchView; onView: (view: WorkbenchView) => void; drafts: number; changes: number }) {
+function AppNavigation({ view, onView, drafts, changes, live }: { view: WorkbenchView; onView: (view: WorkbenchView) => void; drafts: number; changes: number; live: boolean }) {
   return <nav className="app-nav" aria-label="Workspace views">
     <button className={view === "map" ? "active" : ""} onClick={() => onView("map")} aria-current={view === "map" ? "page" : undefined}>
       {mapIcon}<span>Map</span>
@@ -143,10 +143,10 @@ function AppNavigation({ view, onView, drafts, changes }: { view: WorkbenchView;
       {healthIcon}<span>Health</span>
     </button>
     <button className={view === "drafts" ? "active" : ""} onClick={() => onView("drafts")} aria-current={view === "drafts" ? "page" : undefined}>
-      {draftsIcon}<span>Drafts</span>{drafts > 0 && <b className="nav-count draft" aria-label={`${drafts} intakes need attention`}>{drafts}</b>}
+      {draftsIcon}<span>Drafts</span>{!live && <em className="local-badge">Local</em>}{drafts > 0 && <b className="nav-count draft" aria-label={`${drafts} intakes need attention`}>{drafts}</b>}
     </button>
     <button className={view === "changes" ? "active" : ""} onClick={() => onView("changes")} aria-current={view === "changes" ? "page" : undefined}>
-      {changesIcon}<span>Changes</span>{changes > 0 && <b className="nav-count" aria-label={`${changes} open proposals`}>{changes}</b>}
+      {changesIcon}<span>Changes</span>{!live && <em className="local-badge">Local</em>}{changes > 0 && <b className="nav-count" aria-label={`${changes} open proposals`}>{changes}</b>}
     </button>
   </nav>;
 }
@@ -295,6 +295,8 @@ function MapView({ graph, selectedId, onSelect }: { graph: WikiGraph; selectedId
       </div>
       <OkfFindings graph={graph} />
       <div className="canvas-frame">
+        <div className="survey-coordinate coordinate-north" aria-hidden="true">N 00°</div>
+        <div className="survey-coordinate coordinate-east" aria-hidden="true">E 90°</div>
         <GraphStage graph={graph} visibleIds={visibleIds} selectedId={selectedId} onSelect={onSelect} />
         <div className="legend" aria-label="Map legend">
           {KINDS.slice(1).map((item) => <span key={item.value}><i className={`dot ${item.value}`} />{item.label}</span>)}
@@ -620,7 +622,7 @@ export function App() {
   const live = new URLSearchParams(location.search).get("live") === "1";
 
   useEffect(() => {
-    const source = new URLSearchParams(location.search).get("graph") ?? "/graph.json";
+    const source = new URLSearchParams(location.search).get("graph") ?? new URL("./graph.json", document.baseURI).toString();
     let active = true;
     const load = async () => {
       try {
@@ -687,20 +689,24 @@ export function App() {
   const viewTitle = view === "map" ? "Knowledge map" : view === "health" ? "Vault health" : view === "drafts" ? "Draft intake" : "Changes inbox";
 
   return <main className="workbench-shell">
+    <a className="skip-link" href="#workspace-content">Skip to workspace</a>
     <aside className="sidebar">
-      <div className="brand"><span className="brand-mark">L</span><div><strong>LLM Wiki Canvas</strong><small>Local knowledge workbench</small></div></div>
-      <div className="vault-label"><span>Workspace</span><strong>{graph.rootName}</strong></div>
-      <AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} />
-      <div className="sidebar-note"><span className="status-dot" /><div><strong>{live ? "Watching locally" : "Local only"}</strong><small>{live ? "Refreshes when Markdown changes" : "Markdown stays on this machine"}</small></div></div>
+      <div className="brand"><span className="brand-mark" aria-hidden="true"><i /><i /></span><div><strong>LLM Wiki Canvas</strong><small>Evidence cartography</small></div></div>
+      <div className="vault-label"><span>Local survey / vault</span><strong>{graph.rootName}</strong></div>
+      <AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} live={live} />
+      <div className="sidebar-note"><span className="status-dot" /><div><strong>{live ? "Watching source" : "Local evidence"}</strong><small>{live ? "Markdown refreshes this projection" : "Markdown remains the source of truth"}</small></div></div>
     </aside>
 
-    <section className="workbench">
+    <section className={`workbench ${live ? "is-live" : "is-demo"}`} id="workspace-content">
       <header className="topbar">
-        <div className="mobile-brand"><span className="brand-mark">L</span><strong>{graph.rootName}</strong></div>
+        <div className="mobile-brand"><span className="brand-mark" aria-hidden="true"><i /><i /></span><strong>{graph.rootName}</strong></div>
         <div className="breadcrumb"><span>{graph.rootName}</span><b>/</b><strong>{viewTitle}</strong></div>
+        <div className="evidence-route" aria-label="Evidence workflow"><span>Source</span><i>→</i><span>Projection</span><i>→</i><strong>Human gate</strong></div>
         <div className="topbar-meta">{graph.okf && <span className="okf-version">OKF {graph.okf.version}</span>}<span className="status-dot" />{live ? "Live" : "Generated"} {graph.generatedAt.slice(0, 10)}</div>
       </header>
-      <div className="mobile-nav"><AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} /></div>
+      {!live && <section className="demo-disclosure" aria-label="Static demo notice"><div><strong>Sample Atlas · static demo</strong><span>8 synthetic pages. Your local files are not being read or uploaded.</span></div><code>pnpm lwc serve /path/to/vault</code><a href="https://github.com/chicogong/llm-wiki-canvas#readme">Run from source ↗</a></section>}
+      <h1 className="sr-only">{viewTitle}</h1>
+      <div className="mobile-nav"><AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} live={live} /></div>
       {view === "map" && <MapView graph={graph} selectedId={selectedId} onSelect={setSelectedId} />}
       {view === "health" && <HealthView graph={graph} onOpenPage={switchToPage} />}
       {view === "drafts" && <DraftsView inbox={drafts} error={draftsError} live={live} />}

@@ -31,9 +31,9 @@ It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
 - **Relationship impact is visible before review.** The Change blueprint marks affected pages, added or removed links, and target-hash conflicts before anything is applied.
 - **Generated views are reproducible.** Stable node and edge IDs make graph fixtures and Git diffs meaningful.
 
-## Try the working example
+## Try the synthetic working example
 
-The checked-in **Agent Knowledge Atlas** is a small, inspectable wiki about LLM Wiki, visual knowledge, source provenance, and human review.
+The checked-in **Agent Knowledge Atlas** is a small, synthetic, inspectable wiki about LLM Wiki, visual knowledge, source provenance, and human review. It is a product fixture, not evidence from a real user Vault.
 
 ```bash
 git clone https://github.com/chicogong/llm-wiki-canvas.git
@@ -45,6 +45,8 @@ pnpm dev
 ```
 
 Open <http://127.0.0.1:4173>.
+
+The static Viewer reads only the checked-in sample graph. Drafts and Changes require the loopback-only `lwc serve` command; neither mode uploads a Vault.
 
 The demo build has a verifiable result:
 
@@ -71,7 +73,7 @@ public/graph.json            # Deterministic Viewer input
 
 See [Examples](examples/README.md) for a guided walkthrough and commands you can copy.
 
-See the bilingual [product roadmap](ROADMAP.md) for the Workbench, one-command local serving, proposal review, topology overlays, and optional Excalidraw/Mermaid views.
+See the bilingual [product roadmap](ROADMAP.md) for current boundaries and the next validated product steps.
 
 ## How it compares
 
@@ -105,6 +107,8 @@ For the included example, one deterministic build turns **8 source pages and 16 
 Run `pnpm report:demo` to reproduce the full structural snapshot, including connected pages, source metadata, diagnostics, page types, and the most-connected pages. See [Benefits and workflows](docs/value-and-workflows.md) for personal Vault, Agent, and CI usage patterns.
 
 ## Use it on your own vault
+
+The npm package is still an unpublished `0.1.0` release candidate. Until the first public release, use the source checkout below. Do not install the unrelated unscoped `lwc` package.
 
 During development:
 
