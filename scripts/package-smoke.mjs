@@ -54,7 +54,7 @@ try {
   run("npm", ["install", "--no-audit", "--no-fund", tarball], { cwd: consumer });
   const installedPackage = path.join(consumer, "node_modules", "llm-wiki-canvas");
   const installedManifest = JSON.parse(readFileSync(path.join(installedPackage, "package.json"), "utf8"));
-  if (installedManifest.version !== "0.1.0") throw new Error(`packed release-candidate version drifted: ${installedManifest.version}`);
+  if (installedManifest.version !== "0.2.0") throw new Error(`packed release-candidate version drifted: ${installedManifest.version}`);
   const thirdPartyNotices = readFileSync(path.join(installedPackage, "THIRD_PARTY_LICENSES.txt"), "utf8");
   if (!thirdPartyNotices.includes("commander@") || !thirdPartyNotices.includes("cytoscape@") || !thirdPartyNotices.includes("yaml@") || !thirdPartyNotices.includes("License:")) {
     throw new Error("packed npm artifact is missing complete third-party license notices");

@@ -31,7 +31,7 @@ const sections = unique.map((entry) => {
 const output = [
   "THIRD-PARTY SOFTWARE NOTICES AND LICENSES",
   "",
-  "LLM Wiki Canvas 0.1.0 bundles the following production dependencies into its CLI and Viewer artifacts.",
+  "LLM Wiki Canvas 0.2.0 bundles the following production dependencies into its CLI and Viewer artifacts.",
   "This file is generated deterministically from pnpm-lock.yaml and installed package license files.",
   "It does not modify the license terms of LLM Wiki Canvas.",
   "",
