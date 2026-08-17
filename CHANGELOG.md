@@ -4,7 +4,11 @@ All notable changes will be documented here. This project follows Semantic Versi
 
 ## [Unreleased]
 
-No unreleased changes. Version `0.2.0` was published to npm, GitHub Releases, and GitHub Pages on 2026-08-14.
+### Changed
+
+- Reframed the product around its narrowest differentiated job: Git-style change control for AI-maintained Markdown knowledge, with bounded evidence, isolated drafts, hash-bound proposals, and human-controlled write-back.
+- Reordered the README, comparison guide, workflows, roadmap, package metadata, and static Demo so graphs and Canvas support the review workflow instead of defining the product.
+- Added a bilingual review-spine introduction to the static Demo while preserving the local-first Workbench and its existing evidence views.
 
 ## [0.2.0] - 2026-08-14
 

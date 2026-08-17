@@ -2,7 +2,11 @@
 
 [English](value-and-workflows.md) · [简体中文](value-and-workflows.zh-CN.md)
 
-LLM Wiki Canvas 的收益不是“AI 自动写了多少内容”，而是让本地 Markdown 知识库获得一套可以重复执行、可以审查的结构反馈。
+LLM Wiki Canvas 的收益不是“AI 自动写了多少内容”，也不是图谱看起来多复杂，而是把一次不透明的 Agent 文件修改，变成来源绑定、哈希校验、可由人审查后再写回的 Proposal。
+
+## 用户真正痛苦的时刻
+
+Agent 已经生成了一段看起来合理的 Markdown。审查人仍然需要知道：它收到了什么证据、来源或目标是否已经变化、具体文字和关系会怎样改变，以及最终写入的是否仍是刚刚审查的内容。LWC 用文件和校验保留这些答案，不依赖 Agent 自己解释“我做了什么”。
 
 ## 两分钟看到结果
 
@@ -31,7 +35,25 @@ pnpm dev
 
 ## 五类直接收益
 
-### 1. 理解知识库
+### 1. 限定 Agent 获得的证据
+
+从一个准确页面出发，同时限制披露范围和 Prompt 大小，不再附加整个 Vault：
+
+```bash
+lwc context /path/to/vault --focus "Human Review" --depth 1 --max-pages 8 --max-words 2000
+```
+
+结果保留相对路径、完整文件 SHA-256、关系距离和截断/遗漏计数。这里的价值是范围可以复现，并不宣称拓扑检索替代语义检索。
+
+### 2. 让生成内容留在正式知识之外
+
+捕获一份明确来源，保存快照与哈希，Agent 只能编辑声明过的草稿目标。Intake 转成 Proposal 时会重新检查来源、快照、范围和草稿，之后才进入 Review。
+
+### 3. 审查并校验实际变化
+
+Changes 展示来源和目标哈希、精确 diff、关系影响与冲突。来源、草稿、Proposal 或目标文件任一漂移，原交接自动失败。Review 和 Apply 仍由人负责。
+
+### 4. 理解并检查周围的知识库
 
 以前需要逐个打开文件和沿链接跳转；现在先运行报告定位入口和高连接页面，再在 Viewer 中查看一跳关系。
 
@@ -43,9 +65,9 @@ pnpm dev
 
 可验证结果包括页面总数、关系总数、高连接页面、页面类型和本地源路径。
 
-### 2. 控制结构质量
+结构理解和 lint 服务于决策，不能替代事实审查。
 
-把“链接是不是坏了”从人工感觉变成可以进入本地检查和 CI 的命令。
+把“链接是不是坏了”从人工感觉变成可以进入本地检查和 CI 的命令：
 
 ```bash
 pnpm lwc lint /path/to/vault
@@ -54,20 +76,7 @@ pnpm lwc lint /path/to/vault --strict
 
 默认模式遇到错误失败；`--strict` 会把歧义链接、缺标题和孤立页面等警告也作为失败。每条诊断包含错误码与文件路径。
 
-### 3. 让 Agent 的修改可审查
-
-Agent 修改前后分别保存 JSON 报告，即可比较页面、关系、连接覆盖和诊断是否按计划变化：
-
-```bash
-pnpm lwc report /path/to/vault --format json --generated-at 2026-08-10T00:00:00.000Z -o before.json
-# 人工确认后让 Agent 修改 Markdown
-pnpm lwc report /path/to/vault --format json --generated-at 2026-08-10T00:00:00.000Z -o after.json
-git diff --no-index before.json after.json
-```
-
-相同固定时间可以去掉这次刻意对比中的纯时间噪声。报告只能证明结构变化，不能替代内容事实审查。Agent 仍然必须引用来源路径，并展示 Markdown diff。
-
-### 4. 减少重复画图
+### 5. 重建解释视图而不用重复画图
 
 从 WikiLink 自动生成 JSON Canvas，然后在 Obsidian 中人工整理。再次构建时复用已有节点位置。
 
@@ -78,16 +87,6 @@ pnpm lwc build /path/to/vault \
 ```
 
 自动化负责建立和更新连接；人负责空间布局与最终表达。
-
-### 5. 限定 Agent 获得的内容
-
-从一个准确页面出发，同时限制披露范围和 Prompt 大小，不再附加整个 Vault：
-
-```bash
-lwc context /path/to/vault --focus "Human Review" --depth 1 --max-pages 8 --max-words 2000
-```
-
-结果保留原始 Markdown 证据、相对路径、SHA-256、关系距离和截断/遗漏计数。这里的收益是范围可以验证，并不宣称拓扑检索替代语义检索，也不宣称字数更少就必然回答更好。
 
 ## 三种推荐用法
 

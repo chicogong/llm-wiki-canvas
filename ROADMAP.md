@@ -1,17 +1,27 @@
 # Product roadmap / 产品路线图
 
-LLM Wiki Canvas is a **local knowledge workbench for people and coding Agents**, not a smaller RAG platform. Markdown remains truth; the CLI compiles observable structure; the Viewer helps people understand health, relationships, and proposed changes; Obsidian remains an excellent editor.
+LLM Wiki Canvas is a **Git-style review layer for AI-maintained Markdown knowledge bases**, not a smaller RAG platform. It gives Agent knowledge changes the controls code already has: bounded inputs, isolated work, exact diffs, integrity checks, explicit review, and a deliberate write-back step.
 
-LLM Wiki Canvas 是一个**给人和编程 Agent 共用的本地知识工作台**，不是缩小版 RAG 平台。Markdown 始终是事实源；CLI 编译可验证的结构；Viewer 用于理解健康度、关系与待审变更；Obsidian 继续承担日常编辑。
+LLM Wiki Canvas 是一个**面向 AI Agent 的 Markdown 知识变更审查层**，不是缩小版 RAG 平台。它把代码世界已有的输入边界、隔离工作、精确 diff、完整性校验、人工 Review 和明确写回带到知识维护流程中。
+
+## Product thesis / 产品论点
+
+Code changes have branches, CI, review, and merge protection. Agent-generated knowledge often arrives as plausible prose with no durable answer to four questions: what evidence was read, what changed, whether the target drifted, and who decided it could become formal knowledge.
+
+代码修改有分支、CI、Review 和合并保护；Agent 生成的知识却经常只是一段看起来合理的文字，无法持续回答四个问题：读了什么证据、究竟改了什么、目标是否已经漂移、谁决定它可以成为正式知识。
+
+LWC owns this loop and nothing broader:
+
+`bounded evidence → isolated draft → hash-bound proposal → human decision → rebuild`
 
 ## Product shape / 产品形态
 
 ```mermaid
 flowchart LR
-  A["Markdown vault<br/>source of truth"] --> B["lwc CLI<br/>scan · lint · build"]
+  A["Markdown vault<br/>formal knowledge"] --> B["lwc CLI<br/>scan · lint · context"]
   B --> C["Workbench<br/>Map · Health · Drafts · Changes"]
   B --> D["Obsidian Canvas<br/>spatial editing"]
-  E["Codex · Claude Code<br/>Qoder · TRAE · WorkBuddy"] --> G["Source intake<br/>snapshot · isolated draft"]
+  E["Codex · Claude Code<br/>DeepSeek Harness · Qoder · TRAE"] --> G["Selected source<br/>snapshot · isolated draft"]
   B --> H["Bounded context<br/>focus · pages · words"]
   H --> E
   G --> C
@@ -21,19 +31,19 @@ flowchart LR
   C -->|"human review"| A
 ```
 
-The product has three surfaces:
+The product has three surfaces, ordered by user value:
 
-1. **CLI** — deterministic automation for Agents and CI.
-2. **Workbench** — a calm, read-first review surface for people.
-3. **Open files** — Markdown and JSON Canvas that remain useful without this app.
+1. **Change control** — source capture, isolated drafts, hash-bound proposals, and explicit human review.
+2. **CLI and Workbench** — deterministic Agent/CI automation plus a calm evidence-review surface for people.
+3. **Open files and projections** — Markdown remains useful without LWC; graphs, Canvas, Excalidraw, and Mermaid remain rebuildable.
 
-产品只有三层：面向 Agent/CI 的确定性 CLI、面向人的只读优先工作台，以及脱离本项目仍能使用的 Markdown/JSON Canvas 开放文件。
+产品只有三层：来源、草稿、Proposal 和人工 Review 组成的变更控制；面向 Agent/CI 的确定性 CLI 与面向人的证据工作台；以及脱离本项目仍可使用的 Markdown 和可重建开放投影。
 
 ## North star / 北极星
 
-**Turn an existing Markdown Vault into an inspectable Agent knowledge workspace in under two minutes, without migration or a cloud account.**
+**Every Agent-authored formal knowledge change is traceable to bounded evidence, reviewed as an exact proposal, and blocked when any protected input drifts.**
 
-**两分钟内把已有 Markdown Vault 变成可检查的 Agent 知识工作台，不迁移数据，不注册云账号。**
+**每一次进入正式知识库的 Agent 修改，都能追溯到有边界的证据、以精确 Proposal 完成审查，并在任一受保护输入漂移时自动阻断。**
 
 The daily loop is deliberately small:
 
@@ -52,11 +62,11 @@ The daily loop is deliberately small:
 | --- | --- |
 | **Files are the product** | Markdown, source notes, proposals, and review records remain readable without LLM Wiki Canvas. |
 | **Agents propose; people decide** | No UI or Skill silently writes formal knowledge. |
-| **Structure before retrieval** | Make relationships, provenance, and drift observable before adding search infrastructure. |
+| **Change control before more generation** | Make evidence, scope, diff, integrity, and human responsibility observable before adding broader Agent powers. |
 | **One core, many Agents** | Codex, Claude Code, Qoder, TRAE, and WorkBuddy use the same CLI and repository contract. |
 | **Generated views are replaceable** | Graphs, indexes, Canvas, Excalidraw, and Mermaid outputs can always be rebuilt. |
 
-对应的产品判断是：文件本身可用、Agent 只提案、人负责决定、先解决结构可信度、所有 Agent 共用一个内核、所有生成视图都可以重建。
+对应的产品判断是：文件本身可用、Agent 只提案、人负责决定、先解决知识变更可信度、所有 Agent 共用一个内核、所有生成视图都可以重建。
 
 ## Delivery order / 迭代顺序
 
@@ -172,7 +182,7 @@ These are verifiable product measures, not invented productivity percentages:
 
 When choosing between two features, prefer the one that improves the closed loop:
 
-`understand → propose → inspect evidence → decide → rebuild`
+`bound evidence → draft → propose → inspect → decide → rebuild`
 
 Features that mainly increase ingestion breadth, chat capability, or infrastructure complexity wait until they improve this loop with measurable evidence.
 

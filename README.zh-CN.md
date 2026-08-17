@@ -6,24 +6,42 @@
 [![npm](https://img.shields.io/npm/v/llm-wiki-canvas.svg)](https://www.npmjs.com/package/llm-wiki-canvas)
 [![License](https://img.shields.io/badge/license-Apache--2.0-163A5F.svg)](LICENSE)
 
-**面向 Agent 管理的 Markdown 知识库的本地优先可视化编译器。**
+**面向 AI Agent 的 Markdown 知识变更审查层。**
 
-LLM Wiki Canvas 把 Markdown、YAML frontmatter 和 WikiLink 编译成确定性的关系图，以及可继续编辑的 Obsidian Canvas 和 Excalidraw 文件。Codex、Claude Code、Qoder、TRAE 和腾讯 WorkBuddy 仍然操作普通文件；人可以查看全局关系、定位知识库问题并审查生成产物。
+Agent 可以写，知识不能悄悄失控。
 
-项目不内置 LLM、向量数据库、聊天界面、云服务或 MCP Server。
+LLM Wiki Canvas 让 Codex、Claude Code、DeepSeek Harness、Qoder、TRAE 和腾讯 WorkBuddy 在明确边界内理解本地 Markdown 并提出修改。每份选定资料都有来源快照，每份生成内容先留在隔离草稿，每个 Proposal 都带精确 diff、来源与目标哈希以及关系影响，最后仍由人决定是否进入正式知识库。
+
+Markdown 始终是事实源。LWC 不上传 Vault，也不内置 LLM、向量数据库、聊天界面、云服务或强制 MCP Server。
 
 [体验中文热点雷达](https://realtime-ai.chat/llm-wiki-canvas/?lang=zh-CN) · [从 npm 安装](#快速开始) · [阅读使用指南](docs/usage.zh-CN.md)
 
-![LLM Wiki Canvas 中文智能体工程热点雷达](docs/assets/agent-trends-zh.png)
+![LLM Wiki Canvas Agent 知识变更审查流程](public/social-preview.png)
 
-## 你能得到什么
+## 它解决什么问题
+
+代码修改已经有分支、diff、CI、Review 和合并保护；Agent 修改知识通常还没有。一段看起来正确的 Markdown，背后可能使用了过期资料、读取范围过大、覆盖了并发修改，或者根本无法追溯结论来源。
+
+LWC 给现有文件补上缺失的知识变更控制流程：
+
+```text
+选定来源 → 哈希绑定的隔离草稿 → 可审查 Proposal → 人工决定 → 正式 Markdown
+```
+
+## 核心闭环
+
+- **只给 Agent 有边界的证据。** 导出明确页面邻域，限制页面数和字数，保留相对路径、完整文件哈希、截断和遗漏。
+- **生成内容不直接进入正式知识。** 捕获一份明确来源及其 SHA-256，Agent 只能编辑声明过的隔离草稿。
+- **审查实际变化，而不是相信承诺。** 批准前检查精确 diff、来源和目标哈希、目标范围、关系影响与冲突。
+- **证据漂移时自动拒绝。** 来源、草稿、Proposal 或目标文件任一变化，原有交接立即失效，不静默写入。
+- **一套规则服务多个 Agent。** 同一文件契约和 CLI 可跨宿主复用；可选 DeepSeek Harness Bundle 只开放最小知识管理面。
+
+## 支撑能力
 
 - **Markdown 始终是事实源。** 不引入专有数据库，也不强制迁移已有 Vault。
 - **关系可以直接看见。** 搜索、筛选页面，并查看一个页面周围的证据与相邻关系。
 - **知识库质量可以测试。** 断链、歧义链接、缺少标题和孤立页面都有准确路径。
 - **OKF 信任信号可以检查。** Open Knowledge Format v0.2 的来源、验证、时效、生命周期、资料与 Attested Computation 契约会进入图谱和有限上下文，但不会变成不透明评分或可执行载荷。
-- **明确选择的资料会进入受控草稿。** 登记一份 Markdown/文本，保留来源快照和 SHA-256，让任意 Agent 只编辑隔离草稿，再进入现有 Proposal 审查门。
-- **进入审查前即可看见草稿溯源。** Drafts 对照来源快照与隔离产物，校验哈希和目标范围，并解释阻塞原因，但不会写入 Vault。
 - **Canvas 的所有权仍属于你。** 重建时保留节点位置、文字/链接/分组批注和手工连线，只安置新增页面。
 - **Excalidraw 仍是开放交接文件。** 重建时保留页面位置、手绘批注和嵌入文件，同时刷新分类关系。
 - **把大图变成小型解释图。** 选择一个页面及一至两层关系，把同一份证据导出到 Mermaid 或 Excalidraw。
@@ -101,11 +119,11 @@ public/agent-trends-zh.json  # 中文热点雷达的确定性 Viewer 输入
 
 ## 与其他工具怎么选
 
-LLM Wiki Canvas 有意只做很小的一层：编译并检查已经存在的 Markdown Wiki；它不负责导入所有文档格式，不用 LLM 自动生成整个 Wiki，也不提供 RAG 问答。
+LLM Wiki Canvas 有意只做很小的一层：为已有 Markdown Wiki 提供受控读取和可审查写回。它不与其他产品争夺多格式导入、语义检索、聊天或自动生成整个 Wiki。
 
 | 工具 | 核心职责 | 适合选择它的情况 | 与 LLM Wiki Canvas 的关系 |
 | --- | --- | --- | --- |
-| **LLM Wiki Canvas** | 确定性关系图、结构检查、可编辑 Canvas | 已经有 Markdown，希望 Agent 共享可测试的视觉契约 | 本项目 |
+| **LLM Wiki Canvas** | 哈希绑定的 Agent 上下文、草稿、Proposal 与人工写回 | 已经有 Markdown，需要追溯和审查 Agent 修改 | 本项目 |
 | **Obsidian** | 人工编辑 Markdown 与个人知识管理 | 需要优秀的日常写作和浏览体验 | 组合使用：Obsidian 编辑 Vault，`lwc` 生成 Canvas |
 | **QMD** | 本地 BM25、向量与重排检索 | Agent 需要高质量本地搜索 | 组合使用：QMD 检索，`lwc` 可视化并检查结构 |
 | **LLM Wiki** | LLM 自动摄取并维护桌面 Wiki | 希望把文档自动综合成 Wiki 页面 | 自动生成和聊天选它；需要 JSON Canvas 时可再用 `lwc` 处理 Markdown |

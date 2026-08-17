@@ -179,6 +179,39 @@ function AppNavigation({ view, onView, drafts, changes, live, copy }: { view: Wo
   </nav>;
 }
 
+function ProductThesis({ copy, locale }: { copy: ViewerCopy; locale: "en" | "zh-CN" }) {
+  const steps = [
+    { label: copy.flowSource, meta: copy.flowSourceMeta, code: "source.md" },
+    { label: copy.flowDraft, meta: copy.flowDraftMeta, code: ".lwc/drafts/" },
+    { label: copy.flowProposal, meta: copy.flowProposalMeta, code: "proposal.json" },
+    { label: copy.flowDecision, meta: copy.flowDecisionMeta, code: "review → apply" },
+  ];
+  return <section className="product-thesis" aria-labelledby="product-thesis-title" data-testid="product-thesis">
+    <div className="thesis-copy">
+      <p className="section-kicker">{copy.heroEyebrow}</p>
+      <h1 id="product-thesis-title" aria-label={copy.heroTitle}>{locale === "zh-CN" ? <><span>Agent 可以写，</span><span>知识不能悄悄失控。</span></> : copy.heroTitle}</h1>
+      <p className="thesis-description">{copy.heroDescription}</p>
+      <div className="thesis-actions">
+        <a className="primary" href={locale === "zh-CN" ? "https://github.com/chicogong/llm-wiki-canvas/blob/main/README.zh-CN.md#快速开始" : "https://github.com/chicogong/llm-wiki-canvas#quick-start"}>{copy.heroInstall}</a>
+        <a href="https://github.com/chicogong/llm-wiki-canvas">{copy.heroSource} <span aria-hidden="true">↗</span></a>
+      </div>
+      <ul className="thesis-boundaries">
+        <li>{copy.heroBoundaryLocal}</li>
+        <li>{copy.heroBoundaryModel}</li>
+        <li>{copy.heroBoundaryDecision}</li>
+      </ul>
+    </div>
+    <ol className="review-spine" aria-label={copy.evidenceWorkflow}>
+      {steps.map((step, index) => <li key={step.label}>
+        <span className="spine-index">{String(index + 1).padStart(2, "0")}</span>
+        <span className="spine-node" aria-hidden="true" />
+        <div><strong>{step.label}</strong><small>{step.meta}</small></div>
+        <code>{step.code}</code>
+      </li>)}
+    </ol>
+  </section>;
+}
+
 function Inspector({ graph, selected, onSelect, copy }: { graph: WikiGraph; selected?: WikiNode; onSelect: (id: string) => void; copy: ViewerCopy }) {
   const [contextCopied, setContextCopied] = useState(false);
   const relations = useMemo(() => {
@@ -672,7 +705,7 @@ export function App() {
 
   useEffect(() => {
     document.documentElement.lang = locale;
-    document.title = locale === "zh-CN" ? "LLM Wiki Canvas — 中文知识工作台" : "LLM Wiki Canvas — Local Knowledge Workbench";
+    document.title = locale === "zh-CN" ? "LLM Wiki Canvas — Agent 知识变更审查" : "LLM Wiki Canvas — Agent Knowledge Change Review";
   }, [locale]);
 
   useEffect(() => {
@@ -758,8 +791,9 @@ export function App() {
         <a className="locale-switch" href={localeHref(locale)} hrefLang={locale === "en" ? "zh-CN" : "en"}>{copy.languageName}</a>
         <div className="topbar-meta">{graph.okf && <span className="okf-version">OKF {graph.okf.version}</span>}<span className="status-dot" />{live ? copy.live : copy.generated} {graph.generatedAt.slice(0, 10)}</div>
       </header>
+      {!live && <ProductThesis copy={copy} locale={locale} />}
       {!live && <section className="demo-disclosure" aria-label={copy.demoTitle}><div><strong>{copy.demoTitle}</strong><span>{copy.demoDescription}</span></div><code>npm i -g llm-wiki-canvas</code><a href={locale === "zh-CN" ? "https://github.com/chicogong/llm-wiki-canvas/blob/main/README.zh-CN.md#快速开始" : "https://github.com/chicogong/llm-wiki-canvas#quick-start"}>{copy.quickStart}</a></section>}
-      <h1 className="sr-only">{viewTitle}</h1>
+      {live ? <h1 className="sr-only">{viewTitle}</h1> : <h2 className="sr-only">{viewTitle}</h2>}
       <div className="mobile-nav"><AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} live={live} copy={copy} /></div>
       {view === "map" && <MapView graph={graph} selectedId={selectedId} onSelect={setSelectedId} copy={copy} />}
       {view === "health" && <HealthView graph={graph} onOpenPage={switchToPage} copy={copy} />}

@@ -1,6 +1,6 @@
 ---
 name: llm-wiki-canvas
-description: Build, inspect, lint, and visualize a local Markdown, Obsidian, or Open Knowledge Format wiki. Use when Codex needs to ingest notes into an LLM Wiki structure, analyze WikiLinks and relationships, inspect OKF trust signals, find broken links or orphan pages, generate an Obsidian JSON Canvas, or maintain index.md and log.md without adding MCP, a database, or an embedded LLM. Do not use for cloud RAG systems, silent bulk rewrites of source notes, executing Attested Computation contracts, or applying unreviewed Agent changes.
+description: Review and control AI Agent changes to a local Markdown, Obsidian, or Open Knowledge Format wiki. Use when Codex needs bounded source-hashed context, source-bound isolated drafts, hash-checked Proposals, WikiLink diagnostics, relationship impact, or rebuildable Canvas views without adding MCP, a database, or an embedded LLM. Do not use for cloud RAG systems, silent bulk rewrites, executing Attested Computation contracts, or applying unreviewed Agent changes.
 ---
 
 # LLM Wiki Canvas

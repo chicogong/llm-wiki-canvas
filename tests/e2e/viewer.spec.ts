@@ -6,6 +6,9 @@ async function openWorkbench(page: Page): Promise<string[]> {
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await page.waitForLoadState("networkidle");
+  await expect(page.getByRole("heading", { name: "Agents can write. Knowledge should not drift silently." })).toBeVisible();
+  await expect(page.getByTestId("product-thesis")).toContainText("Selected source");
+  await expect(page.getByTestId("product-thesis")).toContainText("Human decision");
   await expect(page.getByTestId("map-view")).toBeVisible();
   await expect(page.getByTestId("graph-canvas")).toBeVisible();
   return errors;
@@ -146,7 +149,8 @@ test("@smoke opens the Chinese technology radar and searches its mock knowledge"
   await page.goto("/?lang=zh-CN");
   await page.waitForLoadState("networkidle");
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
-  await expect(page.getByText("智能体工程热点雷达").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Agent 可以写，知识不能悄悄失控。" })).toBeVisible();
+  await expect(page.getByText("查看支撑审查的证据关系图")).toBeVisible();
   await expect(page.getByText("9 个模拟页面 · 来源可核对 · 不读取本地文件")).toBeVisible();
   const search = page.getByRole("searchbox", { name: "搜索页面" });
   await search.fill("DeepSeek");

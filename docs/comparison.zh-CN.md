@@ -10,7 +10,7 @@
 
 ## 一句话怎么选
 
-- Markdown 已经存在，需要确定性可视化、结构检查、可编辑 JSON Canvas 和仓库级 Agent 工作流：选 **LLM Wiki Canvas**。
+- Markdown 已经存在，需要给 Agent 修改增加证据边界、隔离草稿、精确 diff、完整性校验和人工写回：选 **LLM Wiki Canvas**。
 - 主要由人日常写作、浏览、安装插件和进行广泛的应用内 CLI 自动化：选 **Obsidian**。
 - Agent 最需要的是高质量本地检索：选 **QMD**。
 - 希望 LLM 摄取来源文件并持续自动生成、维护个人 Wiki：选 **LLM Wiki**。
@@ -32,22 +32,25 @@
 | 可编辑 JSON Canvas 生成 | **是** | **是**，原生编辑 Canvas | **否** | 没有一等导出器 | 没有一等导出器 |
 | 稳定 ID 和可复现图 fixture | **是** | 不是主要契约 | 索引可重建 | 由应用管理 | 由服务管理索引 |
 | Agent 集成 | 仓库 Skill + 无头 CLI | 官方 CLI、文件和插件生态 | CLI + MCP | 本地 API + Agent Skill | API + CLI + MCP + Skills |
+| 来源绑定的隔离草稿 | **是**，一份选定来源与一个声明目标 | 可通过文件流程实现，不是核心审查契约 | **否** | 由应用管理生成流程 | 由平台管理 Wiki/Agent 流程 |
+| 写回前的哈希绑定 Proposal | **是** | 依赖 Git 或插件 | **否** | 产品特定 Review 流程 | 有确认与平台工作流，但不是同一文件契约 |
 | 内置聊天 | **否** | 核心能力中**否** | 没有通用聊天 UI | **是** | **是** |
 | 团队 RBAC 和服务运维 | **否** | 不是平台 RBAC | **否** | 偏个人本地 | **是** |
 | 典型运行成本 | Node CLI + 静态 Viewer；无需应用进程 | 安装桌面应用；官方 CLI 需要 Obsidian 正在运行 | Node CLI；语义模式下载本地模型 | 桌面应用 + 模型提供方 | Docker/服务部署 + 基础设施配置 |
 
 ## 最重要的产品边界
 
-LLM Wiki Canvas 不是“更小的 WeKnora”，也不是第二个 LLM Wiki 桌面应用。它交付的是构建产物：
+LLM Wiki Canvas 不是“更小的 WeKnora”，也不是第二个 LLM Wiki 桌面应用。它交付的是一次受控知识变更：
 
 ```text
-Markdown Wiki
-  → 确定性的 graph.json
-  → 可编辑 JSON Canvas
-  → 精确的结构诊断
+选定来源
+  → 哈希绑定的隔离草稿
+  → 精确 Proposal 与关系影响
+  → 人工决定
+  → 正式 Markdown
 ```
 
-编译器不决定 Wiki 应该写什么。人或外部 Agent 负责修改 Markdown，Git 负责审查和历史。
+编译器不决定 Wiki 应该写什么。LWC 在正式 Markdown 改变前把 Agent 交接变成可检查证据；Git 继续负责仓库历史与协作。图谱、Canvas 和诊断服务于审查，不再定义整个产品。
 
 ## 哪些情况应该选其他工具
 
@@ -63,7 +66,7 @@ Obsidian 官方 CLI 已覆盖广泛的应用内自动化，包括读、搜、写
 
 主要问题是从大量本地文档找到相关段落时，选择 QMD。QMD 提供 BM25、向量搜索、查询扩展和本地 LLM 重排。LLM Wiki Canvas 只过滤图谱元数据，不宣称语义检索。
 
-推荐组合：两个工具指向同一个 Markdown 根目录。QMD 回答“哪些段落相关”，`lwc` 回答“页面通过哪些显式链接连接，结构是否健康”。
+推荐组合：两个工具指向同一个 Markdown 根目录。QMD 回答“哪些段落相关”，`lwc` 回答“Agent 收到了哪些有边界的证据、准备改什么、当前是否仍可安全写回”。
 
 ### 应该选 LLM Wiki
 
