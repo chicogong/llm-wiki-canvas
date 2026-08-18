@@ -2,7 +2,11 @@
 
 [English](value-and-workflows.md) · [简体中文](value-and-workflows.zh-CN.md)
 
-The value of LLM Wiki Canvas is not how much prose an AI generates. It gives a local Markdown knowledge base repeatable, reviewable structural feedback.
+The value of LLM Wiki Canvas is not how much prose an AI generates or how impressive a graph looks. It turns an Agent knowledge edit from an opaque file mutation into a source-bound, hash-checked proposal that a person can inspect before write-back.
+
+## The painful moment
+
+An Agent has produced a plausible Markdown change. The reviewer still needs to know what evidence it received, whether that evidence or the target changed, what exact text and relationships will change, and whether the reviewed bytes are the bytes that will be applied. LWC preserves those answers as files and checks rather than relying on the Agent's explanation.
 
 ## See the result in two minutes
 
@@ -31,7 +35,25 @@ These are observations of the checked-in repository, not a universal benchmark o
 
 ## Five concrete benefits
 
-### 1. Understand a wiki
+### 1. Bound the evidence an Agent receives
+
+Start from one exact page and cap disclosure and prompt size instead of attaching the entire Vault:
+
+```bash
+lwc context /path/to/vault --focus "Human Review" --depth 1 --max-pages 8 --max-words 2000
+```
+
+The result carries relative paths, full-file SHA-256, relationship distance, and truncation/omission counts. The value is a reproducible scope boundary, not a claim that topology replaces semantic retrieval.
+
+### 2. Keep generated work outside formal knowledge
+
+Capture one selected source, preserve its snapshot and hash, and let the Agent edit only the declared draft target. Converting that intake to a Proposal rechecks the source, snapshot, scope, and draft before any review begins.
+
+### 3. Review and integrity-check the exact change
+
+Changes exposes source and target hashes, exact diff lines, relationship impact, and conflicts. If the source, draft, proposal, or target drifts, the earlier handoff fails closed. A person still owns review and apply.
+
+### 4. Understand and test the surrounding wiki
 
 Instead of opening every file and following links manually, use the report to locate entry points and highly connected pages, then inspect one-hop relationships in the Viewer.
 
@@ -43,9 +65,9 @@ pnpm dev
 
 The verifiable result includes page and relationship counts, page types, highly connected pages, and local source paths.
 
-### 2. Control structural quality
+Structural understanding and lint support the decision; they are not substitutes for factual review.
 
-Move link integrity from manual intuition into local checks and CI.
+Move link integrity from manual intuition into local checks and CI:
 
 ```bash
 pnpm lwc lint /path/to/vault
@@ -54,20 +76,7 @@ pnpm lwc lint /path/to/vault --strict
 
 Default mode fails on errors. `--strict` also fails on warnings such as ambiguous links, missing titles, and orphan pages. Every diagnostic has a code and file path.
 
-### 3. Review Agent changes
-
-Save JSON reports before and after an approved edit to compare pages, relationships, connectivity, and diagnostics:
-
-```bash
-pnpm lwc report /path/to/vault --format json --generated-at 2026-08-10T00:00:00.000Z -o before.json
-# Let the Agent edit Markdown after human approval
-pnpm lwc report /path/to/vault --format json --generated-at 2026-08-10T00:00:00.000Z -o after.json
-git diff --no-index before.json after.json
-```
-
-Using the same fixed timestamp removes time-only noise from this deliberate comparison. The report proves structural change, not factual correctness. The Agent must still cite sources and show the Markdown diff.
-
-### 4. Avoid redrawing the same map
+### 5. Rebuild explanations without redrawing everything
 
 Generate JSON Canvas from WikiLinks, then arrange it manually in Obsidian. Later builds preserve existing node positions.
 
@@ -78,16 +87,6 @@ pnpm lwc build /path/to/vault \
 ```
 
 Automation maintains connections; people own spatial layout and final communication.
-
-### 5. Bound what an Agent receives
-
-Start from one exact page and cap both disclosure and prompt size instead of attaching the entire Vault:
-
-```bash
-lwc context /path/to/vault --focus "Human Review" --depth 1 --max-pages 8 --max-words 2000
-```
-
-The result preserves raw Markdown evidence, relative paths, SHA-256, relationship distance, and truncation/omission counts. The benefit is a verifiable scope boundary—not a claim that topology replaces semantic retrieval or that fewer words guarantee a better answer.
 
 ## Three recommended workflows
 

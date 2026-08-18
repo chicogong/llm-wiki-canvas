@@ -1,8 +1,8 @@
 {
   "name": "llm-wiki-canvas",
   "version": "0.2.0",
-  "description": "A local-first visual knowledge workspace for coding agents and Obsidian.",
-  "keywords": ["llm-wiki", "obsidian", "json-canvas", "knowledge-graph", "local-first", "agent-skill"],
+  "description": "A Git-style review layer for AI-maintained Markdown knowledge bases.",
+  "keywords": ["llm-wiki", "agent-knowledge", "human-in-the-loop", "markdown", "obsidian", "knowledge-graph", "local-first", "agent-skill"],
   "homepage": "https://github.com/chicogong/llm-wiki-canvas#readme",
   "bugs": {"url": "https://github.com/chicogong/llm-wiki-canvas/issues"},
   "repository": {"type": "git", "url": "git+https://github.com/chicogong/llm-wiki-canvas.git"},

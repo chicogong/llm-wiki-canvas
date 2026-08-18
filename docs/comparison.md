@@ -10,7 +10,7 @@ Legend: **Yes** = a current first-class capability; **Partial** = narrower, opti
 
 ## Short answer
 
-- Choose **LLM Wiki Canvas** when the Markdown already exists and you want deterministic visualization, structural linting, editable JSON Canvas, and a repository-native Agent workflow.
+- Choose **LLM Wiki Canvas** when Markdown already exists and Agent changes need bounded evidence, isolated drafts, exact diffs, integrity checks, and human-controlled write-back.
 - Choose **Obsidian** for daily human authoring, browsing, plugins, and broad app-backed CLI automation.
 - Choose **QMD** when local retrieval quality for Agents is the main problem.
 - Choose **LLM Wiki** when an LLM should ingest source documents and continuously generate and maintain a personal Wiki.
@@ -32,22 +32,25 @@ Legend: **Yes** = a current first-class capability; **Partial** = narrower, opti
 | Editable JSON Canvas generation | **Yes** | **Yes**, native Canvas authoring | **No** | **No** first-class exporter | **No** first-class exporter |
 | Stable IDs and reproducible graph fixture | **Yes** | Not its primary contract | Index is rebuildable | App-managed | Service-managed indexes |
 | Agent integration | Repo Skill + headless CLI | Official CLI, files, and plugin ecosystem | CLI + MCP | Local API + Agent Skill | API + CLI + MCP + Skills |
+| Source-bound isolated draft | **Yes**, one selected source and declared target | File workflow, not a core review contract | **No** | App-managed generation workflow | Managed Wiki/Agent workflow |
+| Hash-bound proposal before write-back | **Yes** | Git/plugin-dependent | **No** | Product-specific review flow | Confirmation and platform workflows, not this file-native contract |
 | Built-in chat | **No** | **No** in core | **No** general chat UI | **Yes** | **Yes** |
 | Team RBAC and service operations | **No** | **No** platform RBAC | **No** | Personal/local focus | **Yes** |
 | Typical operating weight | Node CLI + static Viewer; no app process required | Installed application; the official CLI requires the app to be running | Node CLI + downloaded local models for semantic modes | Desktop app + configured model provider | Docker/service deployment and configured infrastructure |
 
 ## The important boundary
 
-LLM Wiki Canvas is not a “smaller WeKnora” and not a second LLM Wiki desktop application. Its unit of value is a build artifact:
+LLM Wiki Canvas is not a “smaller WeKnora” and not a second LLM Wiki desktop application. Its unit of value is a controlled knowledge change:
 
 ```text
-Markdown Wiki
-  → deterministic graph.json
-  → editable JSON Canvas
-  → exact structural diagnostics
+selected source
+  → hash-bound isolated draft
+  → exact proposal and relationship impact
+  → human decision
+  → formal Markdown
 ```
 
-The compiler does not decide what the Wiki should say. A person or external Agent can write Markdown, and Git remains the review and history layer.
+The compiler does not decide what the Wiki should say. LWC makes the Agent handoff inspectable before formal Markdown changes; Git remains the repository history and collaboration layer. Graph, Canvas, and diagnostics support that review rather than define the product.
 
 ## When another tool is the better answer
 
@@ -63,7 +66,7 @@ Obsidian's official CLI now covers broad app-backed automation, including readin
 
 Choose QMD when the problem is finding relevant passages across many local documents. QMD provides BM25, vector search, query expansion, and local LLM reranking. LLM Wiki Canvas only filters graph metadata and does not claim semantic retrieval.
 
-Recommended combination: point both tools at the same Markdown root. Let QMD answer “which passages matter?” and let `lwc` answer “how are the pages explicitly connected, and is that structure healthy?”
+Recommended combination: point both tools at the same Markdown root. Let QMD answer “which passages matter?” and let `lwc` answer “what bounded evidence was handed to the Agent, what is it proposing, and is that write-back still safe?”
 
 ### Choose LLM Wiki instead
 

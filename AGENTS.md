@@ -1,6 +1,6 @@
 # Agent Guide
 
-LLM Wiki Canvas is a local-first visual compiler for Markdown knowledge bases. Markdown and source notes are truth; graphs, Canvas files, and Viewer data are rebuildable projections.
+LLM Wiki Canvas is a Git-style review layer for AI-maintained Markdown knowledge bases. Markdown, selected sources, proposals, and review records are truth; graphs, Canvas files, and Viewer data are rebuildable projections.
 
 ## Working contract
 

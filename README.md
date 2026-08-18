@@ -6,24 +6,42 @@
 [![npm](https://img.shields.io/npm/v/llm-wiki-canvas.svg)](https://www.npmjs.com/package/llm-wiki-canvas)
 [![License](https://img.shields.io/badge/license-Apache--2.0-163A5F.svg)](LICENSE)
 
-**A local-first visual compiler for Agent-managed Markdown knowledge bases.**
+**A Git-style review layer for AI-maintained Markdown knowledge bases.**
 
-LLM Wiki Canvas turns Markdown, frontmatter, and WikiLinks into a deterministic relationship graph plus editable Obsidian Canvas and Excalidraw files. Codex, Claude Code, Qoder, TRAE, and Tencent WorkBuddy keep working with ordinary files; people get a visual map, diagnostics, and reviewable generated artifacts.
+Agents can write. Knowledge should not drift silently.
 
-It does not ship an LLM, vector database, chat UI, cloud service, or MCP server.
+LLM Wiki Canvas gives Codex, Claude Code, DeepSeek Harness, Qoder, TRAE, and Tencent WorkBuddy a bounded way to understand local Markdown and propose changes. Every selected source is snapshotted, every draft stays isolated, and every proposal carries an exact diff, source and target hashes, and relationship impact before a person decides whether it enters the knowledge base.
+
+Markdown remains the source of truth. LWC does not upload your Vault or ship an LLM, vector database, chat UI, cloud service, or required MCP server.
 
 [Explore the synthetic Atlas](https://realtime-ai.chat/llm-wiki-canvas/) · [中文热点雷达](https://realtime-ai.chat/llm-wiki-canvas/?lang=zh-CN) · [Install from npm](#quick-start) · [Read the usage guide](docs/usage.md)
 
-![LLM Wiki Canvas Atlas viewer](docs/assets/atlas-viewer.png)
+![LLM Wiki Canvas Agent knowledge change review flow](public/social-preview.png)
 
-## What you get
+## The problem it solves
+
+Code has branches, diffs, CI, review, and merge protection. Agent-maintained knowledge usually does not. A plausible Markdown edit can hide a stale source, an over-broad read, a concurrent overwrite, or a conclusion that cannot be traced back to evidence.
+
+LWC adds that missing change-control loop without moving your files into another platform:
+
+```text
+selected source → hash-bound draft → reviewable proposal → human decision → Markdown
+```
+
+## The core loop
+
+- **Give an Agent bounded evidence.** Export an exact page neighborhood with page and word limits, relative paths, full-file hashes, and explicit omissions.
+- **Keep generated work outside formal knowledge.** Capture one selected source, retain its snapshot and SHA-256, and let the Agent edit only the declared isolated draft.
+- **Review the change, not a promise.** Inspect the exact diff, source and target hashes, target scope, structural impact, and conflicts before approval.
+- **Fail closed when evidence drifts.** A changed source, draft, proposal, or target invalidates the earlier handoff instead of silently applying it.
+- **Keep the workflow portable.** The same file contract and CLI work across Agent hosts; the optional DeepSeek Harness bundle exposes only the bounded knowledge-manager surface.
+
+## Supporting capabilities
 
 - **Markdown stays the source of truth.** No proprietary database or forced migration.
 - **Relationships become visible.** Search, filter, and inspect the evidence around a page.
 - **Wiki quality becomes testable.** Broken links, ambiguous links, missing titles, and orphan pages have exact paths.
 - **OKF trust stays inspectable.** Open Knowledge Format v0.2 origin, verification, freshness, lifecycle, sources, and Attested Computation contracts travel through the graph and bounded context without becoming an opaque score or executable payload.
-- **Selected sources become governed drafts.** Register one Markdown/text source, retain its snapshot and SHA-256, let any Agent edit an isolated draft, then convert it into the existing proposal gate.
-- **Draft provenance is visible before review.** Drafts compares the captured source and isolated output, verifies hashes and target scope, and explains blockers without writing to the Vault.
 - **The Canvas stays yours.** Rebuilds preserve adjusted positions, text/link/group annotations, and manual edges while placing only new pages.
 - **Excalidraw stays an open handoff.** Rebuilds retain page positions, hand-drawn annotations, and embedded files while refreshing typed relationships.
 - **Large maps become small explanations.** Select one page and one or two relationship layers, then export the same evidence to Mermaid or Excalidraw.
@@ -91,11 +109,11 @@ See the bilingual [product roadmap](ROADMAP.md) for current boundaries and the n
 
 ## How it compares
 
-LLM Wiki Canvas occupies a deliberately small layer. It compiles and checks an existing Markdown wiki; it does not ingest every document format, generate the wiki with an LLM, or answer questions with RAG.
+LLM Wiki Canvas occupies a deliberately small layer: governed read context and reviewable write-back for an existing Markdown wiki. It does not compete on broad ingestion, semantic search, chat, or autonomous Wiki generation.
 
 | Tool | Primary job | Choose it when | Relationship to LLM Wiki Canvas |
 | --- | --- | --- | --- |
-| **LLM Wiki Canvas** | Deterministic graph, lint, and editable Canvas generation | Markdown already exists and Agents need a testable visual contract | This project |
+| **LLM Wiki Canvas** | Hash-bound Agent context, drafts, proposals, and human-controlled write-back | Markdown already exists and Agent changes need traceable review | This project |
 | **Obsidian** | Human Markdown authoring and personal knowledge management | You want the best day-to-day editing experience | Use together: edit the Vault in Obsidian and generate its Canvas with `lwc` |
 | **QMD** | Local BM25, vector, and reranked document retrieval | Agents need high-quality local search | Use together: QMD retrieves; `lwc` visualizes and checks structure |
 | **LLM Wiki** | LLM-driven ingest into a maintained desktop wiki | You want documents automatically synthesized into wiki pages | Use instead for generation/chat, or run `lwc` over its Markdown when JSON Canvas matters |
