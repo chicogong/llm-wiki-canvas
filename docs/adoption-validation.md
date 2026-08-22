@@ -1,0 +1,119 @@
+# D0 / D+7 adoption validation
+
+This record covers one product only: LLM Wiki Canvas. It uses only the redistributable synthetic files under [`examples/host-fixture`](../examples/host-fixture/). No private Vault, account data, session, or host transcript belongs in this record.
+
+## Fixed candidate
+
+- Candidate branch at D0: `agent/agent-knowledge-review-positioning`
+- Candidate commit at D0: `0b2fa6553fb7e06ad03ffd5d9096d9bff5d2e18b`
+- Fixture ID: `host-fixture-v1`
+- Fixture aggregate SHA-256: `22048691edf640ccbe8710eb8b3013b0cfe8738e39d37517c6d2ec52f1c46332`
+- Hash manifest: [`examples/host-fixture/fixture.sha256`](../examples/host-fixture/fixture.sha256)
+- Formal baseline: `vault/index.md` SHA-256 `4d370bbc80186ded0b7b42a9ac4d41f5b5d2f1d63938464580733d598a2680ba`
+- Selected source: `source/decision.txt` SHA-256 `1e5aaca45daa31047bb96923374c69341ba71f2d96080c98a08e75ccf0f3d72f`
+
+The aggregate covers exactly `source/decision.txt`, `task.md`, and `vault/index.md`. The manifest itself is not included in its own hash.
+
+## Two-minute Quickstart
+
+Prerequisite: dependencies and `dist/index.js` already exist. From the repository root:
+
+```bash
+npm run adoption:quickstart
+```
+
+The command copies the fixed fixture to a temporary workspace, creates bounded context for `Host Fixture`, creates one isolated draft and Proposal, renders the Proposal for review, proves that formal Markdown did not change, and confirms that apply fails before human review. It deletes the temporary workspace afterward.
+
+Acceptance output must contain:
+
+- `status: passed`
+- `fixtureSha256: 22048691edf640ccbe8710eb8b3013b0cfe8738e39d37517c6d2ec52f1c46332`
+- `contextHash: 4d370bbc80186ded0b7b42a9ac4d41f5b5d2f1d63938464580733d598a2680ba`
+- `sourceHash: 1e5aaca45daa31047bb96923374c69341ba71f2d96080c98a08e75ccf0f3d72f`
+- `proposalStatus: proposed`
+- `applyWithoutReview: blocked`
+
+`proposal show` is the review surface in this validation. Approval and apply are deliberately outside the Quickstart; no synthetic process may impersonate a human reviewer.
+
+## D0 record — 2026-08-22
+
+| Host | Evidence | Result | Elapsed | Comparable result |
+| --- | --- | --- | ---: | --- |
+| Codex | Current Codex session executed the local CLI flow | Passed to Proposal review gate | 22 s from Intake creation | Context hash, source hash, target, content hash, and unreviewed-apply blocker matched |
+| Tencent WorkBuddy | Local compatibility fixture only | **Pending real host validation** | 19 s | Same context/source/content hashes and blocker; generator label differs as expected |
+
+Shared proposed content SHA-256: `8fa41a0bd47b323d413d34a63659e6ffc40d678c6508f864c28fc0aaa7b6aa87`. The formal baseline remained unchanged in both runs. Proposal IDs differ because generator identity is part of proposal provenance.
+
+Comparison rules are explicit: both hosts must preserve the exact fixture, context, and source hashes; the proposed text must retain all three source semantics (Markdown is truth, Agent content enters a Proposal, and apply waits for human review); and unreviewed apply must fail closed. Record the proposed content hash even when semantically valid formatting differs. D0 happened to produce the same content hash in both paths.
+
+Failure and correction:
+
+- The first Codex edit assumed a generic draft placeholder. Intake actually generated provenance frontmatter. Codex read the generated draft, preserved `source` and `source_sha256`, and edited only the declared body and metadata.
+- No `workbuddy` or `workbuddy-cli` executable was available. The installed `codebuddy` executable was not used because CodeBuddy is a different host and would not prove WorkBuddy adoption.
+- The full unit command passed 55 tests but two loopback-server tests could not start because this sandbox rejects listening on `127.0.0.1` with `EPERM`. All 54 non-listening tests passed in the focused rerun; 明彻 must rerun the two server tests in a normal local environment.
+- The sensitive-information scan initially found absolute paths inside ignored `.lwc/adoption-d0-*` workspaces. Those generated workspaces were moved out of the repository; the subsequent scan passed, and no local host transcript or `.lwc` state is part of the candidate.
+
+Exact WorkBuddy human gate: a user must open a real signed-in WorkBuddy workspace, select a copy of this synthetic fixture as the working directory, attach `@AGENTS.md` and `@.agents/skills/llm-wiki-canvas/SKILL.md`, keep normal permission prompts enabled, and run `task.md`. Stop if it requests another login, plugin installation, account connection, broader filesystem access, or non-public data. Until those steps complete, the status remains `pending-real-host-validation`.
+
+The machine-readable D0 rows are in [`docs/adoption-ledger.csv`](adoption-ledger.csv). `not-observed` means no installation or Star was attributed; it is not zero demand.
+
+## D+7 template — do not fill early
+
+Target date: 2026-08-29 Asia/Singapore. Copy one row per host into `docs/adoption-ledger.csv` only after an observed rerun.
+
+```text
+observed_at:
+day: D+7
+host:
+host_version:
+evidence_kind: host-runtime | compatibility-fixture | host-attempt
+status: passed | failed | blocked | unavailable | pending-real-host
+candidate_commit:
+fixture_id: host-fixture-v1
+fixture_sha256: 22048691edf640ccbe8710eb8b3013b0cfe8738e39d37517c6d2ec52f1c46332
+elapsed_seconds:
+context_hash:
+source_hash:
+content_hash:
+formal_markdown_changed: false | true
+apply_without_review: blocked | unexpected-pass
+failure:
+correction:
+cta_id: lwc-adoption-v1
+cta_source:
+install_source: npm | source-checkout | existing-install | not-observed
+star_source: lwc-adoption-v1 | other | not-observed
+```
+
+Reproduction commands:
+
+```bash
+git rev-parse HEAD
+pnpm build
+npm run adoption:quickstart
+npm run adoption:workbuddy-compat
+LWC_RUN_HOST_FIXTURE=1 node scripts/host-runtime-fixture.mjs --host codex --output .lwc/host-runtime/codex.json
+```
+
+The last command is opt-in and may use an authenticated Codex host; run it only when the task owner authorizes that account/runtime use. A real WorkBuddy rerun has no repository CLI shortcut and must pass the human gate above. Never substitute the compatibility fixture for a real-host pass.
+
+## One CTA and attribution fields
+
+CTA ID `lwc-adoption-v1` has one canonical destination:
+
+> [Install LLM Wiki Canvas from the README; star the repository only if this review workflow proves useful.](https://github.com/chicogong/llm-wiki-canvas?utm_source=lwc-adoption-fixture&utm_medium=host-validation&utm_campaign=d0-d7)
+
+Record `cta_id`, `cta_source`, `install_source`, and `star_source` in the ledger. Do not publish the CTA from this task, solicit a Star, or infer attribution without an observed source.
+
+## Handoff to 明彻
+
+Use the fixed candidate and no private state:
+
+```bash
+test "$(git rev-parse HEAD)" = "0b2fa6553fb7e06ad03ffd5d9096d9bff5d2e18b"
+git diff --check
+npm run adoption:quickstart
+npm run adoption:workbuddy-compat
+```
+
+The fixed candidate is the current in-scope validation worktree on base commit `0b2fa6553fb7e06ad03ffd5d9096d9bff5d2e18b`; do not switch branches or discard its uncommitted files. Completion is the expected hashes and blocker above, a clean formal fixture, and an explicit `pending-real-host-validation` result for WorkBuddy. Do not review, apply, publish, push, or create a PR as part of this handoff.

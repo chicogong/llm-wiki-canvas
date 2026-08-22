@@ -25,6 +25,8 @@
     "test:package": "node scripts/package-smoke.mjs",
     "test:site": "node scripts/check-static-site.mjs",
     "test:hosts": "node scripts/host-runtime-fixture.mjs --host fixture",
+    "adoption:quickstart": "node scripts/host-runtime-fixture.mjs --host fixture",
+    "adoption:workbuddy-compat": "node scripts/host-runtime-fixture.mjs --host workbuddy-compat",
     "test:harness": "pnpm build && node --test integrations/deepseek-harness/tests/*.test.js",
     "test:host:codex": "node scripts/host-runtime-fixture.mjs --host codex --output .lwc/host-runtime/codex.json",
     "test:host:claude": "node scripts/host-runtime-fixture.mjs --host claude-code --output .lwc/host-runtime/claude-code.json",
