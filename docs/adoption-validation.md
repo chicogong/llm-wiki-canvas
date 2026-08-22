@@ -2,10 +2,13 @@
 
 This record covers one product only: LLM Wiki Canvas. It uses only the redistributable synthetic files under [`examples/host-fixture`](../examples/host-fixture/). No private Vault, account data, session, or host transcript belongs in this record.
 
-## Fixed candidate
+## Candidate identity
 
 - Candidate branch at D0: `agent/agent-knowledge-review-positioning`
-- Candidate commit at D0: `0b2fa6553fb7e06ad03ffd5d9096d9bff5d2e18b`
+- Baseline parent before the adoption-validation commits: `0b2fa6553fb7e06ad03ffd5d9096d9bff5d2e18b`
+- Candidate identity: capture the committed candidate at rerun time with `git rev-parse HEAD`.
+- Fixed candidate SHA: record the captured value in the external handoff report. This tracked document deliberately does not hard-code its own final commit SHA.
+- Required handoff state: the adoption-validation changes are committed and `git status --porcelain` is empty.
 - Fixture ID: `host-fixture-v1`
 - Fixture aggregate SHA-256: `22048691edf640ccbe8710eb8b3013b0cfe8738e39d37517c6d2ec52f1c46332`
 - Hash manifest: [`examples/host-fixture/fixture.sha256`](../examples/host-fixture/fixture.sha256)
@@ -88,7 +91,10 @@ star_source: lwc-adoption-v1 | other | not-observed
 Reproduction commands:
 
 ```bash
-git rev-parse HEAD
+candidate_sha="$(git rev-parse HEAD)"
+test -n "$candidate_sha"
+test -z "$(git status --porcelain)"
+printf '%s\n' "$candidate_sha"
 pnpm build
 npm run adoption:quickstart
 npm run adoption:workbuddy-compat
@@ -107,13 +113,16 @@ Record `cta_id`, `cta_source`, `install_source`, and `star_source` in the ledger
 
 ## Handoff to 明彻
 
-Use the fixed candidate and no private state:
+Resolve the committed candidate without embedding a self-referential SHA in this file:
 
 ```bash
-test "$(git rev-parse HEAD)" = "0b2fa6553fb7e06ad03ffd5d9096d9bff5d2e18b"
+candidate_sha="$(git rev-parse HEAD)"
+test -n "$candidate_sha"
+test -z "$(git status --porcelain)"
 git diff --check
 npm run adoption:quickstart
 npm run adoption:workbuddy-compat
+printf 'candidate=%s\n' "$candidate_sha"
 ```
 
-The fixed candidate is the current in-scope validation worktree on base commit `0b2fa6553fb7e06ad03ffd5d9096d9bff5d2e18b`; do not switch branches or discard its uncommitted files. Completion is the expected hashes and blocker above, a clean formal fixture, and an explicit `pending-real-host-validation` result for WorkBuddy. Do not review, apply, publish, push, or create a PR as part of this handoff.
+The external handoff report makes the printed SHA immutable for the recipient. Completion is a committed, clean worktree; the expected hashes and blocker above; and an explicit `pending-real-host-validation` result for WorkBuddy. Do not review, apply, publish, push, or create a PR as part of this handoff.
