@@ -15,8 +15,8 @@ importers:
         specifier: ^14.0.0
         version: 14.0.3
       cytoscape:
-        specifier: ^3.33.1
-        version: 3.34.0
+        specifier: ^3.34.1
+        version: 3.34.1
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
@@ -670,8 +670,8 @@ packages:
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
 
-  cytoscape@3.34.0:
-    resolution: {integrity: sha512-62rNSrioXw93uliKFBwjukeQyeWwH2PqDrTac31r2P6464u3AUvTk0xS4LVvT251g7IgkFunrI48ZEZGjywSOg==}
+  cytoscape@3.34.1:
+    resolution: {integrity: sha512-Lr0RvH9H75y9ar8h9Toy6u4lxRSCcxUq+hHcQ26sVWo6BnaQp1gwEZOYqwuYTZhyW7npyKnNLP8oJ2p1/3OZ7g==}
     engines: {node: '>=0.10'}
 
   data-urls@5.0.0:
@@ -1777,7 +1777,7 @@ snapshots:
 
   csstype@3.2.3: {}
 
-  cytoscape@3.34.0: {}
+  cytoscape@3.34.1: {}
 
   data-urls@5.0.0:
     dependencies:
