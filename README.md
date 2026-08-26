@@ -78,7 +78,7 @@ pnpm dev
 
 Open <http://127.0.0.1:4173>.
 
-The static Viewer reads only checked-in synthetic graph, draft, and proposal fixtures, so visitors can explore the review flow without local data. Real Drafts and Changes require the loopback-only `lwc serve` command; neither mode uploads a Vault.
+The static Viewer reads only checked-in, hash-verified synthetic graph, draft, and proposal fixtures, so visitors can explore the review flow without local data. Its CLI snippets are templates rather than runnable fixture paths. Real Drafts and Changes require the loopback-only `lwc serve` command; neither mode uploads a Vault.
 
 The demo build has a verifiable result:
 

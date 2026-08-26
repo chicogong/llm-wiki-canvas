@@ -3,43 +3,43 @@
     {
       "file": ".lwc/proposals/proposal-a11ce5afe001.json",
       "id": "proposal-a11ce5afe001",
-      "rootName": "atlas-wiki",
-      "summary": "Add a reviewed knowledge boundary",
+      "rootName": "agent-trends-zh",
+      "summary": "新增一条经审查的知识边界",
       "status": "proposed",
       "createdAt": "2026-08-14T00:10:00.000Z",
       "intake": {
         "id": "intake-a11ce5afe001",
-        "sourceName": "agent-review-notes.txt",
-        "sourceHash": "cbe0f145408b160d3dc08b4ca907ae1e4199e8574ae7882d19c08cea1e26a665",
-        "target": "concepts/Review Boundary.md",
-        "generator": "Synthetic demo"
+        "sourceName": "模拟审查资料.txt",
+        "sourceHash": "9afc4cfb9578cf77cb3bb841b5aadabf999138025d87605b1da5d73672b00290",
+        "target": "concepts/人工审查边界.md",
+        "generator": "模拟 Agent"
       },
       "changes": [
         {
-          "path": "concepts/Review Boundary.md",
+          "path": "concepts/人工审查边界.md",
           "operation": "create",
           "baseHash": null,
-          "contentHash": "a9e0fa59757d6fb8dcaa20f26a0175b0c3a1f812363693f152f63b3bae949ad3",
+          "contentHash": "e0a8a7e5561e5bff1a342b147d13495320c53f2b3f5b62159feacf537563f5c0",
           "targetState": "unchanged",
           "currentHash": null,
           "diff": [
             { "kind": "add", "text": "---" },
-            { "kind": "add", "text": "title: Review Boundary" },
+            { "kind": "add", "text": "title: 人工审查边界" },
             { "kind": "add", "text": "type: concept" },
             { "kind": "add", "text": "source: intake:intake-a11ce5afe001" },
             { "kind": "add", "text": "---" },
             { "kind": "add", "text": "" },
-            { "kind": "add", "text": "# Review Boundary" },
+            { "kind": "add", "text": "# 人工审查边界" },
             { "kind": "add", "text": "" },
-            { "kind": "add", "text": "Agent knowledge remains proposed until a person reviews the exact diff. See [[Human Review]]." }
+            { "kind": "add", "text": "Agent 生成的知识必须先作为 Proposal，经过人工核对精确 diff 后才能进入正式知识。参见 [[证据边界]]。" }
           ]
         }
       ],
       "topology": {
         "addedLinks": [
           {
-            "source": "concepts/Review Boundary.md",
-            "target": "Human Review",
+            "source": "concepts/人工审查边界.md",
+            "target": "证据边界",
             "kind": "wikilink"
           }
         ],

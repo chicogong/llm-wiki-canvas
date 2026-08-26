@@ -12,8 +12,8 @@
         "name": "Synthetic demo source",
         "path": "examples/demo-sources/agent-review-notes.txt",
         "snapshot": ".source/agent-review-notes.txt",
-        "sha256": "1e5aaca45daa31047bb96923374c69341ba71f2d96080c98a08e75ccf0f3d72f",
-        "bytes": 157,
+        "sha256": "cbe0f145408b160d3dc08b4ca907ae1e4199e8574ae7882d19c08cea1e26a665",
+        "bytes": 132,
         "state": "verified",
         "snapshotState": "verified",
         "snapshotContent": "Decision: Markdown remains the source of truth. Boundary: Agent-generated knowledge must enter a Proposal and wait for human review."
@@ -22,7 +22,7 @@
         "path": "concepts/Review Boundary.md",
         "initialHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "state": "edited",
-        "currentHash": "8fa41a0bd47b323d413d34a63659e6ffc40d678c6508f864c28fc0aaa7b6aa87",
+        "currentHash": "2b1a2cf19e3719f29763ea6ae7aeb3af3f5da234cc28a504667eda51c3475e0b",
         "content": "---\ntitle: Review Boundary\ntype: concept\nsource: intake:intake-a11ce5afe002\n---\n\n# Review Boundary\n\nAgent knowledge remains proposed until a person reviews the exact diff. See [[Human Review]].",
         "scope": "declared-only"
       },

@@ -87,7 +87,7 @@ pnpm dev
 
 浏览器打开 <http://127.0.0.1:4173/?lang=zh-CN>；右上角可以随时切回英文 Atlas。
 
-静态 Viewer 只读取仓库内置的模拟关系图、草稿和 Proposal，让访客在不接触本地数据的情况下体验审查流程。真实 Drafts 和 Changes 需要本机回环地址上的 `lwc serve`；两种模式都不会上传 Vault。
+静态 Viewer 只读取仓库内置并经过哈希校验的模拟关系图、草稿和 Proposal，让访客在不接触本地数据的情况下体验审查流程；其中 CLI 片段只是命令格式示例，不是可运行的模拟路径。真实 Drafts 和 Changes 需要本机回环地址上的 `lwc serve`；两种模式都不会上传 Vault。
 
 示例构建结果可以直接验证：
 
