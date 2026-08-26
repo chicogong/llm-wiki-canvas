@@ -213,8 +213,12 @@ test("@smoke localizes the public review demo in Chinese", async ({ page }, test
   if (testInfo.project.name === "mobile") {
     const evidenceValueWidth = await page.locator(".evidence-ledger dd").first().evaluate((element) => element.getBoundingClientRect().width);
     expect(evidenceValueWidth).toBeGreaterThan(240);
-    const touchTargets = await page.locator(".mobile-nav button, .inbox-filters button").evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().height));
-    expect(Math.min(...touchTargets)).toBeGreaterThanOrEqual(44);
+    const touchTargets = await page.locator(".mobile-nav button, .inbox-filters button, .locale-switch, .demo-disclosure a").evaluateAll((elements) => elements.map((element) => {
+      const rect = element.getBoundingClientRect();
+      return { width: rect.width, height: rect.height };
+    }));
+    expect(Math.min(...touchTargets.map((target) => target.width))).toBeGreaterThanOrEqual(44);
+    expect(Math.min(...touchTargets.map((target) => target.height))).toBeGreaterThanOrEqual(44);
   }
   await page.getByRole("button", { name: /变更/ }).click();
   await expect(page).toHaveURL(/view=changes/);
