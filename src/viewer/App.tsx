@@ -314,7 +314,7 @@ function TrustInspector({ node }: { node: WikiNode }) {
   return <section className={`trust-inspector tier-${trust.tier}${trust.stale ? " is-stale" : ""}`} aria-label="Knowledge trust signals">
     <header>
       <div><p className="section-kicker">OKF trust signals</p><h3>Evidence, not a score</h3></div>
-      <span className="trust-tier"><i />{TRUST_LABEL[trust.tier]}</span>
+      <span className="trust-tier"><i aria-hidden="true" />{TRUST_LABEL[trust.tier]}</span>
     </header>
     <div className="trust-signal-grid">
       <article>
@@ -369,7 +369,7 @@ function MapView({ graph, selectedId, onSelect, copy }: { graph: WikiGraph; sele
         <label className="search-field">
           <Icon><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></Icon>
           <span className="sr-only">{copy.searchLabel}</span>
-          <input ref={searchRef} name="wiki-search" autoComplete="off" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.searchPlaceholder} />
+          <input ref={searchRef} name="wiki-search" autoComplete="off" spellCheck={false} type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.searchPlaceholder} />
           <kbd>⌘ K</kbd>
         </label>
         <div className="kind-tabs" role="group" aria-label={copy.filterLabel}>
@@ -382,7 +382,7 @@ function MapView({ graph, selectedId, onSelect, copy }: { graph: WikiGraph; sele
       <div className="canvas-frame">
         <GraphStage graph={graph} visibleIds={visibleIds} selectedId={selectedId} onSelect={onSelect} copy={copy} />
         <div className="legend" aria-label={copy.mapLegend}>
-          {KINDS.slice(1).map((item) => <span key={item}><i className={`dot ${item}`} />{kindLabel(copy, item)}</span>)}
+          {KINDS.slice(1).map((item) => <span key={item}><i className={`dot ${item}`} aria-hidden="true" />{kindLabel(copy, item)}</span>)}
         </div>
         <div className="canvas-help">{copy.canvasHelp}</div>
       </div>
@@ -421,7 +421,7 @@ function HealthView({ graph, onOpenPage, copy }: { graph: WikiGraph; onOpenPage:
       </section>
       <section className="health-card">
         <div className="card-title"><div><p className="section-kicker">{copy.structure}</p><h3>{copy.pageTypes}</h3></div><span>{graph.nodes.length} {copy.total}</span></div>
-        <div className="kind-breakdown">{kindCounts.map((item) => <div key={item.value}><span><i className={`dot ${item.value}`} />{item.label}</span><b>{item.count}</b><i className="bar"><i style={{ width: `${graph.nodes.length ? item.count / graph.nodes.length * 100 : 0}%` }} /></i></div>)}</div>
+        <div className="kind-breakdown">{kindCounts.map((item) => <div key={item.value}><span><i className={`dot ${item.value}`} aria-hidden="true" />{item.label}</span><b>{item.count}</b><i className="bar" aria-hidden="true"><i style={{ width: `${graph.nodes.length ? item.count / graph.nodes.length * 100 : 0}%` }} /></i></div>)}</div>
       </section>
       <section className="health-card hubs-card">
         <div className="card-title"><div><p className="section-kicker">{copy.navigation}</p><h3>{copy.mostConnected}</h3></div><span>{copy.top} {hubs.length}</span></div>
@@ -457,10 +457,10 @@ function Lifecycle({ proposal, copy }: { proposal: ProposalInboxItem; copy: Revi
   const reviewed = proposal.status === "reviewed" || applied;
   const rejected = proposal.status === "rejected";
   return <ol className={`lifecycle ${rejected ? "rejected" : ""}`} aria-label={copy.lifecycle}>
-    <li className="complete"><i>✓</i><span><strong>{copy.proposed}</strong><small>{proposal.createdAt.slice(0, 10)}</small></span></li>
-    {rejected ? <li className="current rejected"><i>×</i><span><strong>{copy.rejected}</strong><small>{proposal.rejection?.rejectedAt.slice(0, 10) ?? copy.decisionRecorded}</small></span></li> : <>
-      <li className={reviewed ? "complete" : "current"}><i>{reviewed ? "✓" : "2"}</i><span><strong>{copy.reviewed}</strong><small>{proposal.review?.reviewedAt.slice(0, 10) ?? copy.humanDecision}</small></span></li>
-      <li className={applied ? "complete" : reviewed ? "current" : "pending"}><i>{applied ? "✓" : "3"}</i><span><strong>{copy.applied}</strong><small>{proposal.application?.appliedAt.slice(0, 10) ?? copy.unchanged}</small></span></li>
+    <li className="complete"><i aria-hidden="true">✓</i><span><strong>{copy.proposed}</strong><small>{readableDate(proposal.createdAt)}</small></span></li>
+    {rejected ? <li className="current rejected"><i aria-hidden="true">×</i><span><strong>{copy.rejected}</strong><small>{proposal.rejection ? readableDate(proposal.rejection.rejectedAt) : copy.decisionRecorded}</small></span></li> : <>
+      <li className={reviewed ? "complete" : "current"}><i aria-hidden="true">{reviewed ? "✓" : "2"}</i><span><strong>{copy.reviewed}</strong><small>{proposal.review ? readableDate(proposal.review.reviewedAt) : copy.humanDecision}</small></span></li>
+      <li className={applied ? "complete" : reviewed ? "current" : "pending"}><i aria-hidden="true">{applied ? "✓" : "3"}</i><span><strong>{copy.applied}</strong><small>{proposal.application ? readableDate(proposal.application.appliedAt) : copy.unchanged}</small></span></li>
     </>}
   </ol>;
 }
@@ -497,7 +497,7 @@ function TopologyPreview({ proposal, copy }: { proposal: ProposalInboxItem; copy
         {linkChanges === 0 && <div className="topology-stable"><span>＝</span><div><strong>{copy.noRelationshipChanges}</strong><small>{copy.contentOnly}</small></div></div>}
       </div>
     </div>
-    <div className="topology-legend"><span><i className="amber" />{copy.pageChanged}</span><span><i className="green" />{copy.linkAdded}</span><span><i className="red" />{copy.linkRemoved}</span></div>
+    <div className="topology-legend"><span><i className="amber" aria-hidden="true" />{copy.pageChanged}</span><span><i className="green" aria-hidden="true" />{copy.linkAdded}</span><span><i className="red" aria-hidden="true" />{copy.linkRemoved}</span></div>
   </section>;
 }
 
@@ -567,7 +567,7 @@ function ChangesView({ inbox, error, copy, demo }: { inbox?: ProposalInbox; erro
         {filtered.map((proposal) => <button key={proposal.id} className={proposal.id === selectedId ? "active" : ""} onClick={() => setSelectedId(proposal.id)}>
           <span className={`proposal-status ${proposal.status}`}>{copy.proposalStatus[proposal.status]}</span>
           <strong>{proposal.summary}</strong>
-          <small>{proposal.changes.length} {proposal.changes.length === 1 ? copy.file : copy.files} · {proposal.createdAt.slice(0, 10)}</small>
+          <small>{proposal.changes.length} {proposal.changes.length === 1 ? copy.file : copy.files} · {readableDate(proposal.createdAt)}</small>
           <code>{proposal.id}</code>
         </button>)}
         {!filtered.length && <div className="inbox-empty"><strong>{proposals.length ? copy.noProposalsState : copy.noProposals}</strong><p>{proposals.length ? copy.chooseFilter : copy.proposalsBoundary}</p>{!proposals.length && <code>lwc proposal create &lt;vault&gt; --from &lt;draft&gt;</code>}</div>}
@@ -583,9 +583,9 @@ function DraftRelay({ draft, copy }: { draft: DraftInboxItem; copy: ReviewCopy }
   const draftComplete = draft.draft.state === "edited" && draft.draft.scope === "declared-only";
   const proposalComplete = draft.proposal?.state === "verified";
   return <ol className="evidence-relay" aria-label={copy.sourceChain}>
-    <li className={sourceComplete ? "complete" : "blocked"}><i>{sourceComplete ? "✓" : "!"}</i><span><b>01</b><strong>{copy.source}</strong><small>{sourceComplete ? copy.sourceVerified : copy.evidenceAttention}</small></span></li>
-    <li className={draftComplete ? "complete current" : draft.state === "blocked" ? "blocked current" : "current"}><i>{draftComplete ? "✓" : draft.state === "blocked" ? "!" : "2"}</i><span><b>02</b><strong>{copy.draft}</strong><small>{draft.draft.state === "edited" ? draft.draft.scope === "declared-only" ? copy.isolatedEdit : copy.scopeExpanded : draft.draft.state === "placeholder" ? copy.placeholder : copy.draftMissing}</small></span></li>
-    <li className={proposalComplete ? "complete" : "pending"}><i>{proposalComplete ? "✓" : "3"}</i><span><b>03</b><strong>{copy.proposal}</strong><small>{proposalComplete ? copy.provenanceVerified : copy.notInQueue}</small></span></li>
+    <li className={sourceComplete ? "complete" : "blocked"}><i aria-hidden="true">{sourceComplete ? "✓" : "!"}</i><span><b>01</b><strong>{copy.source}</strong><small>{sourceComplete ? copy.sourceVerified : copy.evidenceAttention}</small></span></li>
+    <li className={draftComplete ? "complete current" : draft.state === "blocked" ? "blocked current" : "current"}><i aria-hidden="true">{draftComplete ? "✓" : draft.state === "blocked" ? "!" : "2"}</i><span><b>02</b><strong>{copy.draft}</strong><small>{draft.draft.state === "edited" ? draft.draft.scope === "declared-only" ? copy.isolatedEdit : copy.scopeExpanded : draft.draft.state === "placeholder" ? copy.placeholder : copy.draftMissing}</small></span></li>
+    <li className={proposalComplete ? "complete" : "pending"}><i aria-hidden="true">{proposalComplete ? "✓" : "3"}</i><span><b>03</b><strong>{copy.proposal}</strong><small>{proposalComplete ? copy.provenanceVerified : copy.notInQueue}</small></span></li>
   </ol>;
 }
 
@@ -771,16 +771,16 @@ export function App() {
       <div className="brand"><span className="brand-mark" aria-hidden="true"><i /><i /></span><div><strong>LLM Wiki Canvas</strong><small>{copy.localWorkbench}</small></div></div>
       <div className="vault-label"><span>{copy.vaultLabel}</span><strong>{graph.rootName}</strong></div>
       <AppNavigation view={view} onView={selectView} drafts={activeDrafts} changes={openChanges} live={live} copy={copy} />
-      <div className="sidebar-note"><span className="status-dot" /><div><strong>{live ? copy.watchingSource : copy.demoEvidence}</strong><small>{live ? copy.liveProjection : copy.demoEvidenceDescription}</small></div></div>
+      <div className="sidebar-note"><span className="status-dot" aria-hidden="true" /><div><strong>{live ? copy.watchingSource : copy.demoEvidence}</strong><small>{live ? copy.liveProjection : copy.demoEvidenceDescription}</small></div></div>
     </aside>
 
     <section className={`workbench ${live ? "is-live" : "is-demo"}`} id="workspace-content">
       <header className="topbar">
         <div className="mobile-brand"><span className="brand-mark" aria-hidden="true"><i /><i /></span><strong>{graph.rootName}</strong></div>
         <div className="breadcrumb"><span>{graph.rootName}</span><b>/</b><strong>{viewTitle}</strong></div>
-        <div className="evidence-route" aria-label={copy.evidenceWorkflow}><span>{copy.markdown}</span><i /> <span>{copy.map}</span><i /> <strong>{copy.review}</strong></div>
+        <div className="evidence-route" aria-label={copy.evidenceWorkflow}><span>{copy.markdown}</span><i aria-hidden="true" /> <span>{copy.map}</span><i aria-hidden="true" /> <strong>{copy.review}</strong></div>
         <a className="locale-switch" href={localeHref(locale)} hrefLang={locale === "en" ? "zh-CN" : "en"}>{copy.languageName}</a>
-        <div className="topbar-meta">{graph.okf && <span className="okf-version">OKF {graph.okf.version}</span>}<span className="status-dot" />{live ? copy.live : copy.generated} {graph.generatedAt.slice(0, 10)}</div>
+        <div className="topbar-meta">{graph.okf && <span className="okf-version">OKF {graph.okf.version}</span>}<span className="status-dot" aria-hidden="true" />{live ? copy.live : copy.generated} {readableDate(graph.generatedAt)}</div>
       </header>
       {!live && view === "map" && <ProductThesis copy={copy} locale={locale} />}
       {!live && <section className="demo-disclosure" aria-label={copy.demoTitle}><div><strong>{copy.demoTitle}</strong><span>{copy.demoDescription}</span></div><code>npm i -g llm-wiki-canvas</code><a href={locale === "zh-CN" ? "https://github.com/chicogong/llm-wiki-canvas/blob/main/README.zh-CN.md#快速开始" : "https://github.com/chicogong/llm-wiki-canvas#quick-start"}>{copy.quickStart}</a></section>}

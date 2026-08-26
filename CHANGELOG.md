@@ -6,6 +6,7 @@ All notable changes will be documented here. This project follows Semantic Versi
 
 ### Changed
 
+- Rebuilt the Drafts and Changes workbench layout around readable evidence dossiers, corrected nested ledger and comparison grids, aligned the three-stage review lifecycle, restored a keyboard-accessible page picker at narrow widths, and added breakpoint regressions for long paths and hashes.
 - Clarified synthetic versus live evidence throughout the public Demo, localized its Chinese review fixtures and operation labels, and changed non-runnable demo commands into explicit templates.
 - Added shareable `view` query state, 44px mobile navigation/filter targets, and build-time SHA-256 verification for every checked-in demo evidence chain.
 - Made the public Viewer demonstrate the read-only Drafts and Changes review loop with sanitized synthetic evidence, and completed Chinese localization for the core review workflow.
