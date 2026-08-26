@@ -43,22 +43,23 @@ Acceptance output must contain:
 | Host | Evidence | Result | Elapsed | Comparable result |
 | --- | --- | --- | ---: | --- |
 | Codex | Current Codex session executed the local CLI flow | Passed to Proposal review gate | 22 s from Intake creation | Context hash, source hash, target, content hash, and unreviewed-apply blocker matched |
-| Tencent WorkBuddy | Local compatibility fixture only | **Pending real host validation** | 19 s | Same context/source/content hashes and blocker; generator label differs as expected |
+| Tencent WorkBuddy v5.3.14 | Signed-in desktop workspace, Default Permissions, explicitly attached `AGENTS.md` and canonical `SKILL.md` | Passed to Proposal review gate | 2 m 8 s host task; 0.31 s CLI work | Same fixture/context/source/target semantics; formal Markdown unchanged; apply deliberately not attempted |
 
-Shared proposed content SHA-256: `8fa41a0bd47b323d413d34a63659e6ffc40d678c6508f864c28fc0aaa7b6aa87`. The formal baseline remained unchanged in both runs. Proposal IDs differ because generator identity is part of proposal provenance.
+Codex proposed content SHA-256: `8fa41a0bd47b323d413d34a63659e6ffc40d678c6508f864c28fc0aaa7b6aa87`. WorkBuddy proposed content SHA-256: `2e5e71cc2b5d74c2e1d1012c4425b0297a11f6e6d4b6f267ad723796918f8989`. The formal baseline remained unchanged in both runs. Proposal IDs and content hashes differ because generator identity and valid Markdown formatting differ; the required evidence semantics match.
 
-Comparison rules are explicit: both hosts must preserve the exact fixture, context, and source hashes; the proposed text must retain all three source semantics (Markdown is truth, Agent content enters a Proposal, and apply waits for human review); and unreviewed apply must fail closed. Record the proposed content hash even when semantically valid formatting differs. D0 happened to produce the same content hash in both paths.
+Comparison rules are explicit: both hosts must preserve the exact fixture, context, and source hashes; the proposed text must retain all three source semantics (Markdown is truth, Agent content enters a Proposal, and apply waits for human review); and unreviewed apply must fail closed. Record the proposed content hash even when semantically valid formatting differs. D0 produced different content hashes with equivalent required semantics, so no byte-equality claim is made.
 
 Failure and correction:
 
 - The first Codex edit assumed a generic draft placeholder. Intake actually generated provenance frontmatter. Codex read the generated draft, preserved `source` and `source_sha256`, and edited only the declared body and metadata.
 - No `workbuddy` or `workbuddy-cli` executable was available. The installed `codebuddy` executable was not used because CodeBuddy is a different host and would not prove WorkBuddy adoption.
-- The full unit command passed 55 tests but two loopback-server tests could not start because this sandbox rejects listening on `127.0.0.1` with `EPERM`. All 54 non-listening tests passed in the focused rerun; 明彻 must rerun the two server tests in a normal local environment.
+- The later real-host rerun used the installed WorkBuddy desktop app rather than substituting CodeBuddy. WorkBuddy created `intake-04b6f0004ced` and `proposal-f7f8909e212c`, preserved source SHA-256 `1e5aaca45daa31047bb96923374c69341ba71f2d96080c98a08e75ccf0f3d72f`, and left formal `vault/index.md` at SHA-256 `4d370bbc80186ded0b7b42a9ac4d41f5b5d2f1d63938464580733d598a2680ba`.
+- An earlier isolated sandbox could not bind two loopback-server tests on `127.0.0.1`. The candidate was rerun in the normal repository environment on 2026-08-26: all 57 core tests, 20 production Viewer E2E tests, and 2 live Workbench E2E tests passed through `pnpm verify`.
 - The sensitive-information scan initially found absolute paths inside ignored `.lwc/adoption-d0-*` workspaces. Those generated workspaces were moved out of the repository; the subsequent scan passed, and no local host transcript or `.lwc` state is part of the candidate.
 
-Exact WorkBuddy human gate: a user must open a real signed-in WorkBuddy workspace, select a copy of this synthetic fixture as the working directory, attach `@AGENTS.md` and `@.agents/skills/llm-wiki-canvas/SKILL.md`, keep normal permission prompts enabled, and run `task.md`. Stop if it requests another login, plugin installation, account connection, broader filesystem access, or non-public data. Until those steps complete, the status remains `pending-real-host-validation`.
+Exact WorkBuddy human gate: a user must open a real signed-in WorkBuddy workspace, select a copy of this synthetic fixture as the working directory, attach `@AGENTS.md` and `@.agents/skills/llm-wiki-canvas/SKILL.md`, keep normal permission prompts enabled, and run `task.md`. Stop if it requests another login, plugin installation, account connection, broader filesystem access, or non-public data. This gate passed on 2026-08-22 with WorkBuddy v5.3.14; no login, installation, new connection, broader filesystem grant, or private data was required.
 
-The machine-readable D0 rows are in [`docs/adoption-ledger.csv`](adoption-ledger.csv). `not-observed` means no installation or Star was attributed; it is not zero demand.
+The machine-readable D0 rows are in [`docs/adoption-ledger.csv`](adoption-ledger.csv). They retain host version, evidence kind, known hashes, write-safety result, and attribution fields. `not-recorded` preserves an evidence gap instead of inventing a historical value; `not-observed` means no installation or Star was attributed, not zero demand.
 
 ## D+7 template — do not fill early
 
@@ -79,7 +80,7 @@ context_hash:
 source_hash:
 content_hash:
 formal_markdown_changed: false | true
-apply_without_review: blocked | unexpected-pass
+apply_without_review: blocked | not-attempted | unexpected-pass
 failure:
 correction:
 cta_id: lwc-adoption-v1
@@ -111,7 +112,7 @@ CTA ID `lwc-adoption-v1` has one canonical destination:
 
 Record `cta_id`, `cta_source`, `install_source`, and `star_source` in the ledger. Do not publish the CTA from this task, solicit a Star, or infer attribution without an observed source.
 
-## Handoff to 明彻
+## Independent verification handoff
 
 Resolve the committed candidate without embedding a self-referential SHA in this file:
 
@@ -125,4 +126,4 @@ npm run adoption:workbuddy-compat
 printf 'candidate=%s\n' "$candidate_sha"
 ```
 
-The external handoff report makes the printed SHA immutable for the recipient. Completion is a committed, clean worktree; the expected hashes and blocker above; and an explicit `pending-real-host-validation` result for WorkBuddy. Do not review, apply, publish, push, or create a PR as part of this handoff.
+The verification report makes the printed SHA immutable for the recipient. Completion is a committed, clean worktree; the expected hashes and blocker above; and a real WorkBuddy pass to the Proposal review gate. The verifier must not review or apply a Proposal; repository publication remains a separate maintainer decision.
