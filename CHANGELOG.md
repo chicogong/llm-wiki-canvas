@@ -6,6 +6,8 @@ All notable changes will be documented here. This project follows Semantic Versi
 
 ### Changed
 
+- Made the public Viewer demonstrate the read-only Drafts and Changes review loop with sanitized synthetic evidence, and completed Chinese localization for the core review workflow.
+- Fixed the live Workbench to load the served Vault graph instead of bundled demo data, ignored external Markdown URLs during relationship analysis, and removed the Cytoscape font-family warning.
 - Reframed the product around its narrowest differentiated job: Git-style change control for AI-maintained Markdown knowledge, with bounded evidence, isolated drafts, hash-bound proposals, and human-controlled write-back.
 - Reordered the README, comparison guide, workflows, roadmap, package metadata, and static Demo so graphs and Canvas support the review workflow instead of defining the product.
 - Added a bilingual review-spine introduction to the static Demo while preserving the local-first Workbench and its existing evidence views.
