@@ -1,0 +1,52 @@
+{
+  "proposals": [
+    {
+      "file": ".lwc/proposals/proposal-a11ce5afe001.json",
+      "id": "proposal-a11ce5afe001",
+      "rootName": "atlas-wiki",
+      "summary": "Add a reviewed knowledge boundary",
+      "status": "proposed",
+      "createdAt": "2026-08-14T00:10:00.000Z",
+      "intake": {
+        "id": "intake-a11ce5afe001",
+        "sourceName": "agent-review-notes.txt",
+        "sourceHash": "1e5aaca45daa31047bb96923374c69341ba71f2d96080c98a08e75ccf0f3d72f",
+        "target": "concepts/Review Boundary.md",
+        "generator": "Synthetic demo"
+      },
+      "changes": [
+        {
+          "path": "concepts/Review Boundary.md",
+          "operation": "create",
+          "baseHash": null,
+          "contentHash": "8fa41a0bd47b323d413d34a63659e6ffc40d678c6508f864c28fc0aaa7b6aa87",
+          "targetState": "unchanged",
+          "currentHash": null,
+          "diff": [
+            { "kind": "add", "text": "---" },
+            { "kind": "add", "text": "title: Review Boundary" },
+            { "kind": "add", "text": "type: concept" },
+            { "kind": "add", "text": "source: intake:intake-a11ce5afe001" },
+            { "kind": "add", "text": "---" },
+            { "kind": "add", "text": "" },
+            { "kind": "add", "text": "# Review Boundary" },
+            { "kind": "add", "text": "" },
+            { "kind": "add", "text": "Agent knowledge remains proposed until a person reviews the exact diff. See [[Human Review]]." }
+          ]
+        }
+      ],
+      "topology": {
+        "addedLinks": [
+          {
+            "source": "concepts/Review Boundary.md",
+            "target": "Human Review",
+            "kind": "wikilink"
+          }
+        ],
+        "removedLinks": [],
+        "conflicts": []
+      }
+    }
+  ],
+  "issues": []
+}

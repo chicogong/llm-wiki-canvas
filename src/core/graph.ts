@@ -47,6 +47,7 @@ function extractLinks(content: string): RawLink[] {
   const markdown = /(?<!!)\[([^\]]+)\]\(\s*(?:<([^>]+)>|([^)]+?))\s*\)/g;
   for (const match of content.matchAll(markdown)) {
     const href = String(match[2] ?? match[3]).trim().replace(/\s+["'][^"']*["']$/, "");
+    if (/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(href)) continue;
     if (!/\.md(?:#.*)?$/i.test(href)) continue;
     links.push({ target: href.split("#")[0], label: match[1].trim(), kind: "markdown" });
   }

@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync, rmSync } from "node:fs";
+import { appendFileSync, cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { spawn, spawnSync } from "node:child_process";
 import path from "node:path";
 
@@ -13,6 +13,8 @@ rmSync(fixture, { recursive: true, force: true });
 mkdirSync(fixture, { recursive: true });
 cpSync(path.join(root, "examples", "atlas-wiki"), vault, { recursive: true });
 cpSync(path.join(root, "examples", "proposal-draft"), draft, { recursive: true });
+appendFileSync(path.join(vault, "index.md"), "\n[[Live Only Evidence]]\n");
+writeFileSync(path.join(vault, "Live Only Evidence.md"), "# Live Only Evidence\n\nThis page exists only in the loopback Workbench fixture.\n");
 
 const created = spawnSync(process.execPath, [
   "dist/index.js", "proposal", "create", vault,

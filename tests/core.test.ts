@@ -177,6 +177,23 @@ describe("wiki graph compiler", () => {
     expect(graph.stats.brokenLinks).toBe(0);
   });
 
+  it("ignores external Markdown URLs while preserving local Markdown relationships", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "lwc-external-links-"));
+    await writeFile(path.join(root, "index.md"), [
+      "# Home",
+      "[Local](Guide.md)",
+      "[HTTPS](https://github.com/example/project/blob/main/README.md)",
+      "[Protocol relative](//example.com/Guide.md)",
+      "[File URI](file:///private/Guide.md)",
+      "",
+    ].join("\n"));
+    await writeFile(path.join(root, "Guide.md"), "# Guide\n");
+    const graph = await buildGraph(root);
+    expect(graph.edges).toHaveLength(1);
+    expect(graph.edges[0]).toMatchObject({ kind: "markdown" });
+    expect(graph.stats.brokenLinks).toBe(0);
+  });
+
   it("deduplicates repeated relationships and excludes agent schema files", async () => {
     const root = await mkdtemp(path.join(tmpdir(), "lwc-dedupe-"));
     await writeFile(path.join(root, "index.md"), "# Home\n[[Topic]] and again [[Topic]].\n");

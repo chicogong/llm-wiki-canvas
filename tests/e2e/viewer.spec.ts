@@ -151,7 +151,7 @@ test("@smoke opens the Chinese technology radar and searches its mock knowledge"
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
   await expect(page.getByRole("heading", { name: "Agent 可以写，知识不能悄悄失控。" })).toBeVisible();
   await expect(page.getByText("查看支撑审查的证据关系图")).toBeVisible();
-  await expect(page.getByText("9 个模拟页面 · 来源可核对 · 不读取本地文件")).toBeVisible();
+  await expect(page.getByText("模拟关系图 + 只读草稿和 Proposal · 不读取本地文件")).toBeVisible();
   const search = page.getByRole("searchbox", { name: "搜索页面" });
   await search.fill("DeepSeek");
   await expect(page.getByText("2 / 9")).toBeVisible();
@@ -161,6 +161,39 @@ test("@smoke opens the Chinese technology radar and searches its mock knowledge"
   await expect(page.getByRole("link", { name: "EN" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath("agent-trends-zh.png"), fullPage: true });
+  expect(errors).toEqual([]);
+});
+
+test("@smoke previews the read-only review loop in the public demo", async ({ page }) => {
+  const errors = await openWorkbench(page);
+  await page.getByRole("button", { name: /Drafts/ }).click();
+  await expect(page.getByTestId("drafts-view")).toBeVisible();
+  await expect(page.getByText("Ready to propose").first()).toBeVisible();
+  await expect(page.getByText("Synthetic demo source").first()).toBeVisible();
+  await page.getByRole("button", { name: /Changes/ }).click();
+  await expect(page.getByTestId("changes-view")).toBeVisible();
+  await expect(page.getByText("Add a reviewed knowledge boundary").first()).toBeVisible();
+  await expect(page.getByText("The Workbench does not make this decision.")).toBeVisible();
+  expect(await page.getByRole("button", { name: /apply/i }).count()).toBe(0);
+  expect(errors).toEqual([]);
+});
+
+test("@smoke localizes the public review demo in Chinese", async ({ page }, testInfo) => {
+  const errors: string[] = [];
+  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/?lang=zh-CN");
+  await page.getByRole("button", { name: /草稿/ }).click();
+  await expect(page.getByRole("heading", { name: "草稿", exact: true })).toBeVisible();
+  await expect(page.getByText("可创建 Proposal").first()).toBeVisible();
+  if (testInfo.project.name === "mobile") {
+    const evidenceValueWidth = await page.locator(".evidence-ledger dd").first().evaluate((element) => element.getBoundingClientRect().width);
+    expect(evidenceValueWidth).toBeGreaterThan(240);
+  }
+  await page.getByRole("button", { name: /变更/ }).click();
+  await expect(page.getByTestId("changes-view").getByRole("heading", { name: "变更收件箱", exact: true })).toBeVisible();
+  await expect(page.getByText("等待审查").first()).toBeVisible();
+  await expect(page.getByText("工作台不会替你做决定。")).toBeVisible();
   expect(errors).toEqual([]);
 });
 

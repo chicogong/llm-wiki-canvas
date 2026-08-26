@@ -70,6 +70,7 @@ function extractLinks(source: string, content: string): ProposalTopologyLink[] {
   const markdown = /(?<!!)\[[^\]]+\]\(\s*(?:<([^>]+)>|([^)]+?))\s*\)/g;
   for (const match of content.matchAll(markdown)) {
     const href = String(match[1] ?? match[2]).trim().replace(/\s+["'][^"']*["']$/, "");
+    if (/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(href)) continue;
     if (/\.md(?:#.*)?$/i.test(href)) links.push({ source, target: href.split("#")[0], kind: "markdown" });
   }
   return [...new Map(links.map((link) => [`${link.source}\u0000${link.kind}\u0000${link.target}`, link])).values()];
