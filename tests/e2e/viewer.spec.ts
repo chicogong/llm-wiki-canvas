@@ -192,6 +192,24 @@ test("@smoke localizes the public review demo in Chinese", async ({ page }, test
   }
   await expect(page.getByText("只读 · 模拟演示", { exact: true })).toBeVisible();
   await expect(page.getByText("模拟审查资料").first()).toBeVisible();
+  if (testInfo.project.name === "desktop") {
+    const ledgerLayout = await page.locator(".evidence-ledger").evaluate((ledger) => {
+      const panel = ledger.closest(".dossier-panel");
+      const row = ledger.querySelector("dl:first-of-type > div:first-child");
+      const value = row?.querySelector("dd");
+      const comparisonCards = Array.from(document.querySelectorAll(".evidence-compare > article"));
+      return {
+        panelWidth: panel?.getBoundingClientRect().width ?? 0,
+        rowWidth: row?.getBoundingClientRect().width ?? 0,
+        valueWidth: value?.getBoundingClientRect().width ?? 0,
+        comparisonWidths: comparisonCards.map((card) => card.getBoundingClientRect().width),
+      };
+    });
+    expect(ledgerLayout.panelWidth).toBeGreaterThan(620);
+    expect(ledgerLayout.rowWidth).toBeGreaterThan(480);
+    expect(ledgerLayout.valueWidth).toBeGreaterThan(340);
+    expect(Math.min(...ledgerLayout.comparisonWidths)).toBeGreaterThan(480);
+  }
   if (testInfo.project.name === "mobile") {
     const evidenceValueWidth = await page.locator(".evidence-ledger dd").first().evaluate((element) => element.getBoundingClientRect().width);
     expect(evidenceValueWidth).toBeGreaterThan(240);
@@ -327,11 +345,32 @@ test("@smoke remains usable on a narrow viewport", async ({ page }, testInfo) =>
   const errors = await openWorkbench(page);
   await expect(page.getByRole("group", { name: "Filter by page type" })).toBeVisible();
   await expect(page.getByRole("searchbox", { name: "Search pages" })).toBeEditable();
+  await expect(page.getByRole("combobox", { name: "Open page" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByRole("button", { name: "Health", exact: true }).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath("workbench.png"), fullPage: true });
   expect(errors).toEqual([]);
+});
+
+test("@critical keeps review evidence readable across breakpoint edges", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop", "One browser project covers the explicit viewport matrix.");
+  for (const width of [901, 1024, 1025]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const view of ["drafts", "changes"]) {
+      await page.goto(`/?lang=zh-CN&view=${view}`);
+      const geometry = await page.evaluate(() => ({
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        compressedLongValues: Array.from(document.querySelectorAll("code, dd, h2, h3, .proposal-list strong")).filter((element) => {
+          const text = element.textContent?.trim() ?? "";
+          const width = element.getBoundingClientRect().width;
+          return text.length > 24 && width > 0 && width < 80;
+        }).length,
+      }));
+      expect(geometry.overflow).toBeLessThanOrEqual(1);
+      expect(geometry.compressedLongValues).toBe(0);
+    }
+  }
 });
 
 test("@critical exposes empty search state and remains keyboard reachable", async ({ page }) => {
