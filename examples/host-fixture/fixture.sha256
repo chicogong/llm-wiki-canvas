@@ -1,0 +1,6 @@
+# Canonical adoption fixture v1
+# Aggregate recipe: SHA-256 of the three sorted `<file-sha256><two spaces><relative-path>\n` lines below.
+aggregate  22048691edf640ccbe8710eb8b3013b0cfe8738e39d37517c6d2ec52f1c46332
+1e5aaca45daa31047bb96923374c69341ba71f2d96080c98a08e75ccf0f3d72f  source/decision.txt
+6201b5f95a8bfa0332f9d787109b69d03cf86c1a260b18fb5fc3a6253a1c95b3  task.md
+4d370bbc80186ded0b7b42a9ac4d41f5b5d2f1d63938464580733d598a2680ba  vault/index.md
