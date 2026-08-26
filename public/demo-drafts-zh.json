@@ -1,0 +1,37 @@
+{
+  "drafts": [
+    {
+      "file": ".lwc/drafts/intake-a11ce5afe002/intake.json",
+      "id": "intake-a11ce5afe002",
+      "rootName": "agent-trends-zh",
+      "status": "draft",
+      "state": "ready",
+      "createdAt": "2026-08-14T00:05:00.000Z",
+      "generator": "模拟 Agent",
+      "source": {
+        "name": "模拟审查资料",
+        "path": "examples/demo-sources/agent-review-notes-zh.txt",
+        "snapshot": ".source/agent-review-notes-zh.txt",
+        "sha256": "9afc4cfb9578cf77cb3bb841b5aadabf999138025d87605b1da5d73672b00290",
+        "bytes": 117,
+        "state": "verified",
+        "snapshotState": "verified",
+        "snapshotContent": "决定：Markdown 始终是事实源。边界：Agent 生成的知识必须进入 Proposal，并等待人工审查。"
+      },
+      "draft": {
+        "path": "concepts/人工审查边界.md",
+        "initialHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "state": "edited",
+        "currentHash": "78f1394f7ef74c7943ce64843a2d1b1cf8b3a375041c8044d1200088d5c99705",
+        "content": "---\ntitle: 人工审查边界\ntype: concept\nsource: intake:intake-a11ce5afe002\n---\n\n# 人工审查边界\n\nAgent 生成的知识必须先作为 Proposal，经过人工核对精确 diff 后才能进入正式知识。参见 [[证据边界]]。",
+        "scope": "declared-only"
+      },
+      "target": {
+        "operation": "create",
+        "currentHash": null
+      },
+      "blockers": []
+    }
+  ],
+  "issues": []
+}

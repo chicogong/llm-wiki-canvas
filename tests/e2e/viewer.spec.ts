@@ -173,7 +173,7 @@ test("@smoke previews the read-only review loop in the public demo", async ({ pa
   await page.getByRole("button", { name: /Changes/ }).click();
   await expect(page.getByTestId("changes-view")).toBeVisible();
   await expect(page.getByText("Add a reviewed knowledge boundary").first()).toBeVisible();
-  await expect(page.getByText("The Workbench does not make this decision.")).toBeVisible();
+  await expect(page.getByText("The read-only Demo does not make this decision.")).toBeVisible();
   expect(await page.getByRole("button", { name: /apply/i }).count()).toBe(0);
   expect(errors).toEqual([]);
 });
@@ -182,18 +182,34 @@ test("@smoke localizes the public review demo in Chinese", async ({ page }, test
   const errors: string[] = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/?lang=zh-CN");
-  await page.getByRole("button", { name: /草稿/ }).click();
+  await page.goto("/?lang=zh-CN&view=drafts");
   await expect(page.getByRole("heading", { name: "草稿", exact: true })).toBeVisible();
   await expect(page.getByText("可创建 Proposal").first()).toBeVisible();
+  expect(await page.getByText("本地证据", { exact: true }).count()).toBe(0);
+  if (testInfo.project.name === "desktop") {
+    await expect(page.getByText("模拟证据", { exact: true })).toBeVisible();
+    await expect(page.getByText("只读演示 · 不读取本地文件", { exact: true })).toBeVisible();
+  }
+  await expect(page.getByText("只读 · 模拟演示", { exact: true })).toBeVisible();
+  await expect(page.getByText("模拟审查资料").first()).toBeVisible();
   if (testInfo.project.name === "mobile") {
     const evidenceValueWidth = await page.locator(".evidence-ledger dd").first().evaluate((element) => element.getBoundingClientRect().width);
     expect(evidenceValueWidth).toBeGreaterThan(240);
+    const touchTargets = await page.locator(".mobile-nav button, .inbox-filters button").evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().height));
+    expect(Math.min(...touchTargets)).toBeGreaterThanOrEqual(44);
   }
   await page.getByRole("button", { name: /变更/ }).click();
+  await expect(page).toHaveURL(/view=changes/);
   await expect(page.getByTestId("changes-view").getByRole("heading", { name: "变更收件箱", exact: true })).toBeVisible();
   await expect(page.getByText("等待审查").first()).toBeVisible();
-  await expect(page.getByText("工作台不会替你做决定。")).toBeVisible();
+  await expect(page.getByText("新增一条经审查的知识边界").first()).toBeVisible();
+  await expect(page.getByText("新增", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("只读 Demo 不会替你做决定。")).toBeVisible();
+  await expect(page.getByText("命令格式示例，真实 Vault 中请替换路径与 ID。")).toBeVisible();
+  await expect(page.getByText("lwc proposal review <proposal.json> --approve <proposal-id> --reviewer \"<name>\"", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "EN", exact: true }).click();
+  await expect(page).toHaveURL(/lang=en.*view=changes|view=changes.*lang=en/);
+  await expect(page.getByTestId("changes-view")).toContainText("Add a reviewed knowledge boundary");
   expect(errors).toEqual([]);
 });
 

@@ -7,6 +7,11 @@ import { detectViewerLocale, localeHref, REVIEW_COPY, UI_COPY, type ReviewCopy, 
 
 type WorkbenchView = "map" | "health" | "drafts" | "changes";
 
+function workbenchViewFromSearch(search: string): WorkbenchView {
+  const view = new URLSearchParams(search).get("view");
+  return view === "health" || view === "drafts" || view === "changes" ? view : "map";
+}
+
 const KINDS: Array<"all" | NodeKind> = ["all", "index", "concept", "source", "note"];
 
 function kindLabel(copy: ViewerCopy, kind: "all" | NodeKind): string {
@@ -434,13 +439,15 @@ function shellQuote(value: string): string {
   return `'${value.replaceAll("'", `'"'"'`)}'`;
 }
 
-function proposalCommands(proposal: ProposalInboxItem, copy: ReviewCopy): Array<{ label: string; command: string }> {
+function proposalCommands(proposal: ProposalInboxItem, copy: ReviewCopy, demo: boolean): Array<{ label: string; command: string }> {
+  const file = demo ? "<proposal.json>" : shellQuote(proposal.file);
+  const id = demo ? "<proposal-id>" : proposal.id;
   if (proposal.status === "proposed") return [
-    { label: copy.reviewCommand, command: `lwc proposal review ${shellQuote(proposal.file)} --approve ${proposal.id} --reviewer "<name>"` },
-    { label: copy.rejectCommand, command: `lwc proposal reject ${shellQuote(proposal.file)} --confirm ${proposal.id} --reason "<reason>"` },
+    { label: copy.reviewCommand, command: `lwc proposal review ${file} --approve ${id} --reviewer "<name>"` },
+    { label: copy.rejectCommand, command: `lwc proposal reject ${file} --confirm ${id} --reason "<reason>"` },
   ];
   if (proposal.status === "reviewed") return [
-    { label: copy.applyCommand, command: `lwc proposal apply ${shellQuote(proposal.file)} "<vault>" --confirm ${proposal.id}` },
+    { label: copy.applyCommand, command: `lwc proposal apply ${file} "<vault>" --confirm ${id}` },
   ];
   return [];
 }
@@ -476,16 +483,16 @@ function TopologyPreview({ proposal, copy }: { proposal: ProposalInboxItem; copy
         <span className="blueprint-label">{copy.changedPages}</span>
         {proposal.changes.map((change) => <div className={`page-chip ${change.targetState}`} key={change.path}>
           <i aria-hidden="true" />
-          <span><strong>{change.path}</strong><small>{change.operation} · {change.targetState === "unchanged" ? copy.baseVerified : change.targetState === "matches-proposal" ? copy.matchesProposal : copy.hashConflict}</small></span>
+          <span><strong>{change.path}</strong><small>{copy.operations[change.operation]} · {change.targetState === "unchanged" ? copy.baseVerified : change.targetState === "matches-proposal" ? copy.matchesProposal : copy.hashConflict}</small></span>
         </div>)}
       </div>
       <div className="topology-links">
         <span className="blueprint-label">{copy.relationshipDelta}</span>
         {addedLinks.map((link) => <div className="topology-link added" key={`add-${link.source}-${link.kind}-${link.target}`}>
-          <span className="link-sign">+</span><code>{link.source}</code><span className="link-arrow">→</span><strong>{link.target}</strong><small>{link.kind}</small>
+          <span className="link-sign">+</span><code>{link.source}</code><span className="link-arrow">→</span><strong>{link.target}</strong><small>{copy.linkKinds[link.kind]}</small>
         </div>)}
         {removedLinks.map((link) => <div className="topology-link removed" key={`remove-${link.source}-${link.kind}-${link.target}`}>
-          <span className="link-sign">−</span><code>{link.source}</code><span className="link-arrow">→</span><strong>{link.target}</strong><small>{link.kind}</small>
+          <span className="link-sign">−</span><code>{link.source}</code><span className="link-arrow">→</span><strong>{link.target}</strong><small>{copy.linkKinds[link.kind]}</small>
         </div>)}
         {linkChanges === 0 && <div className="topology-stable"><span>＝</span><div><strong>{copy.noRelationshipChanges}</strong><small>{copy.contentOnly}</small></div></div>}
       </div>
@@ -494,8 +501,8 @@ function TopologyPreview({ proposal, copy }: { proposal: ProposalInboxItem; copy
   </section>;
 }
 
-function ProposalDossier({ proposal, copy }: { proposal: ProposalInboxItem; copy: ReviewCopy }) {
-  const commands = proposalCommands(proposal, copy);
+function ProposalDossier({ proposal, copy, demo }: { proposal: ProposalInboxItem; copy: ReviewCopy; demo: boolean }) {
+  const commands = proposalCommands(proposal, copy, demo);
   return <article className="proposal-dossier" data-testid="proposal-dossier">
     <header className="dossier-header">
       <div><p className="section-kicker">{proposal.id}</p><h2>{proposal.summary}</h2></div>
@@ -521,20 +528,20 @@ function ProposalDossier({ proposal, copy }: { proposal: ProposalInboxItem; copy
     <section className="file-review">
       <div className="review-heading"><div><p className="section-kicker">{copy.exactDiff}</p><h3>{proposal.changes.length} {proposal.changes.length === 1 ? copy.changedFile : copy.changedFiles}</h3></div><span>{copy.readOnlyEvidence}</span></div>
       {proposal.changes.map((change, index) => <details key={change.path} open={index === 0}>
-        <summary><span className={`operation ${change.operation}`}>{change.operation}</span><strong>{change.path}</strong><small>{change.diff.filter((line) => line.kind === "add").length}+ · {change.diff.filter((line) => line.kind === "remove").length}−</small></summary>
+        <summary><span className={`operation ${change.operation}`}>{copy.operations[change.operation]}</span><strong>{change.path}</strong><small>{change.diff.filter((line) => line.kind === "add").length}+ · {change.diff.filter((line) => line.kind === "remove").length}−</small></summary>
         <div className={`hash-pair ${change.targetState === "conflict" ? "conflict" : ""}`}><div><span>{copy.baseHash}</span><code>{change.baseHash ?? copy.missing}</code></div><div><span>{copy.proposedHash}</span><code>{change.contentHash}</code></div>{change.targetState === "conflict" && <div><span>{copy.currentHash}</span><code>{change.currentHash ?? copy.missing}</code></div>}</div>
         <pre className="diff-block" aria-label={`${copy.diffFor} ${change.path}`}>{change.diff.map((line, lineIndex) => <span className={line.kind} key={`${line.kind}-${lineIndex}`}><b>{line.kind === "add" ? "+" : line.kind === "remove" ? "−" : " "}</b>{line.text || " "}</span>)}</pre>
       </details>)}
     </section>
 
     {commands.length > 0 && <section className="next-step">
-      <div><p className="section-kicker">{copy.safeNextStep}</p><h3>{copy.noDecision}</h3><p>{copy.commandHelp}</p></div>
+      <div><p className="section-kicker">{demo ? copy.commandTemplate : copy.safeNextStep}</p><h3>{demo ? copy.demoNoDecision : copy.noDecision}</h3><p>{demo ? copy.demoCommandHelp : copy.commandHelp}</p></div>
       <div className="command-list">{commands.map((item) => <div key={item.label}><span>{item.label}</span><code>{item.command}</code></div>)}</div>
     </section>}
   </article>;
 }
 
-function ChangesView({ inbox, error, copy }: { inbox?: ProposalInbox; error?: string; copy: ReviewCopy }) {
+function ChangesView({ inbox, error, copy, demo }: { inbox?: ProposalInbox; error?: string; copy: ReviewCopy; demo: boolean }) {
   const [filter, setFilter] = useState<"all" | "open" | "closed">("all");
   const [selectedId, setSelectedId] = useState<string>();
   const proposals = inbox?.proposals ?? [];
@@ -567,7 +574,7 @@ function ChangesView({ inbox, error, copy }: { inbox?: ProposalInbox; error?: st
       </div>
       {inbox.issues.length > 0 && <section className="inbox-issues"><h3>{copy.unreadableFiles} <span>{inbox.issues.length}</span></h3>{inbox.issues.map((issue) => <div key={issue.file}><strong>{issue.file}</strong><small>{issue.message}</small></div>)}</section>}
     </aside>
-    <div className="dossier-panel">{selected ? <ProposalDossier proposal={selected} copy={copy} /> : <div className="dossier-empty"><span>←</span><p>{copy.selectProposal}</p></div>}</div>
+    <div className="dossier-panel">{selected ? <ProposalDossier proposal={selected} copy={copy} demo={demo} /> : <div className="dossier-empty"><span>←</span><p>{copy.selectProposal}</p></div>}</div>
   </div>;
 }
 
@@ -586,8 +593,8 @@ function EvidenceBadge({ state, label, copy }: { state: EvidenceState; label: st
   return <span className={`evidence-badge ${state}`}><i aria-hidden="true" />{label} {copy.evidenceStatus[state]}</span>;
 }
 
-function DraftDossier({ draft, copy }: { draft: DraftInboxItem; copy: ReviewCopy }) {
-  const nextCommand = `lwc intake propose '${draft.file.replaceAll("'", "'\\''")}' . --summary "Explain why this knowledge belongs in the Vault"`;
+function DraftDossier({ draft, copy, demo }: { draft: DraftInboxItem; copy: ReviewCopy; demo: boolean }) {
+  const nextCommand = demo ? "lwc intake propose <intake.json> <vault> --summary \"Explain why this knowledge belongs in the Vault\"" : `lwc intake propose '${draft.file.replaceAll("'", "'\\''")}' . --summary "Explain why this knowledge belongs in the Vault"`;
   return <article className="draft-dossier" data-testid="draft-dossier">
     <header className="dossier-header draft-header">
       <div><p className="section-kicker">{copy.declaredKnowledgeTarget}</p><h2>{draft.draft.path}</h2><p>{draft.source.name} <span>→</span> {draft.target.operation === "create" ? copy.newPage : draft.target.operation === "update" ? copy.existingPage : copy.unsafeTarget}</p></div>
@@ -599,7 +606,7 @@ function DraftDossier({ draft, copy }: { draft: DraftInboxItem; copy: ReviewCopy
     {draft.blockers.length > 0 && <section className="draft-blockers" role="alert"><div><strong>{copy.evidenceGate}</strong><span>{draft.blockers.length} {draft.blockers.length === 1 ? copy.issue : copy.issues}</span></div><ul>{draft.blockers.map((blocker) => <li key={blocker}>{blocker}</li>)}</ul></section>}
 
     <section className="evidence-ledger">
-      <header><div><p className="section-kicker">{copy.evidenceLedger}</p><h3>{copy.receivedProduced}</h3></div><span>{copy.readOnlyLocal}</span></header>
+      <header><div><p className="section-kicker">{copy.evidenceLedger}</p><h3>{copy.receivedProduced}</h3></div><span>{demo ? copy.readOnlyDemo : copy.readOnlyLocal}</span></header>
       <div className="ledger-grid">
         <dl>
           <div><dt>{copy.originalSource}</dt><dd><code>{draft.source.path}</code><EvidenceBadge state={draft.source.state} label={copy.original} copy={copy} /></dd></div>
@@ -616,11 +623,11 @@ function DraftDossier({ draft, copy }: { draft: DraftInboxItem; copy: ReviewCopy
 
     <section className="evidence-compare">
       <article><header><span>{copy.sourceSnapshot}</span><EvidenceBadge state={draft.source.snapshotState} label={copy.copy} copy={copy} /></header><pre>{draft.source.snapshotContent ?? copy.snapshotUnavailable}</pre><footer><code>{draft.source.sha256}</code></footer></article>
-      <article className="generated"><header><span>{copy.isolatedDraft}</span><span className={`draft-edit-state ${draft.draft.state}`}>{draft.draft.state}</span></header><pre>{draft.draft.content ?? copy.draftUnavailable}</pre><footer><code>{draft.draft.currentHash ?? copy.noDraftHash}</code></footer></article>
+      <article className="generated"><header><span>{copy.isolatedDraft}</span><span className={`draft-edit-state ${draft.draft.state}`}>{copy.draftEditStates[draft.draft.state]}</span></header><pre>{draft.draft.content ?? copy.draftUnavailable}</pre><footer><code>{draft.draft.currentHash ?? copy.noDraftHash}</code></footer></article>
     </section>
 
     <section className={`draft-next-step ${draft.state}`}>
-      <div><p className="section-kicker">{copy.safeNextStep}</p><h3>{draft.state === "ready" ? copy.promote : draft.state === "needs-draft" ? copy.writeFirst : draft.state === "proposed" ? copy.continueChanges : copy.repairEvidence}</h3><p>{draft.state === "ready" ? copy.promoteHelp : draft.state === "needs-draft" ? copy.editHelp(draft.draft.path) : draft.state === "proposed" ? copy.proposedHelp(draft.proposal?.id ?? copy.unavailable) : copy.blockedHelp}</p></div>
+      <div><p className="section-kicker">{demo ? copy.commandTemplate : copy.safeNextStep}</p><h3>{draft.state === "ready" ? copy.promote : draft.state === "needs-draft" ? copy.writeFirst : draft.state === "proposed" ? copy.continueChanges : copy.repairEvidence}</h3><p>{demo ? copy.demoCommandHelp : draft.state === "ready" ? copy.promoteHelp : draft.state === "needs-draft" ? copy.editHelp(draft.draft.path) : draft.state === "proposed" ? copy.proposedHelp(draft.proposal?.id ?? copy.unavailable) : copy.blockedHelp}</p></div>
       {draft.state === "ready" && <code>{nextCommand}</code>}
       {draft.state === "needs-draft" && <code>{draft.file.replace(/intake\.json$/, draft.draft.path)}</code>}
       {draft.state === "proposed" && draft.proposal && <code>{draft.proposal.file}</code>}
@@ -628,7 +635,7 @@ function DraftDossier({ draft, copy }: { draft: DraftInboxItem; copy: ReviewCopy
   </article>;
 }
 
-function DraftsView({ inbox, error, copy }: { inbox?: DraftInbox; error?: string; copy: ReviewCopy }) {
+function DraftsView({ inbox, error, copy, demo }: { inbox?: DraftInbox; error?: string; copy: ReviewCopy; demo: boolean }) {
   const [filter, setFilter] = useState<"all" | "actionable" | "proposed">("all");
   const [selectedId, setSelectedId] = useState<string>();
   const drafts = inbox?.drafts ?? [];
@@ -661,7 +668,7 @@ function DraftsView({ inbox, error, copy }: { inbox?: DraftInbox; error?: string
       </div>
       {inbox.issues.length > 0 && <section className="inbox-issues"><h3>{copy.unreadableIntakes} <span>{inbox.issues.length}</span></h3>{inbox.issues.map((issue) => <div key={issue.file}><strong>{issue.file}</strong><small>{issue.message}</small></div>)}</section>}
     </aside>
-    <div className="dossier-panel">{selected ? <DraftDossier draft={selected} copy={copy} /> : <div className="dossier-empty"><span className="violet-arrow">←</span><p>{copy.selectIntake}</p></div>}</div>
+    <div className="dossier-panel">{selected ? <DraftDossier draft={selected} copy={copy} demo={demo} /> : <div className="dossier-empty"><span className="violet-arrow">←</span><p>{copy.selectIntake}</p></div>}</div>
   </div>;
 }
 
@@ -672,7 +679,7 @@ export function App() {
   const [inboxError, setInboxError] = useState<string>();
   const [drafts, setDrafts] = useState<DraftInbox>();
   const [draftsError, setDraftsError] = useState<string>();
-  const [view, setView] = useState<WorkbenchView>("map");
+  const [view, setView] = useState<WorkbenchView>(() => workbenchViewFromSearch(location.search));
   const [selectedId, setSelectedId] = useState<string>();
   const params = new URLSearchParams(location.search);
   const live = params.get("live") === "1";
@@ -680,8 +687,8 @@ export function App() {
   const copy = UI_COPY[locale];
   const reviewCopy = REVIEW_COPY[locale];
   const graphSource = params.get("graph") ?? new URL(live ? "./graph.json" : locale === "zh-CN" ? "./agent-trends-zh.json" : "./graph.json", document.baseURI).toString();
-  const inboxSource = live ? "/__lwc/proposals" : new URL("./demo-proposals.json", document.baseURI).toString();
-  const draftsSource = live ? "/__lwc/drafts" : new URL("./demo-drafts.json", document.baseURI).toString();
+  const inboxSource = live ? "/__lwc/proposals" : new URL(locale === "zh-CN" ? "./demo-proposals-zh.json" : "./demo-proposals.json", document.baseURI).toString();
+  const draftsSource = live ? "/__lwc/drafts" : new URL(locale === "zh-CN" ? "./demo-drafts-zh.json" : "./demo-drafts.json", document.baseURI).toString();
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -747,7 +754,13 @@ export function App() {
   if (error) return <main className="status-screen"><div className="status-mark">!</div><p className="section-kicker">{copy.graphUnavailable}</p><h1>{copy.graphFailed}</h1><p>{error}</p><code>pnpm demo:build</code></main>;
   if (!graph) return <main className="status-screen"><div className="loading-mark" /><p className="section-kicker">{copy.reading}</p><h1>{copy.opening}</h1></main>;
 
-  const switchToPage = (id: string) => { setSelectedId(id); setView("map"); };
+  const selectView = (next: WorkbenchView) => {
+    setView(next);
+    const url = new URL(location.href);
+    if (next === "map") url.searchParams.delete("view"); else url.searchParams.set("view", next);
+    history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  };
+  const switchToPage = (id: string) => { setSelectedId(id); selectView("map"); };
   const openChanges = inbox?.proposals.filter((proposal) => proposal.status === "proposed" || proposal.status === "reviewed").length ?? 0;
   const activeDrafts = drafts?.drafts.filter((draft) => draft.state !== "proposed").length ?? 0;
   const viewTitle = view === "map" ? copy.mapTitle : view === "health" ? copy.healthTitle : view === "drafts" ? copy.draftsTitle : copy.changesTitle;
@@ -757,8 +770,8 @@ export function App() {
     <aside className="sidebar">
       <div className="brand"><span className="brand-mark" aria-hidden="true"><i /><i /></span><div><strong>LLM Wiki Canvas</strong><small>{copy.localWorkbench}</small></div></div>
       <div className="vault-label"><span>{copy.vaultLabel}</span><strong>{graph.rootName}</strong></div>
-      <AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} live={live} copy={copy} />
-      <div className="sidebar-note"><span className="status-dot" /><div><strong>{live ? copy.watchingSource : copy.localEvidence}</strong><small>{live ? copy.liveProjection : copy.markdownTruth}</small></div></div>
+      <AppNavigation view={view} onView={selectView} drafts={activeDrafts} changes={openChanges} live={live} copy={copy} />
+      <div className="sidebar-note"><span className="status-dot" /><div><strong>{live ? copy.watchingSource : copy.demoEvidence}</strong><small>{live ? copy.liveProjection : copy.demoEvidenceDescription}</small></div></div>
     </aside>
 
     <section className={`workbench ${live ? "is-live" : "is-demo"}`} id="workspace-content">
@@ -772,11 +785,11 @@ export function App() {
       {!live && view === "map" && <ProductThesis copy={copy} locale={locale} />}
       {!live && <section className="demo-disclosure" aria-label={copy.demoTitle}><div><strong>{copy.demoTitle}</strong><span>{copy.demoDescription}</span></div><code>npm i -g llm-wiki-canvas</code><a href={locale === "zh-CN" ? "https://github.com/chicogong/llm-wiki-canvas/blob/main/README.zh-CN.md#快速开始" : "https://github.com/chicogong/llm-wiki-canvas#quick-start"}>{copy.quickStart}</a></section>}
       {live ? <h1 className="sr-only">{viewTitle}</h1> : <h2 className="sr-only">{viewTitle}</h2>}
-      <div className="mobile-nav"><AppNavigation view={view} onView={setView} drafts={activeDrafts} changes={openChanges} live={live} copy={copy} /></div>
+      <div className="mobile-nav"><AppNavigation view={view} onView={selectView} drafts={activeDrafts} changes={openChanges} live={live} copy={copy} /></div>
       {view === "map" && <MapView graph={graph} selectedId={selectedId} onSelect={setSelectedId} copy={copy} />}
       {view === "health" && <HealthView graph={graph} onOpenPage={switchToPage} copy={copy} />}
-      {view === "drafts" && <DraftsView inbox={drafts} error={draftsError} copy={reviewCopy} />}
-      {view === "changes" && <ChangesView inbox={inbox} error={inboxError} copy={reviewCopy} />}
+      {view === "drafts" && <DraftsView inbox={drafts} error={draftsError} copy={reviewCopy} demo={!live} />}
+      {view === "changes" && <ChangesView inbox={inbox} error={inboxError} copy={reviewCopy} demo={!live} />}
     </section>
   </main>;
 }

@@ -6,6 +6,8 @@ All notable changes will be documented here. This project follows Semantic Versi
 
 ### Changed
 
+- Clarified synthetic versus live evidence throughout the public Demo, localized its Chinese review fixtures and operation labels, and changed non-runnable demo commands into explicit templates.
+- Added shareable `view` query state, 44px mobile navigation/filter targets, and build-time SHA-256 verification for every checked-in demo evidence chain.
 - Made the public Viewer demonstrate the read-only Drafts and Changes review loop with sanitized synthetic evidence, and completed Chinese localization for the core review workflow.
 - Fixed the live Workbench to load the served Vault graph instead of bundled demo data, ignored external Markdown URLs during relationship analysis, and removed the Cytoscape font-family warning.
 - Reframed the product around its narrowest differentiated job: Git-style change control for AI-maintained Markdown knowledge, with bounded evidence, isolated drafts, hash-bound proposals, and human-controlled write-back.
