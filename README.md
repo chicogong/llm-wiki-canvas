@@ -6,11 +6,11 @@
 [![npm](https://img.shields.io/npm/v/llm-wiki-canvas.svg)](https://www.npmjs.com/package/llm-wiki-canvas)
 [![License](https://img.shields.io/badge/license-Apache--2.0-163A5F.svg)](LICENSE)
 
-**A Git-style review layer for AI-maintained Markdown knowledge bases.**
+**A Git-style Proposal review layer before AI Agents change Markdown knowledge.**
 
 Agents can write. Knowledge should not drift silently.
 
-LLM Wiki Canvas gives Codex, Claude Code, DeepSeek Harness, Qoder, TRAE, and Tencent WorkBuddy a bounded way to understand local Markdown and propose changes. Every selected source is snapshotted, every draft stays isolated, and every proposal carries an exact diff, source and target hashes, and relationship impact before a person decides whether it enters the knowledge base.
+LLM Wiki Canvas gives Codex, Claude Code, DeepSeek Harness, Qoder, TRAE, and Tencent WorkBuddy a bounded way to understand Markdown and propose changes. Its core is source SHA-256, an Evidence Ledger of what the Agent received and produced, exact diffs, explicit omission disclosure, stale-base blocking, and a human accept/reject decision.
 
 Markdown remains the source of truth. LWC does not upload your Vault or ship an LLM, vector database, chat UI, cloud service, or required MCP server.
 
@@ -20,12 +20,12 @@ Markdown remains the source of truth. LWC does not upload your Vault or ship an 
 
 ## The problem it solves
 
-Code has branches, diffs, CI, review, and merge protection. Agent-maintained knowledge usually does not. A plausible Markdown edit can hide a stale source, an over-broad read, a concurrent overwrite, or a conclusion that cannot be traced back to evidence.
+Code changes can use branches, diffs, CI, review, and merge protection. When Agent-authored knowledge bypasses equivalent controls, a plausible Markdown edit can hide a stale source, an over-broad read, a concurrent overwrite, or a conclusion that cannot be traced back to evidence.
 
 LWC adds that missing change-control loop without moving your files into another platform:
 
 ```text
-selected source → hash-bound draft → reviewable proposal → human decision → Markdown
+selected source + bounded context → Evidence Ledger → hash-bound draft → exact Proposal diff → human accept/reject → Markdown
 ```
 
 ## The core loop
@@ -34,11 +34,13 @@ selected source → hash-bound draft → reviewable proposal → human decision 
 - **Keep generated work outside formal knowledge.** Capture one selected source, retain its snapshot and SHA-256, and let the Agent edit only the declared isolated draft.
 - **Review the change, not a promise.** Inspect the exact diff, source and target hashes, target scope, structural impact, and conflicts before approval.
 - **Fail closed when evidence drifts.** A changed source, draft, proposal, or target invalidates the earlier handoff instead of silently applying it.
+- **Keep the decision human.** A person explicitly accepts or rejects the Proposal; an Agent or Viewer never invents that decision.
 - **Keep the workflow portable.** The same file contract and CLI work across Agent hosts; the optional DeepSeek Harness bundle exposes only the bounded knowledge-manager surface.
 
 ## Supporting capabilities
 
 - **Markdown stays the source of truth.** No proprietary database or forced migration.
+- **Evidence stays inspectable.** The Evidence Ledger shows the selected source, captured copy, source hash, declared target, isolated draft, and what the Agent produced.
 - **Relationships become visible.** Search, filter, and inspect the evidence around a page.
 - **Wiki quality becomes testable.** Broken links, ambiguous links, missing titles, and orphan pages have exact paths.
 - **OKF trust stays inspectable.** Open Knowledge Format v0.2 origin, verification, freshness, lifecycle, sources, and Attested Computation contracts travel through the graph and bounded context without becoming an opaque score or executable payload.

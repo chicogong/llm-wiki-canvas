@@ -1,18 +1,18 @@
 # Product roadmap / 产品路线图
 
-LLM Wiki Canvas is a **Git-style review layer for AI-maintained Markdown knowledge bases**, not a smaller RAG platform. It gives Agent knowledge changes the controls code already has: bounded inputs, isolated work, exact diffs, integrity checks, explicit review, and a deliberate write-back step.
+LLM Wiki Canvas is a **Git-style Proposal review layer before AI Agents change Markdown knowledge**, not a smaller RAG platform. It gives Agent knowledge changes the controls code already has: source hashes, bounded evidence with omission disclosure, an Evidence Ledger, isolated work, exact diffs, stale-base blocking, and explicit human acceptance or rejection.
 
-LLM Wiki Canvas 是一个**面向 AI Agent 的 Markdown 知识变更审查层**，不是缩小版 RAG 平台。它把代码世界已有的输入边界、隔离工作、精确 diff、完整性校验、人工 Review 和明确写回带到知识维护流程中。
+LLM Wiki Canvas 是一个**Agent 修改 Markdown 知识前的 Git 式 Proposal 审查层**，不是缩小版 RAG 平台。它把来源哈希、带遗漏披露的有限证据、证据账本、隔离工作、精确 diff、过期基线阻断和人工接受或拒绝带到知识维护流程中。
 
 ## Product thesis / 产品论点
 
-Code changes have branches, CI, review, and merge protection. Agent-generated knowledge often arrives as plausible prose with no durable answer to four questions: what evidence was read, what changed, whether the target drifted, and who decided it could become formal knowledge.
+Code changes have branches, CI, review, and merge protection. LWC gives Agent-generated knowledge a durable answer to six questions: which source hash was used, what bounded evidence was shown, what was omitted, what exact diff is proposed, whether the base became stale, and which person accepted or rejected it.
 
-代码修改有分支、CI、Review 和合并保护；Agent 生成的知识却经常只是一段看起来合理的文字，无法持续回答四个问题：读了什么证据、究竟改了什么、目标是否已经漂移、谁决定它可以成为正式知识。
+代码修改有分支、CI、Review 和合并保护；LWC 让 Agent 生成的知识持续回答六个问题：使用了哪个来源哈希、展示了哪些有限证据、遗漏了什么、提出了什么精确 diff、基线是否已经过期、由谁接受或拒绝。
 
 LWC owns this loop and nothing broader:
 
-`bounded evidence → isolated draft → hash-bound proposal → human decision → rebuild`
+`source hash + bounded evidence → Evidence Ledger → isolated draft → exact hash-bound Proposal → human accept/reject → rebuild`
 
 ## Product shape / 产品形态
 
@@ -33,17 +33,17 @@ flowchart LR
 
 The product has three surfaces, ordered by user value:
 
-1. **Change control** — source capture, isolated drafts, hash-bound proposals, and explicit human review.
+1. **Change control** — source capture, an Evidence Ledger, omission disclosure, isolated drafts, exact hash-bound Proposals, stale-base blocking, and explicit human acceptance or rejection.
 2. **CLI and Workbench** — deterministic Agent/CI automation plus a calm evidence-review surface for people.
 3. **Open files and projections** — Markdown remains useful without LWC; graphs, Canvas, Excalidraw, and Mermaid remain rebuildable.
 
-产品只有三层：来源、草稿、Proposal 和人工 Review 组成的变更控制；面向 Agent/CI 的确定性 CLI 与面向人的证据工作台；以及脱离本项目仍可使用的 Markdown 和可重建开放投影。
+产品只有三层：来源哈希、证据账本、遗漏披露、隔离草稿、精确 Proposal、过期基线阻断和人工接受或拒绝组成的变更控制；面向 Agent/CI 的确定性 CLI 与面向人的证据工作台；以及脱离本项目仍可使用的 Markdown 和可重建开放投影。
 
 ## North star / 北极星
 
-**Every Agent-authored formal knowledge change is traceable to bounded evidence, reviewed as an exact proposal, and blocked when any protected input drifts.**
+**Every Agent-authored formal knowledge change is traceable to a source hash and omission-aware Evidence Ledger, reviewed as an exact Proposal, blocked on a stale base, and explicitly accepted or rejected by a person.**
 
-**每一次进入正式知识库的 Agent 修改，都能追溯到有边界的证据、以精确 Proposal 完成审查，并在任一受保护输入漂移时自动阻断。**
+**每一次进入正式知识库的 Agent 修改，都能追溯到来源哈希与披露遗漏的证据账本、以精确 Proposal 完成审查、在基线过期时自动阻断，并由人明确接受或拒绝。**
 
 The daily loop is deliberately small:
 

@@ -12,7 +12,7 @@ const html = readFileSync(path.join(output, "index.html"), "utf8");
 if (!html.includes("<html lang=\"en\">")) throw new Error("Static demo language metadata is missing");
 if (!html.includes("rel=\"canonical\"")) throw new Error("Static demo canonical URL is missing");
 if (!html.includes("property=\"og:title\"")) throw new Error("Static demo social metadata is missing");
-if (!html.includes("Git-style review flow")) throw new Error("Static demo metadata does not express the knowledge change-review positioning");
+if (!html.includes("Git-style Proposal review layer")) throw new Error("Static demo metadata does not express the Proposal review-layer positioning");
 if (/\b(?:src|href)=\"\/assets\//.test(html)) throw new Error("Static demo uses root-absolute assets and will break on project Pages");
 
 const demoDrafts = JSON.parse(readFileSync(path.join(output, "demo-drafts.json"), "utf8"));
