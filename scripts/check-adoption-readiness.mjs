@@ -160,4 +160,7 @@ for (const [index, row] of rows.entries()) {
 const d0Rows = rows.filter((row) => row.day === "D0").length;
 const d7Rows = rows.filter((row) => row.day === "D+7").length;
 const d7HostPasses = rows.filter((row) => row.day === "D+7" && row.evidence_kind === "host-runtime" && row.status === "passed").length;
+if (today >= targetDate && d7HostPasses === 0) {
+  throw new Error(`Adoption readiness requires at least one D+7 technical host pass on or after ${targetDate}`);
+}
 console.log(`Adoption readiness passed for ${today}: ${d0Rows} D0 row(s), ${d7Rows} D+7 row(s), ${d7HostPasses} technical host pass(es), fixture ${fixtureHash}`);
