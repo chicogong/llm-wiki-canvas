@@ -65,9 +65,15 @@ Exact WorkBuddy human gate: a user must open a real signed-in WorkBuddy workspac
 
 The machine-readable D0 rows are in [`docs/adoption-ledger.csv`](adoption-ledger.csv). They retain host version, evidence kind, known hashes, write-safety result, and attribution fields. `not-recorded` preserves an evidence gap instead of inventing a historical value; `not-observed` means no installation or Star was attributed, not zero demand.
 
-## D+7 template — do not fill early
+## D+7 validation
 
 Earliest valid date: 2026-08-29 Asia/Singapore. Copy one row per host into `docs/adoption-ledger.csv` only after an observed rerun. `pnpm adoption:check` rejects a D+7 row dated before 2026-08-29 or after the current Singapore date. During the 2026-08-27 preparation run, the ledger must still contain D0 rows only.
+
+### Observed D+7 technical rerun — 2026-08-29
+
+Codex CLI 0.147.0 reran the synthetic fixture from source checkout against candidate `f7b0ddfb579e51a3106157b866c1fa1a23516419`. It reached the Proposal review gate in 51 seconds, preserved the canonical fixture, context, and source hashes, left formal Markdown unchanged, and proved that apply without review remained blocked. The observed content hash was `f1da1ec645099aa23101a4731cab12e58c51811ec44fcc6ab6f456f76e0e8808`.
+
+This is `host-runtime` evidence of technical repeatability, not evidence of an independent target user, natural reuse, retention, installation, or Star attribution. The same-day deterministic reference and WorkBuddy compatibility fixtures also passed locally, but the compatibility result remains `pending-real-host` and is not recorded as a WorkBuddy host pass. A fresh real WorkBuddy rerun and unassisted target-user reuse remain unobserved.
 
 ```text
 observed_at:

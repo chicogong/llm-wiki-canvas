@@ -101,7 +101,24 @@ function parseCsvLine(line, lineNumber) {
 
 const lines = readFileSync(ledgerPath, "utf8").trim().split("\n");
 const headers = parseCsvLine(lines[0], 1);
-const requiredHeaders = ["observed_at", "day", "host", "host_version", "evidence_kind", "status", "candidate_commit", "fixture_id", "fixture_sha256", "install_source", "star_source"];
+const requiredHeaders = [
+  "observed_at",
+  "day",
+  "host",
+  "host_version",
+  "evidence_kind",
+  "status",
+  "candidate_commit",
+  "fixture_id",
+  "fixture_sha256",
+  "context_hash",
+  "source_hash",
+  "content_hash",
+  "formal_markdown_changed",
+  "apply_without_review",
+  "install_source",
+  "star_source",
+];
 for (const header of requiredHeaders) {
   if (!headers.includes(header)) throw new Error(`Adoption ledger is missing column: ${header}`);
 }
@@ -124,6 +141,16 @@ for (const [index, row] of rows.entries()) {
   if (row.day === "D+7") {
     if (today < targetDate) throw new Error(`D+7 cannot be recorded before ${targetDate}; current Singapore date is ${today}`);
     if (row.observed_at < targetDate) throw new Error(`D+7 row ${line} predates ${targetDate}`);
+    if (row.evidence_kind === "host-runtime" && row.status === "passed") {
+      if (!/^[a-f0-9]{40}$/.test(row.candidate_commit)) throw new Error(`D+7 host-runtime pass ${line} is missing a full candidate commit`);
+      if (![row.context_hash, row.source_hash, row.content_hash].every((hash) => /^[a-f0-9]{64}$/.test(hash))) {
+        throw new Error(`D+7 host-runtime pass ${line} is missing a full evidence hash`);
+      }
+      if (row.formal_markdown_changed !== "false") throw new Error(`D+7 host-runtime pass ${line} changed formal Markdown`);
+      if (!["blocked", "not-attempted"].includes(row.apply_without_review)) {
+        throw new Error(`D+7 host-runtime pass ${line} did not preserve the human review boundary`);
+      }
+    }
   }
   if (row.evidence_kind === "compatibility-fixture" && row.status !== "pending-real-host") {
     throw new Error(`Compatibility fixture row ${line} must remain pending-real-host`);
@@ -132,4 +159,5 @@ for (const [index, row] of rows.entries()) {
 
 const d0Rows = rows.filter((row) => row.day === "D0").length;
 const d7Rows = rows.filter((row) => row.day === "D+7").length;
-console.log(`Adoption readiness passed for ${today}: ${d0Rows} D0 row(s), ${d7Rows} valid D+7 row(s), fixture ${fixtureHash}`);
+const d7HostPasses = rows.filter((row) => row.day === "D+7" && row.evidence_kind === "host-runtime" && row.status === "passed").length;
+console.log(`Adoption readiness passed for ${today}: ${d0Rows} D0 row(s), ${d7Rows} D+7 row(s), ${d7HostPasses} technical host pass(es), fixture ${fixtureHash}`);
