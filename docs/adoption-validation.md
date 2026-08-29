@@ -2,6 +2,10 @@
 
 This record covers one product only: LLM Wiki Canvas. It uses only the redistributable synthetic files under [`examples/host-fixture`](../examples/host-fixture/). No private Vault, account data, session, or host transcript belongs in this record.
 
+## Positioning invariant
+
+LWC is the Git-style Proposal review layer used before an Agent changes Markdown knowledge. Its positioning centers on source hashes, the Evidence Ledger, exact diffs, omission disclosure, stale-base blocking, and a human accept/reject boundary. D0 and D+7 observe the shared evidence and human boundary; `pnpm verify` separately guards stale-base blocking. These checks do not claim an empty general-purpose local-first knowledge-base market, and they do not authorize Chat, RAG, cloud, or MCP expansion.
+
 ## Candidate identity
 
 - Candidate branch at D0: `agent/agent-knowledge-review-positioning`
@@ -61,9 +65,15 @@ Exact WorkBuddy human gate: a user must open a real signed-in WorkBuddy workspac
 
 The machine-readable D0 rows are in [`docs/adoption-ledger.csv`](adoption-ledger.csv). They retain host version, evidence kind, known hashes, write-safety result, and attribution fields. `not-recorded` preserves an evidence gap instead of inventing a historical value; `not-observed` means no installation or Star was attributed, not zero demand.
 
-## D+7 template — do not fill early
+## D+7 validation
 
-Target date: 2026-08-29 Asia/Singapore. Copy one row per host into `docs/adoption-ledger.csv` only after an observed rerun.
+Earliest valid date: 2026-08-29 Asia/Singapore. Copy one row per host into `docs/adoption-ledger.csv` only after an observed rerun. `pnpm adoption:check` rejects a D+7 row dated before 2026-08-29 or after the current Singapore date. During the 2026-08-27 preparation run, the ledger must still contain D0 rows only.
+
+### Observed D+7 technical rerun — 2026-08-29
+
+Codex CLI 0.147.0 reran the synthetic fixture from source checkout against candidate `f7b0ddfb579e51a3106157b866c1fa1a23516419`. It reached the Proposal review gate in 51 seconds, preserved the canonical fixture, context, and source hashes, left formal Markdown unchanged, and proved that apply without review remained blocked. The observed content hash was `f1da1ec645099aa23101a4731cab12e58c51811ec44fcc6ab6f456f76e0e8808`.
+
+This is `host-runtime` evidence of technical repeatability, not evidence of an independent target user, natural reuse, retention, installation, or Star attribution. The same-day deterministic reference and WorkBuddy compatibility fixtures also passed locally, but the compatibility result remains `pending-real-host` and is not recorded as a WorkBuddy host pass. A fresh real WorkBuddy rerun and unassisted target-user reuse remain unobserved.
 
 ```text
 observed_at:
@@ -97,12 +107,13 @@ test -n "$candidate_sha"
 test -z "$(git status --porcelain)"
 printf '%s\n' "$candidate_sha"
 pnpm build
+pnpm adoption:check
 npm run adoption:quickstart
 npm run adoption:workbuddy-compat
 LWC_RUN_HOST_FIXTURE=1 node scripts/host-runtime-fixture.mjs --host codex --output .lwc/host-runtime/codex.json
 ```
 
-The last command is opt-in and may use an authenticated Codex host; run it only when the task owner authorizes that account/runtime use. A real WorkBuddy rerun has no repository CLI shortcut and must pass the human gate above. Never substitute the compatibility fixture for a real-host pass.
+The last command is opt-in and may use an authenticated Codex host; run it only when the task owner authorizes that account/runtime use. A real WorkBuddy rerun has no repository CLI shortcut and must pass the human gate above with a fresh observation on or after 2026-08-29; the D0 pass cannot be copied forward. Never substitute the compatibility fixture for a real-host pass.
 
 ## One CTA and attribution fields
 
@@ -121,6 +132,7 @@ candidate_sha="$(git rev-parse HEAD)"
 test -n "$candidate_sha"
 test -z "$(git status --porcelain)"
 git diff --check
+pnpm adoption:check
 npm run adoption:quickstart
 npm run adoption:workbuddy-compat
 printf 'candidate=%s\n' "$candidate_sha"

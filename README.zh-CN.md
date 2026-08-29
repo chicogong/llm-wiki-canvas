@@ -6,11 +6,11 @@
 [![npm](https://img.shields.io/npm/v/llm-wiki-canvas.svg)](https://www.npmjs.com/package/llm-wiki-canvas)
 [![License](https://img.shields.io/badge/license-Apache--2.0-163A5F.svg)](LICENSE)
 
-**面向 AI Agent 的 Markdown 知识变更审查层。**
+**Agent 修改 Markdown 知识前的 Git 式 Proposal 审查层。**
 
 Agent 可以写，知识不能悄悄失控。
 
-LLM Wiki Canvas 让 Codex、Claude Code、DeepSeek Harness、Qoder、TRAE 和腾讯 WorkBuddy 在明确边界内理解本地 Markdown 并提出修改。每份选定资料都有来源快照，每份生成内容先留在隔离草稿，每个 Proposal 都带精确 diff、来源与目标哈希以及关系影响，最后仍由人决定是否进入正式知识库。
+LLM Wiki Canvas 让 Codex、Claude Code、DeepSeek Harness、Qoder、TRAE 和腾讯 WorkBuddy 在明确边界内理解 Markdown 并提出修改。核心是来源 SHA-256、记录 Agent 收到与产出内容的证据账本、精确 diff、明确的遗漏披露、过期基线阻断，以及由人作出的接受或拒绝决定。
 
 Markdown 始终是事实源。LWC 不上传 Vault，也不内置 LLM、向量数据库、聊天界面、云服务或强制 MCP Server。
 
@@ -20,12 +20,12 @@ Markdown 始终是事实源。LWC 不上传 Vault，也不内置 LLM、向量数
 
 ## 它解决什么问题
 
-代码修改已经有分支、diff、CI、Review 和合并保护；Agent 修改知识通常还没有。一段看起来正确的 Markdown，背后可能使用了过期资料、读取范围过大、覆盖了并发修改，或者根本无法追溯结论来源。
+代码修改可以使用分支、diff、CI、Review 和合并保护。当 Agent 修改知识时绕过同等级控制，一段看起来正确的 Markdown 就可能使用过期资料、读取范围过大、覆盖并发修改，或者根本无法追溯结论来源。
 
 LWC 给现有文件补上缺失的知识变更控制流程：
 
 ```text
-选定来源 → 哈希绑定的隔离草稿 → 可审查 Proposal → 人工决定 → 正式 Markdown
+选定来源 + 有限上下文 → 证据账本 → 哈希绑定的隔离草稿 → 精确 Proposal diff → 人工接受或拒绝 → 正式 Markdown
 ```
 
 ## 核心闭环
@@ -34,11 +34,13 @@ LWC 给现有文件补上缺失的知识变更控制流程：
 - **生成内容不直接进入正式知识。** 捕获一份明确来源及其 SHA-256，Agent 只能编辑声明过的隔离草稿。
 - **审查实际变化，而不是相信承诺。** 批准前检查精确 diff、来源和目标哈希、目标范围、关系影响与冲突。
 - **证据漂移时自动拒绝。** 来源、草稿、Proposal 或目标文件任一变化，原有交接立即失效，不静默写入。
+- **决定权始终属于人。** 人必须明确接受或拒绝 Proposal；Agent 与 Viewer 都不能虚构这个决定。
 - **一套规则服务多个 Agent。** 同一文件契约和 CLI 可跨宿主复用；可选 DeepSeek Harness Bundle 只开放最小知识管理面。
 
 ## 支撑能力
 
 - **Markdown 始终是事实源。** 不引入专有数据库，也不强制迁移已有 Vault。
+- **证据始终可以检查。** 证据账本展示选定来源、捕获副本、来源哈希、声明目标、隔离草稿与 Agent 实际产出。
 - **关系可以直接看见。** 搜索、筛选页面，并查看一个页面周围的证据与相邻关系。
 - **知识库质量可以测试。** 断链、歧义链接、缺少标题和孤立页面都有准确路径。
 - **OKF 信任信号可以检查。** Open Knowledge Format v0.2 的来源、验证、时效、生命周期、资料与 Attested Computation 契约会进入图谱和有限上下文，但不会变成不透明评分或可执行载荷。
