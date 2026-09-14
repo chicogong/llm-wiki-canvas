@@ -10,7 +10,7 @@ Do not copy or edit these files for a session. They are the single sources of tr
 | --- | --- | --- |
 | Public synthetic fixture | [`../../examples/host-fixture`](../../examples/host-fixture/) | Contains no private Vault or account data |
 | Fixture hash manifest | [`../../examples/host-fixture/fixture.sha256`](../../examples/host-fixture/fixture.sha256) | Fixes the aggregate, source, task, and formal-baseline hashes |
-| Only participant task | [`../../examples/host-fixture/task.md`](../../examples/host-fixture/task.md) | Ends at Proposal review; forbids review, reject, apply, commit, or formal-file edits |
+| Only participant task | [`../../examples/host-fixture/task.md`](../../examples/host-fixture/task.md) | Ends at an inspectable Proposal; the participant decision is not required for D0; forbids review, reject, apply, commit, or formal-file edits |
 | Technical D0/D+7 record | [`../adoption-validation.md`](../adoption-validation.md) | Keeps fixture and host-runtime evidence separate from user evidence |
 | Blank observation record | [`d0-observation-record.md`](d0-observation-record.md) | Records one authorized session without personal identifiers |
 
@@ -48,16 +48,16 @@ The observer may stop the session for privacy, security, unexpected permissions,
 
 ## What to time and record
 
-Use the blank record for four timestamps:
+Use the blank record for the four required timestamps:
 
 1. installation start;
 2. CLI ready;
 3. task start;
-4. Proposal first visible and participant decision stated.
+4. Proposal first visible.
 
-`review_minutes` is the elapsed time from the Proposal first becoming visible until the participant states **accept** or **reject** and gives a reason. The decision is observational only: the participant must not run `proposal review`, `proposal reject`, or `proposal apply` in this D0 task.
+The blank record has a fifth, optional timestamp for an accept/reject decision. Record it only if the participant volunteers a decision and reason without prompting; otherwise mark it `not-observed`. Do not wait for or solicit a decision. `review_minutes` is therefore optional and is measured from the Proposal first becoming visible until a volunteered decision is stated. It is not a D0 pass criterion. The participant must not run `proposal review`, `proposal reject`, or `proposal apply` in this D0 task.
 
-Record the formal baseline SHA-256 before and after the session. If any formal Markdown changes before an approved review, mark `unapproved_write = yes`; never repair or conceal it inside the observation.
+Record the formal baseline SHA-256 before and after the session. If any formal Markdown changes during the session, mark `unapproved_write = yes`; never repair or conceal it inside the observation.
 
 ## D0 pass gate
 
@@ -66,10 +66,11 @@ D0 passes only when all are true:
 - the pinned CLI becomes ready within 5 minutes;
 - the fixture aggregate, source, task, and formal-baseline hashes match the canonical manifest before task start;
 - the participant completes the sole task without observer help and reaches an inspectable Proposal diff;
-- the participant independently states accept or reject and a reason;
-- formal Markdown remains unchanged through the decision;
+- formal Markdown remains unchanged through Proposal display;
 - an unreviewed apply is either not attempted or is blocked; an unexpected write or apply is a failure;
 - no private data, extra permission, account connection, or non-public material enters the session record.
+
+The participant's accept/reject decision is exploratory only. D0 passes without one; the observer must never prompt for it or suggest a reason.
 
 Report failure, blocked, and not-observed states as written. A synthetic session, compatibility fixture, CI run, static demo, or HTTP response must never be relabeled as independent user evidence.
 

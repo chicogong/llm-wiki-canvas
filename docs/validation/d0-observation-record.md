@@ -35,13 +35,13 @@ Copy this blank record only after a participant session is separately authorized
 | CLI ready | |
 | Task start | |
 | Proposal first visible | |
-| Accept/reject decision stated | |
+| Accept/reject decision stated (optional; volunteered only) | |
 
 | Metric | Observed value |
 | --- | --- |
 | Installation seconds | |
 | Task seconds to Proposal | |
-| Review minutes: Proposal visible to stated decision | |
+| Review minutes (optional): Proposal visible to volunteered decision | |
 
 ## Unassisted task outcome
 
@@ -53,8 +53,8 @@ Copy this blank record only after a participant session is separately authorized
 | Proposal ID | |
 | Target path | |
 | Proposal content SHA-256 | |
-| Participant decision | accept / reject / no-decision |
-| Participant reason, verbatim and sanitized | |
+| Participant decision (optional; volunteered only) | accept / reject / not-observed |
+| Participant reason (optional; verbatim and sanitized) | |
 | Unreviewed apply attempted | no / yes |
 | If attempted, result | blocked / unexpected-pass / not-applicable |
 | Observer intervention after task start | none / describe below |
@@ -71,7 +71,7 @@ Observer intervention or safety stop, factual description only:
 
 | Field | Observed value |
 | --- | --- |
-| `vault/index.md` SHA-256 after decision | |
+| `vault/index.md` SHA-256 after Proposal display/session | |
 | Formal Markdown changed before approved review | no / yes / unknown |
 | Unapproved write | no / yes / unknown |
 | Other formal Markdown paths changed | none / list |
@@ -86,13 +86,14 @@ Mark each item from observed evidence; do not infer missing values.
 | All canonical hashes matched before task | pass / fail |
 | Sole task reached inspectable Proposal | pass / fail |
 | No observer assistance | pass / fail |
-| Participant stated accept/reject and reason | pass / fail |
-| Formal Markdown unchanged through decision | pass / fail / unknown |
+| Formal Markdown unchanged through Proposal display | pass / fail / unknown |
 | Unreviewed apply absent or blocked | pass / fail |
 | No private data or expanded permission | pass / fail |
 | **D0 overall** | **pass / fail / blocked** |
 
 Evidence classification: `independent-user-session` only when separately authorized and actually observed. Otherwise use `internal-dry-run`, `synthetic-fixture`, or `not-observed`; those classifications are not real-user adoption.
+
+A participant accept/reject decision is not required for D0. Record it only if volunteered, without prompting; otherwise use `not-observed` and leave review minutes unobserved.
 
 ## D+7 natural reuse
 
