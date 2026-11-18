@@ -169,7 +169,7 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ================================================================================
-Package: cytoscape@3.34.3
+Package: cytoscape@3.35.0
 License: MIT
 Homepage: http://js.cytoscape.org
 
@@ -654,7 +654,7 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ================================================================================
-Package: react@19.3.0
+Package: react@19.3.1
 License: MIT
 Homepage: https://react.dev/
 
@@ -681,7 +681,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ================================================================================
-Package: react-dom@19.3.0
+Package: react-dom@19.3.1
 License: MIT
 Homepage: https://react.dev/
 
@@ -905,7 +905,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ================================================================================
-Package: yaml@2.9.0
+Package: yaml@2.9.1
 License: ISC
 Author: Eemeli Aro <eemeli@gmail.com>
 Homepage: https://eemeli.org/yaml/
